@@ -1,0 +1,34 @@
+# Laravel
+/vendor
+/node_modules
+/public/hot
+/public/storage
+/storage/*.key
+
+# Environnement
+.env
+.env.local
+.env.*.local
+
+# Fichiers de logs
+/storage/logs
+/storage/framework/cache
+/storage/framework/sessions
+/storage/framework/views
+
+# Cache de l'application
+/bootstrap/cache/*.php
+
+# Autres fichiers de configuration
+*.sublime-project
+*.sublime-workspace
+
+# IDEs
+/.idea
+/.vscode
+*.log
+*.swp
+
+# OS generated files
+.DS_Store
+Thumbs.db
