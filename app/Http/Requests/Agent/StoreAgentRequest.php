@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Agent;
 
+use App\Enums\UserRole;
 use Illuminate\Foundation\Http\FormRequest;
 
 class StoreAgentRequest extends FormRequest
@@ -11,9 +12,10 @@ class StoreAgentRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        // Vérifier si l'utilisateur actuel est un agent
+        return true; // À adapter selon votre logique d'authentification
     }
-
+  
     /**
      * Get the validation rules that apply to the request.
      *
@@ -22,7 +24,39 @@ class StoreAgentRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'nom' => ['required', 'string', 'max:255'],
+            'prenom' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'string', 'email', 'unique:user,email'],
+            'photo' => ['nullable', 'string'],
+            'mot_de_passe' => ['required', 'string', 'min:8'],
+            'telephone' => ['required', 'string'],
+            'adresse' => ['required', 'string'],
+            'date_naissance' => ['required', 'date'],
+            'numero_identite' => ['required', 'string', 'unique:user,numero_identite']
+        ];
+    }
+
+    /**
+     * Get custom messages for validator errors.
+     *
+     * @return array
+     */
+    public function messages(): array
+    {
+        return [
+            'nom.required' => 'Le nom est requis',
+            'prenom.required' => 'Le prénom est requis',
+            'email.required' => 'L\'email est requis',
+            'email.email' => 'L\'email doit être une adresse email valide',
+            'email.unique' => 'Cet email est déjà utilisé',
+            'mot_de_passe.required' => 'Le mot de passe est requis',
+            'mot_de_passe.min' => 'Le mot de passe doit contenir au moins 8 caractères',
+            'telephone.required' => 'Le numéro de téléphone est requis',
+            'adresse.required' => 'L\'adresse est requise',
+            'date_naissance.required' => 'La date de naissance est requise',
+            'date_naissance.date' => 'La date de naissance doit être une date valide',
+            'numero_identite.required' => 'Le numéro d\'identité est requis',
+            'numero_identite.unique' => 'Ce numéro d\'identité est déjà utilisé'
         ];
     }
 }

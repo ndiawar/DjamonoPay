@@ -130,6 +130,15 @@
             'aliases' => array(),
             'dev_requirement' => false,
         ),
+        'endroid/qr-code' => array(
+            'pretty_version' => '6.0.2',
+            'version' => '6.0.2.0',
+            'reference' => '86f264ac7f88e06352d046e5b72b441f28bfa5d0',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../endroid/qr-code',
+            'aliases' => array(),
+            'dev_requirement' => false,
+        ),
         'fakerphp/faker' => array(
             'pretty_version' => 'v1.23.1',
             'version' => '1.23.1.0',

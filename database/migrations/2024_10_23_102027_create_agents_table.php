@@ -13,6 +13,10 @@ return new class extends Migration
     {
         Schema::create('agents', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('user_id')  // 
+                  ->unique()
+                  ->constrained('users')    // Référence à la table users
+                  ->onDelete('cascade');
             $table->timestamps();
         });
     }

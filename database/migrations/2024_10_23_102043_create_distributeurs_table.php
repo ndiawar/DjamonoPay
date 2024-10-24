@@ -13,6 +13,10 @@ return new class extends Migration
     {
         Schema::create('distributeurs', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('user_id')
+                  ->constrained('users')
+                  ->onDelete('cascade');
+            $table->decimal('solde', 10, 2)->default(0);
             $table->timestamps();
         });
     }

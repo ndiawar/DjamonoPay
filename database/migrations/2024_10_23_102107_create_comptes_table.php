@@ -13,6 +13,14 @@ return new class extends Migration
     {
         Schema::create('comptes', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('user_id')
+                  ->constrained('users')
+                  ->onDelete('cascade');
+            $table->string('numero', 5)->unique(); // Changé en string(5) pour 2 lettres + 3 chiffres
+            $table->decimal('solde', 10, 2)->default(0);
+            $table->string('qr_code')->nullable();
+            $table->boolean('est_bloque')->default(false);
+            $table->timestamp('qr_code_creation')->nullable();
             $table->timestamps();
         });
     }
