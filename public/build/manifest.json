@@ -1108,6 +1108,16 @@
     "isEntry": true,
     "src": "public/assets/scss/app.scss"
   },
+  "resources/css/app.css": {
+    "file": "assets/app-68457e87.css",
+    "isEntry": true,
+    "src": "resources/css/app.css"
+  },
+  "resources/css/register.css": {
+    "file": "assets/register-1206f7ff.css",
+    "isEntry": true,
+    "src": "resources/css/register.css"
+  },
   "resources/css/style.css": {
     "file": "assets/style-8cb61faf.css",
     "isEntry": true,
@@ -1119,11 +1129,16 @@
     "src": "resources/js/app.js"
   },
   "resources/js/login.js": {
-    "file": "assets/login-42318d61.js",
+    "file": "assets/login-1523c887.js",
     "imports": [
       "resources/js/app.js"
     ],
     "isEntry": true,
     "src": "resources/js/login.js"
+  },
+  "resources/js/register.js": {
+    "file": "assets/register-c5f5cc3e.js",
+    "isEntry": true,
+    "src": "resources/js/register.js"
   }
 }

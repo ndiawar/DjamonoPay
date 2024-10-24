@@ -90,6 +90,15 @@
                     <input type="text" name="numero_identite" placeholder="Numéro carte d'identité" value="{{ old('numero_identite') }}" required>
                     <div class="error-message" id="numeroIdentiteError"></div>
                 </div>
+                <div class="input-icon">
+                    <i class="fas fa-users"></i>
+                    <select name="role" required>
+                        <option value="" disabled selected>Choisir un rôle</option>
+                        <option value="agent" {{ old('role') == 'agent' ? 'selected' : '' }}>Agent</option>
+                        <option value="distributeur" {{ old('role') == 'distributeur' ? 'selected' : '' }}>Distributeur</option>
+                    </select>
+                    <div class="error-message" id="roleError"></div>
+                </div>
             </div>
 
             <div class="input-group center">

@@ -3,27 +3,24 @@
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Artisan;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
+use App\Http\Controllers\Auth\RegisterController;
 use App\Enums\UserRole;
+use Illuminate\Support\Facades\Auth;
 
 /**
  * Route pour la page d'accueil.
- * Cette route redirige automatiquement toute requête à la racine du site ('/') 
- * vers la route nommée 'index', qui est définie plus bas dans le groupe de routes 'dashboard'.
  */
 Route::get('/', function () {
-    return redirect()->route('index');
+    return redirect()->route('dashboard');
 })->name('/');
 
 /**
  * Groupe de routes sous le préfixe 'dashboard'.
- * Toutes les routes dans ce groupe auront le préfixe 'dashboard' dans leur URL.
- * Ici, une vue 'dashboard.index' est retournée lorsque l'utilisateur accède à '/dashboard/index'.
- * La route est nommée 'index', ce qui permet d'y accéder facilement via 'route('index')'.
  */
 Route::prefix('dashboard')->group(function () {
-    Route::view('index', 'dashboard.index')->name('index');
-    Route::view('dashboard-distributeur', 'dashboard.dashboard-distributeur')->name('dashboard-distributeur');
-    Route::view('dashboard-client', 'dashboard.dashboard-client')->name('dashboard-client');
+    Route::view('index', 'dashboard.index')->name('index'); // Dashboard Agent
+    Route::view('dashboard-distributeur', 'dashboard.dashboard-distributeur')->name('dashboard-distributeur'); // Dashboard Distributeur
+    Route::view('dashboard-client', 'dashboard.dashboard-client')->name('dashboard-client'); // Dashboard Client
 });
 
 /**
@@ -34,9 +31,23 @@ Route::post('/login', [AuthenticatedSessionController::class, 'store']);
 Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
 
 /**
- * Groupe de routes sous le préfixe 'others'.
- * Ces routes gèrent les erreurs spécifiques comme 400, 401, 403, 404, 500, et 503.
- * Chaque route renvoie une vue spécifique pour une erreur donnée.
+ * Routes pour l'inscription.
+ */
+Route::get('/register', function () {
+    return view('auth.register');
+})->name('register');
+
+Route::post('/register', [RegisterController::class, 'register']);
+
+/**
+ * Route pour afficher le formulaire d'inscription d'un distributeur/agent
+ */
+Route::get('/distributeur-agent', function () {
+    return view('auth.distributeur_agent'); // Assurez-vous que le chemin vers la vue est correct
+})->name('distributeur-agent');
+
+/**
+ * Routes pour gérer les erreurs spécifiques.
  */
 Route::prefix('others')->group(function () {
     Route::view('400', 'errors.400')->name('error-400');
@@ -49,8 +60,6 @@ Route::prefix('others')->group(function () {
 
 /**
  * Route pour effacer le cache.
- * Cette route exécute plusieurs commandes Artisan pour effacer différents types de caches.
- * La route est nommée 'clear.cache' et renvoie un message "Cache is cleared" lorsque ces actions sont complétées.
  */
 Route::get('/clear-cache', function () {
     Artisan::call('config:cache');
@@ -62,7 +71,7 @@ Route::get('/clear-cache', function () {
 })->name('clear.cache');
 
 /**
- * Route pour le tableau de bord, protégé par des middleware.
+ * Groupe de routes protégées par le middleware 'auth'.
  */
 Route::middleware([
     'auth:sanctum',
@@ -70,8 +79,20 @@ Route::middleware([
     'verified',
 ])->group(function () {
     Route::get('/dashboard', function () {
-        return view('dashboard');
-    })->name('dashboard');
+        // Vérification de l'authentification de l'utilisateur
+        if ($user = Auth::user()) {
+            $role = $user->role;
 
-    // Ajoutez d'autres routes protégées par l'authentification ici
+            // Redirection en fonction du rôle
+            return match ($role) {
+                UserRole::AGENT => redirect()->route('index'),
+                UserRole::DISTRIBUTEUR => redirect()->route('dashboard-distributeur'),
+                UserRole::CLIENT => redirect()->route('dashboard-client'),
+                default => redirect()->route('login'),
+            };
+        }
+
+        // Redirection vers la page de connexion si l'utilisateur n'est pas authentifié
+        return redirect()->route('login')->with('error', 'Vous devez vous connecter pour accéder à cette page.');
+    })->name('dashboard');
 });

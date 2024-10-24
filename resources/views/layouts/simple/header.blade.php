@@ -42,8 +42,17 @@
             </div>
           </div>
           <ul class="profile-dropdown onhover-show-div">
-            <li><a href="#"><i data-feather="log-in"> </i><span>Log in</span></a></li>
-          </ul>
+            <li>
+                <a href="{{ route('logout') }}" 
+                   onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                    <i data-feather="log-out"></i><span>Log out</span>
+                </a>
+                <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+                    @csrf
+                </form>
+            </li>
+        </ul>
+        
         </li>
       </ul>
     </div>
