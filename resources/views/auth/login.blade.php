@@ -1,48 +1,83 @@
-<x-guest-layout>
-    <x-authentication-card>
-        <x-slot name="logo">
-            <x-authentication-card-logo />
-        </x-slot>
+<!DOCTYPE html>
+<html lang="fr">
 
-        <x-validation-errors class="mb-4" />
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Connexion - DjamonoPay</title>
+    @vite(['resources/css/style.css', 'resources/js/login.js'])
+    <!-- Intégration de Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
 
-        @if (session('status'))
-            <div class="mb-4 font-medium text-sm text-green-600">
-                {{ session('status') }}
+<body>
+    <div class="background-blur"></div>
+
+    <div class="container">
+        <!-- Section gauche : Texte + Image -->
+        <div class="left-section">
+            <div class="text-content">
+                <h1>Se connecter à DjamonoPay</h1>
+                <p>Si vous n'avez pas de compte, <a href="{{ route('register') }}">inscrivez-vous ici !</a></p>
             </div>
-        @endif
+            <img id="handal-image" src="{{ asset('images/paie-removebg-preview.png') }}" alt="Illustration échange" />
+        </div>
 
-        <form method="POST" action="{{ route('login') }}">
-            @csrf
-
-            <div>
-                <x-label for="email" value="{{ __('Email') }}" />
-                <x-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email')" required autofocus autocomplete="username" />
-            </div>
-
-            <div class="mt-4">
-                <x-label for="password" value="{{ __('Password') }}" />
-                <x-input id="password" class="block mt-1 w-full" type="password" name="password" required autocomplete="current-password" />
-            </div>
-
-            <div class="block mt-4">
-                <label for="remember_me" class="flex items-center">
-                    <x-checkbox id="remember_me" name="remember" />
-                    <span class="ms-2 text-sm text-gray-600">{{ __('Remember me') }}</span>
-                </label>
+        <!-- Section droite : Formulaire de connexion -->
+        <div class="right-section">
+            <div class="top-nav">
+                <a href="#" class="nav-link active">Se connecter</a>
+                <a href="{{ route('register') }}" class="nav-link">S'inscrire</a>
             </div>
 
-            <div class="flex items-center justify-end mt-4">
-                @if (Route::has('password.request'))
-                    <a class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" href="{{ route('password.request') }}">
-                        {{ __('Forgot your password?') }}
-                    </a>
+            <form method="POST" action="{{ route('login') }}">
+                @csrf
+
+                <div class="input-group">
+                    <i class="fas fa-user icon"></i>
+                    <input 
+                        type="email" 
+                        name="email" 
+                        placeholder="Entrer Email" 
+                        required 
+                        autofocus 
+                    >
+                </div>
+                <div class="message email-message"></div> <!-- Message pour l'email -->
+
+                <div class="input-group">
+                    <i class="fas fa-lock icon"></i>
+                    <input 
+                        type="password" 
+                        name="password" 
+                        placeholder="Mot de passe" 
+                        id="password" 
+                        required 
+                    >
+                    <i class="fas fa-eye toggle-password" id="togglePassword"></i>
+                </div>
+                <div class="message password-message"></div> <!-- Message pour le mot de passe -->
+
+                <div class="forgot-password">
+                    <a href="{{ route('password.request') }}">Mot de passe oublié ?</a>
+                </div>
+
+                <button type="submit" class="btn-connect">Se connecter</button>
+
+                @if ($errors->any())
+                    <div class="error">
+                        <ul>
+                            @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
                 @endif
+            </form>
+        </div>
+    </div>
 
-                <x-button class="ms-4">
-                    {{ __('Log in') }}
-                </x-button>
-            </div>
-        </form>
-    </x-authentication-card>
-</x-guest-layout>
+    <script src="{{ asset('js/login.js') }}"></script>
+</body>
+
+</html>

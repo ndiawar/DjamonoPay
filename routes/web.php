@@ -2,7 +2,8 @@
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Artisan;
-use Illuminate\Support\Facades\Session;
+use App\Http\Controllers\Auth\AuthenticatedSessionController;
+use App\Enums\UserRole;
 
 /**
  * Route pour la page d'accueil.
@@ -26,11 +27,16 @@ Route::prefix('dashboard')->group(function () {
 });
 
 /**
+ * Routes pour l'authentification.
+ */
+Route::get('/login', [AuthenticatedSessionController::class, 'create'])->name('login');
+Route::post('/login', [AuthenticatedSessionController::class, 'store']);
+Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
+
+/**
  * Groupe de routes sous le préfixe 'others'.
  * Ces routes gèrent les erreurs spécifiques comme 400, 401, 403, 404, 500, et 503.
- * Chaque route renvoie une vue spécifique pour une erreur donnée. Par exemple, 
- * '/others/404' affichera la vue 'errors.404' pour indiquer une erreur 404 (page non trouvée).
- * Chacune de ces routes a un nom comme 'error-404' pour faciliter leur appel via 'route('error-404')'.
+ * Chaque route renvoie une vue spécifique pour une erreur donnée.
  */
 Route::prefix('others')->group(function () {
     Route::view('400', 'errors.400')->name('error-400');
@@ -43,8 +49,7 @@ Route::prefix('others')->group(function () {
 
 /**
  * Route pour effacer le cache.
- * Cette route exécute plusieurs commandes Artisan pour effacer différents types de caches (config, cache d'application, vues, routes).
- * Cela peut être utile après des modifications dans la configuration ou les routes pour s'assurer que les caches obsolètes ne sont pas utilisés.
+ * Cette route exécute plusieurs commandes Artisan pour effacer différents types de caches.
  * La route est nommée 'clear.cache' et renvoie un message "Cache is cleared" lorsque ces actions sont complétées.
  */
 Route::get('/clear-cache', function () {
@@ -56,6 +61,9 @@ Route::get('/clear-cache', function () {
     return "Cache is cleared";
 })->name('clear.cache');
 
+/**
+ * Route pour le tableau de bord, protégé par des middleware.
+ */
 Route::middleware([
     'auth:sanctum',
     config('jetstream.auth_session'),
@@ -64,4 +72,6 @@ Route::middleware([
     Route::get('/dashboard', function () {
         return view('dashboard');
     })->name('dashboard');
+
+    // Ajoutez d'autres routes protégées par l'authentification ici
 });
