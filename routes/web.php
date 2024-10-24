@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Session;
+use App\Http\Controllers\DistributeurController;
 
 /**
  * Route pour la page d'accueil.
@@ -19,11 +20,18 @@ Route::get('/', function () {
  * Ici, une vue 'dashboard.index' est retournée lorsque l'utilisateur accède à '/dashboard/index'.
  * La route est nommée 'index', ce qui permet d'y accéder facilement via 'route('index')'.
  */
+// Route::prefix('dashboard')->group(function () {
+//     Route::view('index', 'dashboard.index')->name('index');
+//     Route::view('dashboard-distributeur', 'dashboard.dashboard-distributeur')->name('dashboard-distributeur');
+//     Route::view('dashboard-client', 'dashboard.dashboard-client')->name('dashboard-client');
+// });
+
 Route::prefix('dashboard')->group(function () {
     Route::view('index', 'dashboard.index')->name('index');
-    Route::view('dashboard-distributeur', 'dashboard.dashboard-distributeur')->name('dashboard-distributeur');
+    Route::get('dashboard-distributeur', [DistributeurController::class, 'index'])->name('dashboard-distributeur');
     Route::view('dashboard-client', 'dashboard.dashboard-client')->name('dashboard-client');
 });
+
 
 /**
  * Groupe de routes sous le préfixe 'others'.
@@ -64,4 +72,38 @@ Route::middleware([
     Route::get('/dashboard', function () {
         return view('dashboard');
     })->name('dashboard');
+});
+
+
+
+
+//routes pour les comptes 
+// Route::prefix('comptes')->group(function () {
+//     Route::post('{compte}/crediter', [CompteController::class, 'crediter']);
+//     Route::post('{compte}/debiter', [CompteController::class, 'debiter']);
+//     Route::post('{compte}/bloquer', [CompteController::class, 'bloquer']);
+//     Route::post('{compte}/debloquer', [CompteController::class, 'debloquer']);
+//     Route::post('{compte}/qr-code', [CompteController::class, 'generateQrCode']);
+//     Route::post('{compte}/verifier-qr-code', [CompteController::class, 'verifierQrCode']);
+// });
+
+
+
+
+
+Route::middleware([
+    'auth:sanctum',
+    config('jetstream.auth_session'),
+    'verified',
+])->group(function () {
+    Route::get('/dashboard', function () {
+        return view('dashboard');
+    })->name('dashboard');
+
+    // Routes pour les distributeurs
+    Route::resource('distributeur', DistributeurController::class);
+    
+    // Route supplémentaire pour la mise à jour du solde
+    Route::post('distributeur/{distributeur}/update-solde', [DistributeurController::class, 'updateSolde'])
+        ->name('distributeur.update-solde');
 });

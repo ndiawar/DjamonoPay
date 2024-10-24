@@ -1,0 +1,150 @@
+body {
+  
+    font-family: 'Arial', sans-serif;
+    background-color: #fff;
+  }
+  
+  
+  /* Styles des cards */
+  .card-solde, .card-mini {
+    border-radius: 15px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    position: relative;
+  }
+  
+  /* Bande colorée à gauche */
+  .card-solde::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 8px;
+    height: 100%;
+    background-color: #003F6B;
+  
+  }
+  
+  .card-mini::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 8px;
+      height: 100%;
+      background-color: #B0DEFF;
+    }
+  
+  .card-solde {
+    display: flex;
+    align-items: center;
+    padding: 20px;
+  }
+  
+  .card-solde h2 {
+    font-size: 2.5rem;
+    font-weight: bold;
+  }
+  
+  .solde-actions {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+  }
+  
+  .icon-circle {
+    background-color: #003F6B;
+    color: white;
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+  }
+  
+  .indicator {
+    background-color: rgba(40, 167, 69, 0.1);
+    color: #28a745;
+    border-radius: 10px;
+    padding: 2px 8px;
+    font-weight: bold;
+    font-size: 0.9rem;
+    margin-top: 5px;
+    display: inline-block;
+  }
+  
+  .navbar-brand img {
+    width: 40px;
+    height: 40px;
+  }
+  
+  /* Table stylée */
+  .table {
+    background-color: white;
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  .table th {
+    background-color: #003F6B;
+    color: white;
+  }
+  
+  .avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+  
+  /* Styles supplémentaires */
+  
+  
+  @keyframes scroll {
+    0% { transform: translateX(100%); }
+    100% { transform: translateX(-100%); }
+  }
+  .logout-btn, .notification-btn {
+      background-color: #003F6B;
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-left: 10px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+  
+    .logout-btn:hover, .notification-btn:hover {
+      background-color: #084298;
+    }
+  
+   
+  
+   /* Styles pour les liens du menu de navigation */
+  .navbar-nav .nav-link {
+      color: #003F6B; /* Couleur du texte des liens */
+      padding: 10px 15px;
+      border-radius: 8px; /* Coins arrondis */
+      transition: background-color 0.3s, color 0.3s;
+  }
+  
+  .navbar-nav .nav-link:hover {
+      background-color: #B0DEFF; /* Fond bleu clair au survol */
+      color: #003F6B; /* Couleur du texte sur hover */
+  }
+  
+  /* Style pour le lien actif */
+  .navbar-nav .nav-link.active {
+      background-color: #B0DEFF; /* Fond bleu foncé pour le lien actif */
+      color: #003F6B; /* Couleur du texte */
+      border: 2px solid #B0DEFF; /* Bordure bleu clair */
+  }
+  
+    
