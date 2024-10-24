@@ -160,3 +160,4 @@ class User extends Authenticatable
     {
         return $this->transactions()->where('etat', 'en_attente');
     }
+}
