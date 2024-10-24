@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')  // 
                   ->unique()
-                  ->constrained('users')    // Référence à la table users2
+                  ->constrained('users')    // Référence à la table users
                   ->onDelete('cascade');
             $table->timestamps();
         });

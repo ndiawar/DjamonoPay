@@ -12,7 +12,7 @@ class Client extends Model
     use HasFactory;
 
     protected $fillable = [
-        'users2_id',
+        'user_id',
         'solde'
     ];
 
@@ -23,9 +23,9 @@ class Client extends Model
     /**
      * Obtenir l'utilisateur associé au client
      */
-    public function users2(): BelongsTo
+    public function user(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'users2_id');
+        return $this->belongsTo(User::class, 'user_id');
     }
 
     /**
@@ -39,7 +39,7 @@ class Client extends Model
         ));
 
         return self::create([
-            'users2_id' => $user->id,
+            'user_id' => $user->id,
             'solde' => 0 // Solde initial à 0
         ]);
     }

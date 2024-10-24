@@ -19,10 +19,10 @@ class AgentController extends Controller
      */
     public function index(): JsonResource
     {
-        $agents = Agent::with('users2')
+        $agents = Agent::with('user')
             ->when(request('search'), function($query, $search) {
                 $query->where('numero_identite', 'like', "%{$search}%")
-                    ->orWhereHas('users2', function($q) use ($search) {
+                    ->orWhereHas('user', function($q) use ($search) {
                         $q->where('nom', 'like', "%{$search}%")
                           ->orWhere('email', 'like', "%{$search}%");
                     });
@@ -77,7 +77,7 @@ class AgentController extends Controller
      */
     public function show(Agent $agent): JsonResource
     {
-        return new AgentResource($agent->load('users2'));
+        return new AgentResource($agent->load('user'));
     }
 
     /**
@@ -103,14 +103,14 @@ class AgentController extends Controller
 
         // Mise à jour des données de l'utilisateur
         if (!empty($userData)) {
-            $agent->users2->update($userData);
+            $agent->user->update($userData);
         }
 
         DB::commit();
 
         return response()->json([
             'message' => 'Agent mis à jour avec succès',
-            'data' => new AgentResource($agent->load('users2'))
+            'data' => new AgentResource($agent->load('user'))
         ]);
 
     } catch (\Exception $e) {
@@ -131,7 +131,7 @@ class AgentController extends Controller
             DB::beginTransaction();
 
             // Supprimer l'utilisateur (cascade supprimera aussi l'agent)
-            $agent->users2->delete();
+            $agent->user->delete();
 
             DB::commit();
 

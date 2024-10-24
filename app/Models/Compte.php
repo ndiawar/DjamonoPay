@@ -11,7 +11,7 @@ class Compte extends Model
     use HasFactory;
 
     protected $fillable = [
-        'users2_id',
+        'user_id',
         'numero',
         'solde',
         'qr_code',
@@ -28,9 +28,9 @@ class Compte extends Model
     /**
      * Obtenir l'utilisateur propriétaire du compte
      */
-    public function users2(): BelongsTo
+    public function user(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'users2_id');
+        return $this->belongsTo(User::class, 'user_id');
     }
 
     /**
@@ -59,7 +59,7 @@ class Compte extends Model
     public static function createWithNumber(array $data, User $user): self
     {
         return self::create([
-            'users2_id' => $user->id,
+            'user_id' => $user->id,
             'numero' => self::generateAccountNumber($user->nom, $user->prenom),
             'est_bloque' => false,
             'solde' => 0,

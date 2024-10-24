@@ -12,7 +12,7 @@ class Distributeur extends Model
     use HasFactory;
 
     protected $fillable = [
-        'users2_id',
+        'user_id',
         'solde'
     ];
 
@@ -23,9 +23,9 @@ class Distributeur extends Model
     /**
      * Obtenir l'utilisateur associé au distributeur
      */
-    public function users2(): BelongsTo
+    public function user(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'users2_id');
+        return $this->belongsTo(User::class, 'user_id');
     }
 
     /**
@@ -39,8 +39,12 @@ class Distributeur extends Model
         ));
 
         return self::create([
-            'users2_id' => $user->id,
+            'user_id' => $user->id,
             'solde' => 0 // Solde initial à 0
         ]);
     }
+    public function users()
+{
+    return $this->belongsTo(User::class, 'user_id');
+}
 }

@@ -12,15 +12,15 @@ class Agent extends Model
     use HasFactory;
 
     protected $fillable = [
-        'users2_id',
+        'user_id',
     ];
 
     /**
      * Obtenir l'utilisateur associé à l'agent.
      */
-    public function users2(): BelongsTo
+    public function user(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'users2_id');
+        return $this->belongsTo(User::class, 'user_id');
     }
 
     /**
@@ -36,7 +36,7 @@ class Agent extends Model
 
         // Créer l'agent lié à l'utilisateur
         return self::create([
-            'users2_id' => $user->id,
+            'user_id' => $user->id,
         ]);
     }
 }

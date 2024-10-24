@@ -26,14 +26,13 @@ class StoreUserRequest extends FormRequest
         return [
             'nom' => ['required', 'string', 'max:255'],
             'prenom' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'unique:users2,email'], // Corrigé users en users2
+            'email' => ['required', 'string', 'email', 'unique:user,email'], // Corrigé users en user
             'photo' => ['nullable', 'string'],
             'mot_de_passe' => ['required', 'string', 'min:8'],
-            'role' => ['required', 'string', Rule::enum(UserRole::class)],
             'telephone' => ['required', 'string'],
             'adresse' => ['required', 'string'],
             'date_naissance' => ['required', 'date'],
-            'numero_identite' => ['required', 'string', 'unique:users2,numero_identite'], // Corrigé le nom de la table et du champ
+            'numero_identite' => ['required', 'string', 'unique:user,numero_identite'], // Corrigé le nom de la table et du champ
             'etat_compte' => ['boolean', 'nullable'], // Ajout de nullable car c'est une valeur par défaut
         ];
     }
@@ -57,6 +56,7 @@ class StoreUserRequest extends FormRequest
             'mot_de_passe.min' => 'Le mot de passe doit contenir au moins 8 caractères',
             'role.required' => 'Le rôle est requis',
             'role.enum' => 'Le rôle sélectionné n\'est pas valide',
+                      'role' => ['required', 'string', Rule::enum(UserRole::class)],
             'telephone.required' => 'Le numéro de téléphone est requis',
             'adresse.required' => 'L\'adresse est requise',
             'date_naissance.required' => 'La date de naissance est requise',

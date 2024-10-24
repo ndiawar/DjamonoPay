@@ -25,13 +25,13 @@ class UpdateAgentRequest extends FormRequest
         return [
             'nom' => ['sometimes', 'string', 'max:255'],
             'prenom' => ['sometimes', 'string', 'max:255'],
-            'email' => ['sometimes', 'string', 'email', Rule::unique('users2')->ignore($this->agent->users2->id)],
+            'email' => ['sometimes', 'string', 'email', Rule::unique('user')->ignore($this->agent->user->id)],
             'photo' => ['nullable', 'string'],
             'mot_de_passe' => ['sometimes', 'string', 'min:8'],
             'telephone' => ['sometimes', 'string'],
             'adresse' => ['sometimes', 'string'],
             'date_naissance' => ['sometimes', 'date'],
-            'numero_identite' => ['sometimes', 'string', Rule::unique('users2')->ignore($this->agent->users2->id)]
+            'numero_identite' => ['sometimes', 'string', Rule::unique('user')->ignore($this->agent->user->id)]
         ];
     }
 

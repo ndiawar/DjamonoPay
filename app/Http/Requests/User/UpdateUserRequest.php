@@ -26,14 +26,14 @@ class UpdateUserRequest extends FormRequest
         return [
             'nom' => ['sometimes', 'string', 'max:255'],
             'prenom' => ['sometimes', 'string', 'max:255'],
-            'email' => ['sometimes', 'string', 'email', Rule::unique('users2', 'email')->ignore($this->users->id)],
+            'email' => ['sometimes', 'string', 'email', Rule::unique('user', 'email')->ignore($this->users->id)],
             'photo' => ['nullable', 'string'],
             'mot_de_passe' => ['sometimes', 'string', 'min:8'],
             'role' => ['sometimes', 'string', Rule::enum(UserRole::class)],
             'telephone' => ['sometimes', 'string'], // Corrigé numero_telephone en telephone
             'adresse' => ['sometimes', 'string'],
             'date_naissance' => ['sometimes', 'date'],
-            'numero_identite' => ['sometimes', 'string', Rule::unique('users2', 'numero_identite')->ignore($this->users->id)], // Corrigé le nom du champ
+            'numero_identite' => ['sometimes', 'string', Rule::unique('user', 'numero_identite')->ignore($this->users->id)], // Corrigé le nom du champ
             'etat_compte' => ['sometimes', 'boolean'],
         ];
 

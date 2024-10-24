@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('clients', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('users2_id')
+            $table->foreignId('user_id')
                   ->constrained('users')
                   ->onDelete('restrict')
                   ->onUpdate('cascade');
@@ -21,7 +21,7 @@ return new class extends Migration
             $table->timestamps();
             
             // Index pour améliorer les performances des requêtes
-            $table->index('users2_id');
+            $table->index('user_id');
         });
     }
 

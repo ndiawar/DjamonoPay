@@ -26,13 +26,13 @@ class UpdateDistributeurRequest extends FormRequest
         return [
             'nom' => ['sometimes', 'string', 'max:255'],
             'prenom' => ['sometimes', 'string', 'max:255'],
-            'email' => ['sometimes', 'string', 'email', Rule::unique('users2', 'email')->ignore($this->distributeur->users2->id)],
+            'email' => ['sometimes', 'string', 'email', Rule::unique('user', 'email')->ignore($this->distributeur->user->id)],
             'photo' => ['nullable', 'string'],
             'mot_de_passe' => ['sometimes', 'string', 'min:8'],
             'telephone' => ['sometimes', 'string'],
             'adresse' => ['sometimes', 'string'],
             'date_naissance' => ['sometimes', 'date'],
-            'numero_identite' => ['sometimes', 'string', Rule::unique('users2', 'numero_identite')->ignore($this->distributeur->users2->id)],
+            'numero_identite' => ['sometimes', 'string', Rule::unique('user', 'numero_identite')->ignore($this->distributeur->user->id)],
             'solde' => ['sometimes', 'numeric', 'min:0'],
             'etat_compte' => ['sometimes', 'boolean'],
         ];

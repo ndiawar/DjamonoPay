@@ -26,13 +26,13 @@ class StoreAgentRequest extends FormRequest
         return [
             'nom' => ['required', 'string', 'max:255'],
             'prenom' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'unique:users2,email'],
+            'email' => ['required', 'string', 'email', 'unique:user,email'],
             'photo' => ['nullable', 'string'],
             'mot_de_passe' => ['required', 'string', 'min:8'],
             'telephone' => ['required', 'string'],
             'adresse' => ['required', 'string'],
             'date_naissance' => ['required', 'date'],
-            'numero_identite' => ['required', 'string', 'unique:users2,numero_identite']
+            'numero_identite' => ['required', 'string', 'unique:user,numero_identite']
         ];
     }
 

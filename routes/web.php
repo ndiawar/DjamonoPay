@@ -4,6 +4,8 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Session;
 use App\Http\Controllers\DistributeurController;
+use App\Http\Controllers\CompteController;
+use App\Http\Controllers\TransactionController;
 
 /**
  * Route pour la page d'accueil.
@@ -74,18 +76,30 @@ Route::middleware([
     })->name('dashboard');
 });
 
+ // Routes pour les transactions
+ Route::prefix('transactions')->name('transactions.')->group(function () {
+    Route::get('/', [TransactionController::class, 'index'])->name('index');
+    Route::post('/', [TransactionController::class, 'store'])->name('store');
+    Route::get('{transaction}', [TransactionController::class, 'show'])->name('show');
+    Route::post('{transaction}/annuler', [TransactionController::class, 'annuler'])->name('annuler');
+    Route::get('historique', [TransactionController::class, 'historique'])->name('historique');
+    Route::get('statistiques', [TransactionController::class, 'statistiques'])->name('statistiques');
+});
+
+// Routes pour les comptes
+Route::prefix('comptes')->name('comptes.')->group(function () {
+    Route::post('{compte}/crediter', [CompteController::class, 'crediter'])->name('crediter');
+    Route::post('{compte}/debiter', [CompteController::class, 'debiter'])->name('debiter');
+    Route::post('{compte}/bloquer', [CompteController::class, 'bloquer'])->name('bloquer');
+    Route::post('{compte}/debloquer', [CompteController::class, 'debloquer'])->name('debloquer');
+    Route::post('{compte}/transfert', [CompteController::class, 'transfert'])->name('transfert');
+    Route::post('{compte}/qr-code', [CompteController::class, 'generateQrCode'])->name('qr-code');
+    Route::post('{compte}/verifier-qr-code', [CompteController::class, 'verifierQrCode'])->name('verifier-qr-code');
+});
 
 
 
-//routes pour les comptes 
-// Route::prefix('comptes')->group(function () {
-//     Route::post('{compte}/crediter', [CompteController::class, 'crediter']);
-//     Route::post('{compte}/debiter', [CompteController::class, 'debiter']);
-//     Route::post('{compte}/bloquer', [CompteController::class, 'bloquer']);
-//     Route::post('{compte}/debloquer', [CompteController::class, 'debloquer']);
-//     Route::post('{compte}/qr-code', [CompteController::class, 'generateQrCode']);
-//     Route::post('{compte}/verifier-qr-code', [CompteController::class, 'verifierQrCode']);
-// });
+
 
 
 
@@ -104,6 +118,30 @@ Route::middleware([
     Route::resource('distributeur', DistributeurController::class);
     
     // Route supplémentaire pour la mise à jour du solde
-    Route::post('distributeur/{distributeur}/update-solde', [DistributeurController::class, 'updateSolde'])
-        ->name('distributeur.update-solde');
+    // Route::patch('distributeur/{distributeur}/update-solde', [DistributeurController::class, 'updateSolde'])
+    //     ->name('distributeur.update-solde');
+    // Route::patch('distributeur/{distributeur}/update-solde', [DistributeurController::class, 'updateSolde'])
+    // ->name('distributeur.update-solde');
+
+    // Nouvelles routes pour les fonctionnalités du distributeur
+    Route::prefix('distributeur')->name('distributeur.')->group(function () {
+        // Opérations sur les clients
+        Route::post('/crediter-client', [DistributeurController::class, 'crediterClient'])
+            ->name('crediter-client');
+        Route::post('/retrait-client', [DistributeurController::class, 'retraitClient'])
+            ->name('retrait-client');
+        Route::post('/verifier-client-qr', [DistributeurController::class, 'verifierClientQRCode'])
+            ->name('verifier-client-qr');
+        
+        // Gestion des transactions
+        Route::post('/annuler-transaction/{transaction}', [DistributeurController::class, 'annulerTransaction'])
+            ->name('annuler-transaction');
+            
+        // Consultation
+        Route::get('/consulter-solde', [DistributeurController::class, 'consulterSolde'])
+            ->name('consulter-solde');
+        Route::get('/historique-transactions', [DistributeurController::class, 'historiqueTrasactions'])
+            ->name('historique-transactions');
+    });
+
 });
