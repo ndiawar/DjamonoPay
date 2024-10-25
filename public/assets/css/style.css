@@ -23850,21 +23850,21 @@ body.dark-only .page-wrapper .page-body-wrapper .page-title {
   box-shadow: rgba(0, 0, 0, 0.07) 0px 4px 40px;
 }
 body.dark-only .page-wrapper .page-body-wrapper div.sidebar-wrapper .sidebar-main .sidebar-links .simplebar-wrapper .simplebar-mask .simplebar-content-wrapper .simplebar-content > li a svg.stroke-icon {
-  stroke: #fff;
+  stroke: #0066FF;
 }
 body.dark-only .page-wrapper .page-body-wrapper div.sidebar-wrapper .sidebar-main .sidebar-links .simplebar-wrapper .simplebar-mask .simplebar-content-wrapper .simplebar-content > li a svg.fill-icon {
-  fill: rgba(255, 255, 255, 0.5);
+  fill: #000248;
   stroke: transparent;
 }
 body.dark-only .page-wrapper .page-body-wrapper div.sidebar-wrapper .sidebar-main .sidebar-links .simplebar-wrapper .simplebar-mask .simplebar-content-wrapper .simplebar-content > li a.active svg.stroke-icon {
-  stroke: var(--theme-default);
+  stroke: #0066FF;
 }
 body.dark-only .page-wrapper .page-body-wrapper div.sidebar-wrapper .sidebar-main .sidebar-links .simplebar-wrapper .simplebar-mask .simplebar-content-wrapper .simplebar-content > li a.active svg.fill-icon {
-  fill: var(--theme-default);
+  fill: #000248;
   stroke: transparent;
 }
 body.dark-only .page-wrapper .page-body-wrapper .sidebar-main .sidebar-links .sidebar-link.active svg.stroke-icon {
-  stroke: var(--theme-default);
+  stroke: #0066FF;
 }
 body.dark-only .page-wrapper .page-body-wrapper .sidebar-main .sidebar-links li a span {
   color: rgba(255, 255, 255, 0.6);
@@ -29269,7 +29269,7 @@ button[data-toggle=dropdown]:hover ~ .dropdown-menu {
   font-weight: 500;
 }
 .page-wrapper .page-body-wrapper div.sidebar-wrapper .sidebar-main .sidebar-links .simplebar-wrapper .simplebar-mask .simplebar-content-wrapper .simplebar-content > li a svg.stroke-icon {
-  stroke: #2c323f;
+  stroke: #0066FF;
 }
 .page-wrapper .page-body-wrapper div.sidebar-wrapper .sidebar-main .sidebar-links .simplebar-wrapper .simplebar-mask .simplebar-content-wrapper .simplebar-content > li a svg.fill-icon {
   fill: #757589;
@@ -29278,7 +29278,7 @@ button[data-toggle=dropdown]:hover ~ .dropdown-menu {
   transition: all 0.3s ease;
 }
 .page-wrapper .page-body-wrapper div.sidebar-wrapper .sidebar-main .sidebar-links .simplebar-wrapper .simplebar-mask .simplebar-content-wrapper .simplebar-content > li a.active svg.stroke-icon {
-  stroke: var(--theme-default);
+  stroke: #0066FF;
 }
 .page-wrapper .page-body-wrapper div.sidebar-wrapper .sidebar-main .sidebar-links .simplebar-wrapper .simplebar-mask .simplebar-content-wrapper .simplebar-content > li a.active svg.fill-icon {
   fill: var(--theme-default);
@@ -29401,7 +29401,7 @@ button[data-toggle=dropdown]:hover ~ .dropdown-menu {
   transition: all 0.3s ease;
 }
 .page-wrapper.horizontal-wrapper .page-body-wrapper .sidebar-wrapper .sidebar-main .sidebar-links .simplebar-wrapper .simplebar-mask .simplebar-content-wrapper .simplebar-content > li:hover a svg.stroke-icon {
-  stroke: var(--theme-default);
+  stroke: #0066FF;
   transition: all 0.3s ease;
 }
 .page-wrapper.horizontal-wrapper .page-body-wrapper .sidebar-wrapper .sidebar-main .sidebar-links .simplebar-wrapper .simplebar-mask .simplebar-content-wrapper .simplebar-content > li:hover a svg.fill-icon {
@@ -30125,13 +30125,13 @@ button[data-toggle=dropdown]:hover ~ .dropdown-menu {
   stroke: var(--theme-default);
 }
 .page-wrapper.compact-wrapper.dark-sidebar .page-body-wrapper div.sidebar-wrapper .sidebar-main .sidebar-links .simplebar-wrapper .simplebar-mask .simplebar-content-wrapper .simplebar-content > li a svg.stroke-icon, .page-wrapper.compact-wrapper.color-sidebar .page-body-wrapper div.sidebar-wrapper .sidebar-main .sidebar-links .simplebar-wrapper .simplebar-mask .simplebar-content-wrapper .simplebar-content > li a svg.stroke-icon {
-  stroke: rgba(255, 255, 255, 0.6);
+  stroke: #0066FF;
 }
 .page-wrapper.compact-wrapper.dark-sidebar .page-body-wrapper div.sidebar-wrapper .sidebar-main .sidebar-links .simplebar-wrapper .simplebar-mask .simplebar-content-wrapper .simplebar-content > li a svg.fill-icon, .page-wrapper.compact-wrapper.color-sidebar .page-body-wrapper div.sidebar-wrapper .sidebar-main .sidebar-links .simplebar-wrapper .simplebar-mask .simplebar-content-wrapper .simplebar-content > li a svg.fill-icon {
   fill: rgba(255, 255, 255, 0.6);
 }
 .page-wrapper.compact-wrapper.dark-sidebar .page-body-wrapper div.sidebar-wrapper .sidebar-main .sidebar-links .simplebar-wrapper .simplebar-mask .simplebar-content-wrapper .simplebar-content > li a.active svg.stroke-icon, .page-wrapper.compact-wrapper.color-sidebar .page-body-wrapper div.sidebar-wrapper .sidebar-main .sidebar-links .simplebar-wrapper .simplebar-mask .simplebar-content-wrapper .simplebar-content > li a.active svg.stroke-icon {
-  stroke: var(--theme-default);
+  stroke: #0066FF;
 }
 .page-wrapper.compact-wrapper.dark-sidebar .page-body-wrapper div.sidebar-wrapper .sidebar-main .sidebar-links .simplebar-wrapper .simplebar-mask .simplebar-content-wrapper .simplebar-content > li a.active svg.fill-icon, .page-wrapper.compact-wrapper.color-sidebar .page-body-wrapper div.sidebar-wrapper .sidebar-main .sidebar-links .simplebar-wrapper .simplebar-mask .simplebar-content-wrapper .simplebar-content > li a.active svg.fill-icon {
   fill: var(--theme-default);
@@ -30146,7 +30146,7 @@ button[data-toggle=dropdown]:hover ~ .dropdown-menu {
   color: rgba(255, 255, 255, 0.6);
 }
 .page-wrapper.compact-wrapper.dark-sidebar div.sidebar-wrapper .sidebar-main .sidebar-links li a svg.stroke-icon, .page-wrapper.compact-wrapper.color-sidebar div.sidebar-wrapper .sidebar-main .sidebar-links li a svg.stroke-icon {
-  stroke: rgba(255, 255, 255, 0.6);
+  stroke: #0066FF;
 }
 .page-wrapper.compact-wrapper.dark-sidebar div.sidebar-wrapper .sidebar-main .sidebar-links li a svg.fill-icon, .page-wrapper.compact-wrapper.color-sidebar div.sidebar-wrapper .sidebar-main .sidebar-links li a svg.fill-icon {
   fill: rgba(255, 255, 255, 0.6);
