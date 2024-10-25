@@ -619,11 +619,7 @@ class ComposerStaticInit3cc103bb845e9d02d8758e54e8e63801
         'App\\Http\\Controllers\\DistributeurController' => __DIR__ . '/../..' . '/app/Http/Controllers/DistributeurController.php',
         'App\\Http\\Controllers\\SystemLoggerController' => __DIR__ . '/../..' . '/app/Http/Controllers/SystemLoggerController.php',
         'App\\Http\\Controllers\\TransactionController' => __DIR__ . '/../..' . '/app/Http/Controllers/TransactionController.php',
-<<<<<<< HEAD
         'App\\Http\\Controllers\\UserController' => __DIR__ . '/../..' . '/app/Http/Controllers/UserController.php',
-=======
-        'App\\Http\\Controllers\\UsersController' => __DIR__ . '/../..' . '/app/Http/Controllers/UsersController.php',
->>>>>>> f7cc77ef3d357ca27e05268659c7c3aeaa9d20a1
         'App\\Http\\Kernel' => __DIR__ . '/../..' . '/app/Http/Kernel.php',
         'App\\Http\\Middleware\\Authenticate' => __DIR__ . '/../..' . '/app/Http/Middleware/Authenticate.php',
         'App\\Http\\Middleware\\EncryptCookies' => __DIR__ . '/../..' . '/app/Http/Middleware/EncryptCookies.php',
@@ -648,21 +644,12 @@ class ComposerStaticInit3cc103bb845e9d02d8758e54e8e63801
         'App\\Http\\Requests\\Transaction\\UpdateTransactionRequest' => __DIR__ . '/../..' . '/app/Http/Requests/Transaction/UpdateTransactionRequest.php',
         'App\\Http\\Requests\\User\\StoreUserRequest' => __DIR__ . '/../..' . '/app/Http/Requests/User/StoreUserRequest.php',
         'App\\Http\\Requests\\User\\UpdateUserRequest' => __DIR__ . '/../..' . '/app/Http/Requests/User/UpdateUserRequest.php',
-<<<<<<< HEAD
-=======
-        'App\\Http\\Requests\\Users\\StoreUsersRequest' => __DIR__ . '/../..' . '/app/Http/Requests/Users/StoreUsersRequest.php',
-        'App\\Http\\Requests\\Users\\UpdateUsersRequest' => __DIR__ . '/../..' . '/app/Http/Requests/Users/UpdateUsersRequest.php',
->>>>>>> f7cc77ef3d357ca27e05268659c7c3aeaa9d20a1
         'App\\Http\\Resources\\AgentCollection' => __DIR__ . '/../..' . '/app/Http/Resources/AgentCollection.php',
         'App\\Http\\Resources\\AgentResource' => __DIR__ . '/../..' . '/app/Http/Resources/AgentResource.php',
         'App\\Http\\Resources\\ClientCollection' => __DIR__ . '/../..' . '/app/Http/Resources/ClientCollection.php',
         'App\\Http\\Resources\\ClientResource' => __DIR__ . '/../..' . '/app/Http/Resources/ClientResource.php',
         'App\\Http\\Resources\\CompteCollection' => __DIR__ . '/../..' . '/app/Http/Resources/CompteCollection.php',
         'App\\Http\\Resources\\CompteResource' => __DIR__ . '/../..' . '/app/Http/Resources/CompteResource.php',
-<<<<<<< HEAD
-=======
-        'App\\Http\\Resources\\DistributeurCollection' => __DIR__ . '/../..' . '/app/Http/Resources/DistributeurCollection.php',
->>>>>>> f7cc77ef3d357ca27e05268659c7c3aeaa9d20a1
         'App\\Http\\Resources\\DistributeurResource' => __DIR__ . '/../..' . '/app/Http/Resources/DistributeurResource.php',
         'App\\Http\\Resources\\SystemLoggerCollection' => __DIR__ . '/../..' . '/app/Http/Resources/SystemLoggerCollection.php',
         'App\\Http\\Resources\\SystemLoggerResource' => __DIR__ . '/../..' . '/app/Http/Resources/SystemLoggerResource.php',
