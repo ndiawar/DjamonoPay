@@ -24,16 +24,6 @@
         <h1>S’inscrire à DjomanoPay</h1>
         <p>Rejoignez DjomanoPay et profitez de paiements rapides et sécurisés !</p>
 
-        @if ($errors->any())
-            <div class="alert alert-danger">
-                <ul>
-                    @foreach ($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
-            </div>
-        @endif
-
         <form method="POST" action="{{ route('register') }}" enctype="multipart/form-data" id="registrationForm">
             @csrf
 
@@ -41,12 +31,16 @@
                 <div class="input-icon">
                     <i class="fas fa-user"></i>
                     <input type="text" name="nom" placeholder="Nom" value="{{ old('nom') }}" required>
-                    <div class="error-message" id="nomError"></div>
+                    @error('nom')
+                        <div class="error-message" style="color: red;">{{ $message }}</div>
+                    @enderror
                 </div>
                 <div class="input-icon">
                     <i class="fas fa-user"></i>
                     <input type="text" name="prenom" placeholder="Prénom" value="{{ old('prenom') }}" required>
-                    <div class="error-message" id="prenomError"></div>
+                    @error('prenom')
+                        <div class="error-message" style="color: red;">{{ $message }}</div>
+                    @enderror
                 </div>
             </div>
 
@@ -54,12 +48,16 @@
                 <div class="input-icon">
                     <i class="fas fa-envelope"></i>
                     <input type="email" name="email" placeholder="Adresse E-mail" value="{{ old('email') }}" required>
-                    <div class="error-message" id="emailError"></div>
+                    @error('email')
+                        <div class="error-message" style="color: red;">{{ $message }}</div>
+                    @enderror
                 </div>
                 <div class="input-icon">
                     <i class="fas fa-phone"></i>
                     <input type="tel" name="telephone" placeholder="Téléphone" value="{{ old('telephone') }}" required>
-                    <div class="error-message" id="telephoneError"></div>
+                    @error('telephone')
+                        <div class="error-message" style="color: red;">{{ $message }}</div>
+                    @enderror
                 </div>
             </div>
 
@@ -67,20 +65,25 @@
                 <div class="input-icon">
                     <i class="fas fa-home"></i>
                     <input type="text" name="adresse" placeholder="Adresse" value="{{ old('adresse') }}" required>
-                    <div class="error-message" id="adresseError"></div>
+                    @error('adresse')
+                        <div class="error-message" style="color: red;">{{ $message }}</div>
+                    @enderror
                 </div>
                 <div class="input-icon">
                     <i class="fas fa-calendar-alt"></i>
                     <input type="date" name="date_naissance" value="{{ old('date_naissance') }}" required 
                            min="1000-01-01" max="2012-12-31">
-                    <div class="error-message" id="dateNaissanceError"></div>
+                    @error('date_naissance')
+                        <div class="error-message" style="color: red;">{{ $message }}</div>
+                    @enderror
                 </div>
                 
                 <div class="input-icon password-container">
                     <i class="fas fa-lock"></i>
                     <input type="password" name="password" placeholder="Mot de passe" id="password" required>
-                    <div class="error-message" id="passwordError"></div>
-                    <i class="fas fa-eye" id="togglePassword" style="cursor: pointer; position: absolute; right: -200px; top: 50%; transform: translateY(-50%);"></i>
+                    @error('password')
+                        <div class="error-message" style="color: red;">{{ $message }}</div>
+                    @enderror
                 </div>
             </div>
 
@@ -88,7 +91,9 @@
                 <div class="input-icon">
                     <i class="fas fa-id-card"></i>
                     <input type="text" name="numero_identite" placeholder="Numéro carte d'identité" value="{{ old('numero_identite') }}" required>
-                    <div class="error-message" id="numeroIdentiteError"></div>
+                    @error('numero_identite')
+                        <div class="error-message" style="color: red;">{{ $message }}</div>
+                    @enderror
                 </div>
             </div>
 
@@ -96,7 +101,9 @@
                 <div class="input-icon">
                     <i class="fas fa-file-image"></i>
                     <input type="file" name="photo" accept=".png, .jpeg" required>
-                    <div class="error-message" id="photoError"></div>
+                    @error('photo')
+                        <div class="error-message" style="color: red;">{{ $message }}</div>
+                    @enderror
                 </div>
             </div>
 

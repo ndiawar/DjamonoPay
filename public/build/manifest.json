@@ -1104,7 +1104,7 @@
     "src": "public/assets/images/details_open.png"
   },
   "public/assets/scss/app.scss": {
-    "file": "assets/app-ada41474.css",
+    "file": "assets/app-cf7dd54f.css",
     "isEntry": true,
     "src": "public/assets/scss/app.scss"
   },
@@ -1119,7 +1119,7 @@
     "src": "resources/css/register.css"
   },
   "resources/css/style.css": {
-    "file": "assets/style-8cb61faf.css",
+    "file": "assets/style-097e0ee8.css",
     "isEntry": true,
     "src": "resources/css/style.css"
   },
@@ -1137,7 +1137,7 @@
     "src": "resources/js/login.js"
   },
   "resources/js/register.js": {
-    "file": "assets/register-c5f5cc3e.js",
+    "file": "assets/register-692df319.js",
     "isEntry": true,
     "src": "resources/js/register.js"
   }

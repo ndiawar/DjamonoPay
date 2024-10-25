@@ -8,6 +8,14 @@
     @vite(['resources/css/style.css', 'resources/js/login.js'])
     <!-- Intégration de Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* Styles pour les messages d'erreur */
+        .error-message {
+            color: red; /* Couleur du texte en rouge */
+            font-weight: bold; /* Mettre en gras */
+            margin-bottom: 10px; /* Espacement en bas */
+        }
+    </style>
 </head>
 
 <body>
@@ -65,7 +73,7 @@
                 <button type="submit" class="btn-connect">Se connecter</button>
 
                 @if ($errors->any())
-                    <div class="error">
+                    <div class="error-message">
                         <ul>
                             @foreach ($errors->all() as $error)
                                 <li>{{ $error }}</li>

@@ -10,7 +10,8 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     const form = document.getElementById('registrationForm');
-    
+    const registerButton = document.getElementById('registerButton'); // Remplacez par l'ID de votre bouton de soumission
+
     // Validation en temps réel
     form.addEventListener('input', function(event) {
         const target = event.target;
@@ -22,7 +23,7 @@ document.addEventListener('DOMContentLoaded', function() {
         target.classList.remove('valid', 'invalid');
 
         if (target.name === 'nom' || target.name === 'prenom') {
-            const regex = /^[A-Z][a-zA-Z]*$/; // Commence par une majuscule, suivi de lettres
+            const regex = /^[A-Z][a-zA-Z]*(\s[A-Z][a-zA-Z]*)*$/; // Commence par une majuscule, suivi de lettres (plusieurs mots possibles)
             if (!regex.test(target.value)) {
                 isValid = false;
                 errorMessageElement.textContent = 'Doit commencer par une majuscule et ne contenir que des lettres.';
@@ -38,10 +39,10 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         if (target.name === 'telephone') {
-            const regex = /^\+?[0-9]{10,15}$/; // Numéro de téléphone (ajustez selon vos besoins)
+            const regex = /^\d{9}$/; // Numéro de téléphone doit contenir exactement 9 chiffres
             if (!regex.test(target.value)) {
                 isValid = false;
-                errorMessageElement.textContent = 'Numéro de téléphone invalide.';
+                errorMessageElement.textContent = 'Numéro de téléphone invalide (exactement 9 chiffres).';
             }
         }
 
@@ -62,17 +63,18 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         if (target.name === 'password') {
-            const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d]{8,}$/; // Au moins 8 caractères, une majuscule, une minuscule et un chiffre
+            const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/; // Au moins 8 caractères, une majuscule, une minuscule, un chiffre et un caractère spécial
             if (!regex.test(target.value)) {
                 isValid = false;
-                errorMessageElement.textContent = 'Doit contenir au moins 8 caractères, une majuscule, une minuscule et un chiffre.';
+                errorMessageElement.textContent = 'Doit contenir au moins 8 caractères, une majuscule, une minuscule, un chiffre et un caractère spécial.';
             }
         }
 
         if (target.name === 'numero_identite') {
-            if (target.value.trim() === '') {
+            const regex = /^\d{9}$/; // Exactement 9 chiffres
+            if (!regex.test(target.value)) {
                 isValid = false;
-                errorMessageElement.textContent = 'Le numéro de carte d\'identité ne peut pas être vide.';
+                errorMessageElement.textContent = 'Le numéro d\'identité doit contenir exactement 9 chiffres.';
             }
         }
 
@@ -91,5 +93,12 @@ document.addEventListener('DOMContentLoaded', function() {
             target.classList.add('invalid');
             target.classList.remove('valid');
         }
+
+        // Vérifier si le formulaire est valide et activer/désactiver le bouton d'enregistrement
+        const allInputsValid = Array.from(form.elements).every(input => {
+            return input.classList.contains('valid') || input.type === 'submit';
+        });
+
+        registerButton.disabled = !allInputsValid; // Activer ou désactiver le bouton d'enregistrement
     });
 });
