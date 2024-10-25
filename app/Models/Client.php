@@ -27,6 +27,10 @@ class Client extends Model
     {
         return $this->belongsTo(User::class, 'user_id');
     }
+    public function compte(): BelongsTo
+    {
+        return $this->belongsTo(Compte::class, 'compte_id');
+    }
 
     /**
      * Créer un nouveau client avec un utilisateur associé
@@ -37,6 +41,11 @@ class Client extends Model
             $userData,
             ['role' => UserRole::CLIENT]
         ));
+
+        $compte = Compte::createWithNumber([
+            'solde' => 0,
+            'est_bloque' => false
+        ], $user);
 
         return self::create([
             'user_id' => $user->id,

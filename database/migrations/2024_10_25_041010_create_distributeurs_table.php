@@ -16,8 +16,15 @@ return new class extends Migration
             $table->foreignId('user_id')
                   ->constrained('users')
                   ->onDelete('cascade');
-            $table->decimal('solde', 10, 2)->default(0);
+            $table->foreignId('compte_id')
+                  ->constrained('comptes')
+                  ->onDelete('restrict');
+            $table->decimal('solde', 10, 2)->default(0)->comment('Solde des commissions'); // Solde pour les commissions
             $table->timestamps();
+
+            // Index
+            $table->unique('user_id');
+            $table->unique('compte_id');
         });
     }
 

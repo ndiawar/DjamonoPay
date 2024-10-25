@@ -1,170 +1,257 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Models;
 
-use App\Http\Requests\User\StoreUserRequest as UserStoreUserRequest;
-use App\Http\Requests\User\UpdateUserRequest as UserUpdateUserRequest;
-use App\Http\Requests\Users\StoreUserRequest;
-use App\Http\Requests\Users\UpdateUserRequest;
-use App\Http\Resources\UserCollection;
-use App\Http\Resources\UserResource;
-use App\Models\Distributeur;
-use App\Models\User;
-use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Hash;
+use App\Enums\UserRole;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
+use Laravel\Fortify\TwoFactorAuthenticatable;
+use Laravel\Jetstream\HasProfilePhoto;
+use Laravel\Sanctum\HasApiTokens;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
-class UserController extends Controller
+class User extends Authenticatable
 {
-    /**
-     * Afficher la liste des utilisateurs avec recherche et tri
-     */
-    public function index(Request $request)
-    {
-        $users = User::when($request->search, function($query, $search) {
-                $query->where('nom', 'like', "%{$search}%")
-                    ->orWhere('prenom', 'like', "%{$search}%")
-                    ->orWhere('email', 'like', "%{$search}%")
-                    ->orWhere('numero_identite', 'like', "%{$search}%");
-            })
-            ->when($request->role, function($query, $role) {
-                $query->where('role', $role);
-            })
-            ->orderBy($request->sort_by ?? 'created_at', $request->sort_direction ?? 'desc')
-            ->paginate($request->per_page ?? 10);
+    use HasApiTokens;
+    use HasFactory;
+    use HasProfilePhoto;
+    use Notifiable;
+    use TwoFactorAuthenticatable;
 
-        return new UserCollection($users);
-    }
+    // Constantes pour l'état du compte
+    public const ETAT_ACTIF = 'actif';
+    public const ETAT_BLOQUE = 'bloque';
 
     /**
-     * Créer un nouvel utilisateur
+     * Les attributs qui sont assignables en masse.
      */
-    public function store(UserStoreUserRequest $request): JsonResponse
-    {
-        try {
-            DB::beginTransaction();
-
-            $userData = $request->validated();
-            $userData['mot_de_passe'] = Hash::make($userData['mot_de_passe']);
-            
-            $user = User::create($userData);
-
-            DB::commit();
-
-            return response()->json([
-                'message' => 'Utilisateur créé avec succès',
-                'data' => new UserResource($user)
-            ], 201);
-
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return response()->json([
-                'message' => 'Erreur lors de la création de l\'utilisateur',
-                'error' => $e->getMessage()
-            ], 500);
-        }
-    }
+    protected $fillable = [
+        'nom',
+        'prenom',
+        'email',
+        'photo',
+        'password',
+        'role',
+        'telephone',
+        'adresse',
+        'date_naissance',
+        'numero_identite',
+        'etat_compte'
+    ];
 
     /**
-     * Afficher un utilisateur spécifique
+     * Les attributs qui doivent être cachés pour la sérialisation.
      */
-    public function show(User $users): JsonResponse
-    {
-        try {
-            return response()->json([
-                'data' => new UserResource($users)
-            ]);
-        } catch (\Exception $e) {
-            return response()->json([
-                'message' => 'Erreur lors de la récupération de l\'utilisateur',
-                'error' => $e->getMessage()
-            ], 500);
-        }
-    }
+    protected $hidden = [
+        'password',
+        'remember_token',
+        'two_factor_recovery_codes',
+        'two_factor_secret',
+    ];
 
     /**
-     * Mettre à jour un utilisateur
+     * Les attributs qui doivent être convertis.
      */
-    public function update(UserUpdateUserRequest $request, User $users): JsonResponse
-    {
-        try {
-            DB::beginTransaction();
+    protected $casts = [
+        'email_verified_at' => 'datetime',
+        'date_naissance' => 'date',
+        'etat_compte' => 'string',
+        'role' => UserRole::class
+    ];
 
-            $userData = $request->validated();
-            
-            // Hash du mot de passe seulement s'il est fourni
-            if (isset($userData['mot_de_passe'])) {
-                $userData['mot_de_passe'] = Hash::make($userData['mot_de_passe']);
+    /**
+     * Les accesseurs à ajouter au tableau du modèle.
+     */
+    protected $appends = [
+        'profile_photo_url',
+        'nom_complet'
+    ];
+
+    /**
+     * Valeurs par défaut des attributs
+     */
+    protected $attributes = [
+        'etat_compte' => self::ETAT_ACTIF
+    ];
+
+    /**
+     * Boot du modèle
+     */
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::created(function ($user) {
+            try {
+                switch ($user->role) {
+                    case UserRole::CLIENT:
+                        if (!$user->compte) {
+                            Compte::createWithNumber([
+                                'solde' => 0,
+                                'est_bloque' => false
+                            ], $user);
+                        }
+                        break;
+
+                    case UserRole::DISTRIBUTEUR:
+                        if (!$user->distributeur) {
+                            $user->distributeur()->create(['solde' => 0]);
+                            // Créer aussi un compte pour le distributeur
+                            if (!$user->compte) {
+                                Compte::createWithNumber([
+                                    'solde' => 0,
+                                    'est_bloque' => false
+                                ], $user);
+                            }
+                        }
+                        break;
+
+                    case UserRole::AGENT:
+                        if (!$user->agent) {
+                            $user->agent()->create([]);
+                        }
+                        break;
+                }
+            } catch (\Exception $e) {
+                report($e);
+                throw $e;
             }
+        });
 
-            $users->update($userData);
-
-            DB::commit();
-
-            return response()->json([
-                'message' => 'Utilisateur mis à jour avec succès',
-                'data' => new UserResource($users)
-            ]);
-
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return response()->json([
-                'message' => 'Erreur lors de la mise à jour de l\'utilisateur',
-                'error' => $e->getMessage()
-            ], 500);
-        }
+        // Suppression en cascade
+        static::deleting(function ($user) {
+            $user->compte()->delete();
+            $user->distributeur()->delete();
+            $user->agent()->delete();
+            $user->transactions()->delete();
+            $user->transactionsDistribuees()->delete();
+            $user->transactionsAgent()->delete();
+        });
     }
 
     /**
-     * Supprimer un utilisateur
+     * Relations
      */
-    public function destroy(User $users): JsonResponse
+    public function distributeur(): HasOne
     {
-        try {
-            DB::beginTransaction();
+        return $this->hasOne(Distributeur::class, 'user_id');
+    }
 
-            $users->delete();
+    public function agent(): HasOne
+    {
+        return $this->hasOne(Agent::class, 'user_id');
+    }
 
-            DB::commit();
+    public function compte(): HasOne
+    {
+        return $this->hasOne(Compte::class);
+    }
 
-            return response()->json([
-                'message' => 'Utilisateur supprimé avec succès'
-            ]);
+    public function transactions(): HasMany
+    {
+        return $this->hasMany(Transaction::class);
+    }
 
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return response()->json([
-                'message' => 'Erreur lors de la suppression de l\'utilisateur',
-                'error' => $e->getMessage()
-            ], 500);
-        }
+    public function transactionsDistribuees(): HasMany
+    {
+        return $this->hasMany(Transaction::class, 'distributeur_id');
+    }
+
+    public function transactionsAgent(): HasMany
+    {
+        return $this->hasMany(Transaction::class, 'agent_id');
     }
 
     /**
-     * Activer/désactiver le compte d'un utilisateur
+     * Accesseurs et Mutateurs
      */
-    public function toggleStatus(User $users): JsonResponse
+    public function getNomCompletAttribute(): string
     {
-        try {
-            $users->update([
-                'etat_compte' => !$users->etat_compte
-            ]);
-
-            return response()->json([
-                'message' => 'État du compte modifié avec succès',
-                'data' => new UserResource($users)
-            ]);
-
-        } catch (\Exception $e) {
-            return response()->json([
-                'message' => 'Erreur lors de la modification de l\'état du compte',
-                'error' => $e->getMessage()
-            ], 500);
-        }
+        return "{$this->nom} {$this->prenom}";
     }
-    public function distributeur()
-{
-    return $this->hasOne(Distributeur::class);
-}
+
+    /**
+     * Scopes
+     */
+    public function scopeRole($query, $role)
+    {
+        return $query->where('role', $role);
+    }
+
+    public function scopeActif($query)
+    {
+        return $query->where('etat_compte', self::ETAT_ACTIF);
+    }
+
+    public function scopeBloque($query)
+    {
+        return $query->where('etat_compte', self::ETAT_BLOQUE);
+    }
+
+    /**
+     * Méthodes d'assistance
+     */
+    public function isAgent(): bool
+    {
+        return $this->role === UserRole::AGENT;
+    }
+
+    public function isDistributeur(): bool
+    {
+        return $this->role === UserRole::DISTRIBUTEUR;
+    }
+
+    public function isClient(): bool
+    {
+        return $this->role === UserRole::CLIENT;
+    }
+
+    public function isActive(): bool
+    {
+        return $this->etat_compte === self::ETAT_ACTIF;
+    }
+
+    public function getSolde()
+    {
+        return match ($this->role) {
+            UserRole::CLIENT => $this->compte?->solde ?? 0,
+            UserRole::DISTRIBUTEUR => $this->distributeur?->solde ?? 0,
+            default => 0
+        };
+    }
+
+    /**
+     * Méthodes de gestion
+     */
+    public function bloquerCompte(): bool
+    {
+        $this->etat_compte = self::ETAT_BLOQUE;
+        if ($this->compte) {
+            $this->compte->est_bloque = true;
+            $this->compte->save();
+        }
+        return $this->save();
+    }
+
+    public function debloquerCompte(): bool
+    {
+        $this->etat_compte = self::ETAT_ACTIF;
+        if ($this->compte) {
+            $this->compte->est_bloque = false;
+            $this->compte->save();
+        }
+        return $this->save();
+    }
+
+    public function getProfilSpecifique()
+    {
+        return match ($this->role) {
+            UserRole::CLIENT => $this->compte,
+            UserRole::DISTRIBUTEUR => $this->distributeur,
+            UserRole::AGENT => $this->agent,
+            default => null
+        };
+    }
 }

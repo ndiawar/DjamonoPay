@@ -13,7 +13,7 @@ class Distributeur extends Model
 
     protected $fillable = [
         'user_id',
-        'solde'
+        'solde',
     ];
 
     protected $casts = [
@@ -29,6 +29,14 @@ class Distributeur extends Model
     }
 
     /**
+     * Obtenir le compte associé au distributeur
+     */
+    public function compte(): BelongsTo
+    {
+        return $this->belongsTo(Compte::class, 'compte_id');
+    }
+
+    /**
      * Créer un nouveau distributeur avec un utilisateur associé
      */
     public static function createWithUser(array $userData): self
@@ -38,13 +46,30 @@ class Distributeur extends Model
             ['role' => UserRole::DISTRIBUTEUR]
         ));
 
+        $compte = Compte::createWithNumber([
+            'solde' => 0,
+            'est_bloque' => false
+        ], $user);
+
         return self::create([
             'user_id' => $user->id,
             'solde' => 0 // Solde initial à 0
         ]);
     }
+
+    /**
+     * Vérifier si le distributeur peut effectuer une transaction
+     */
+    public function peutEffectuerTransaction(float $montant): bool
+    {
+        return $this->compte && $this->compte->solde >= $montant;
+    }
+
+    /**
+     * Relation avec les utilisateurs (pour la rétrocompatibilité)
+     */
     public function users()
-{
-    return $this->belongsTo(User::class, 'user_id');
-}
+    {
+        return $this->belongsTo(User::class, 'user_id');
+    }
 }

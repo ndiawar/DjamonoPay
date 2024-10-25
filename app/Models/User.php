@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\UserRole;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -18,6 +19,10 @@ class User extends Authenticatable
     use HasProfilePhoto;
     use Notifiable;
     use TwoFactorAuthenticatable;
+
+    // Constantes pour l'état du compte
+    public const ETAT_ACTIF = 'actif';
+    public const ETAT_BLOQUE = 'bloque';
 
     /**
      * Les attributs qui sont assignables en masse.
@@ -58,6 +63,8 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
         'date_naissance' => 'date',
+        'etat_compte' => 'string',
+        'role' => UserRole::class
     ];
 
     /**
@@ -71,9 +78,43 @@ class User extends Authenticatable
     ];
 
     /**
-     * Obtenir la relation avec le modèle Distributeur
+     * Valeurs par défaut des attributs
      *
-     * @return HasOne
+     * @var array
+     */
+    protected $attributes = [
+        'etat_compte' => self::ETAT_ACTIF
+    ];
+
+    /**
+     * Boot du modèle
+     */
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::created(function ($user) {
+            switch ($user->role) {
+                case UserRole::CLIENT:
+                    Compte::createWithNumber([
+                        'solde' => 0,
+                        'est_bloque' => false
+                    ], $user);
+                    break;
+                case UserRole::DISTRIBUTEUR:
+                    $user->distributeur()->create([
+                        'solde' => 0
+                    ]);
+                    break;
+                case UserRole::AGENT:
+                    $user->agent()->create([]);
+                    break;
+            }
+        });
+    }
+
+    /**
+     * Obtenir la relation avec le modèle Distributeur
      */
     public function distributeur(): HasOne
     {
@@ -81,9 +122,36 @@ class User extends Authenticatable
     }
 
     /**
+     * Obtenir la relation avec le modèle Agent
+     */
+    public function agent(): HasOne
+    {
+        return $this->hasOne(Agent::class, 'user_id');
+    }
+
+    /**
+     * Obtenir la relation avec le modèle Compte
+     */
+    public function compte(): HasOne
+    {
+        return $this->hasOne(Compte::class, 'user_id');
+    }
+
+    /**
+     * Obtenir le profil selon le rôle
+     */
+    public function profil()
+    {
+        return match ($this->role) {
+            UserRole::CLIENT => $this->compte,
+            UserRole::DISTRIBUTEUR => $this->distributeur,
+            UserRole::AGENT => $this->agent,
+            default => null
+        };
+    }
+
+    /**
      * Obtenir le nom complet de l'utilisateur
-     *
-     * @return string
      */
     public function getNomCompletAttribute(): string
     {
@@ -92,8 +160,6 @@ class User extends Authenticatable
 
     /**
      * Obtenir toutes les transactions où l'utilisateur est le client
-     *
-     * @return HasMany
      */
     public function transactions(): HasMany
     {
@@ -102,8 +168,6 @@ class User extends Authenticatable
 
     /**
      * Obtenir toutes les transactions où l'utilisateur est le distributeur
-     *
-     * @return HasMany
      */
     public function transactionsDistribuees(): HasMany
     {
@@ -112,8 +176,6 @@ class User extends Authenticatable
 
     /**
      * Obtenir toutes les transactions où l'utilisateur est l'agent
-     *
-     * @return HasMany
      */
     public function transactionsAgent(): HasMany
     {
@@ -121,11 +183,15 @@ class User extends Authenticatable
     }
 
     /**
+     * Obtenir les transactions actives de l'utilisateur
+     */
+    public function transactionsActives(): HasMany
+    {
+        return $this->transactions()->where('etat', 'en_attente');
+    }
+
+    /**
      * Définir une requête pour inclure uniquement les utilisateurs d'un rôle donné
-     *
-     * @param  \Illuminate\Database\Eloquent\Builder  $query
-     * @param  string  $role
-     * @return \Illuminate\Database\Eloquent\Builder
      */
     public function scopeRole($query, $role)
     {
@@ -134,46 +200,93 @@ class User extends Authenticatable
 
     /**
      * Vérifier si l'utilisateur est un agent
-     *
-     * @return bool
      */
     public function isAgent(): bool
     {
-        return $this->role === 'agent';
+        return $this->role === UserRole::AGENT;
     }
 
     /**
      * Vérifier si l'utilisateur est un distributeur
-     *
-     * @return bool
      */
     public function isDistributeur(): bool
     {
-        return $this->role === 'distributeur';
+        return $this->role === UserRole::DISTRIBUTEUR;
     }
 
     /**
      * Vérifier si l'utilisateur est un client
-     *
-     * @return bool
      */
     public function isClient(): bool
     {
-        return $this->role === 'client';
+        return $this->role === UserRole::CLIENT;
     }
 
     /**
-     * Obtenir les transactions actives de l'utilisateur
-     *
-     * @return HasMany
+     * Vérifier si le compte est actif
      */
-    public function transactionsActives(): HasMany
+    public function isActive(): bool
     {
-        return $this->transactions()->where('etat', 'en_attente');
+        return $this->etat_compte === self::ETAT_ACTIF;
     }
 
-    public function compte()
-{
-    return $this->hasOne(Compte::class);
-}
+    /**
+     * Vérifier si le compte est bloqué
+     */
+    public function isBlocked(): bool
+    {
+        return $this->etat_compte === self::ETAT_BLOQUE;
+    }
+
+    /**
+     * Vérifier si l'utilisateur a un profil
+     */
+    public function hasProfile(): bool
+    {
+        return $this->profil() !== null;
+    }
+
+    /**
+     * Obtenir le solde de l'utilisateur
+     */
+    public function getSolde()
+    {
+        return match ($this->role) {
+            UserRole::CLIENT => $this->compte?->solde ?? 0,
+            UserRole::DISTRIBUTEUR => $this->distributeur?->solde ?? 0,
+            default => 0
+        };
+    }
+
+    /**
+     * Obtenir la couleur associée au rôle
+     */
+    public function getRoleColor(): string
+    {
+        return UserRole::getRoleColors()[$this->role] ?? 'gray';
+    }
+
+    /**
+     * Obtenir l'icône associée au rôle
+     */
+    public function getRoleIcon(): string
+    {
+        return UserRole::getRoleIcon($this->role);
+    }
+
+    /**
+     * Vérifier si l'utilisateur peut gérer les utilisateurs
+     */
+    public function canManageUsers(): bool
+    {
+        return UserRole::canManageUsers($this->role);
+    }
+
+    /**
+     * Vérifier si l'utilisateur peut gérer les transactions
+     */
+    public function canManageTransactions(): bool
+    {
+        return UserRole::canManageTransactions($this->role);
+    }
 }

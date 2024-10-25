@@ -15,7 +15,7 @@ use Endroid\QrCode\Writer\PngWriter;
 class CompteController extends Controller
 {
     // Constante pour la durée de validité du QR Code (3 minutes)
-    private const QR_CODE_VALIDITY = 3;
+    private const QR_CODE_VALIDITY = 1;
 
     /**
      * Créditer un compte via un distributeur
