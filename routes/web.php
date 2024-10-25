@@ -36,7 +36,7 @@ Route::prefix('dashboard')->group(function () {
     Route::view('dashboard-client', 'dashboard.dashboard-client')->name('dashboard-client');
     Route::view('dashboard-activitées', 'dashboard.dashboard-activitées')->name('dashboard-activitées');
     Route::view('dashboard-utilisateurs', 'dashboard.dashboard-utilisateurs')->name('dashboard-utilisateurs');
-
+    Route::view('profil-user', 'page.profil')->name('profil-user');
 });
 
 
@@ -101,6 +101,7 @@ Route::prefix('comptes')->name('comptes.')->group(function () {
     Route::post('{compte}/qr-code', [CompteController::class, 'generateQrCode'])->name('qr-code');
     Route::post('{compte}/verifier-qr-code', [CompteController::class, 'verifierQrCode'])->name('verifier-qr-code');
 });
+
 
 
 

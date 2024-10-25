@@ -1,257 +1,247 @@
 <?php
 
-namespace App\Models;
+namespace App\Http\Controllers;
 
-use App\Enums\UserRole;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Notifications\Notifiable;
-use Laravel\Fortify\TwoFactorAuthenticatable;
-use Laravel\Jetstream\HasProfilePhoto;
-use Laravel\Sanctum\HasApiTokens;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\HasOne;
+use App\Http\Requests\User\StoreUserRequest;
+use App\Http\Requests\User\UpdateUserRequest;
+use App\Http\Resources\UserCollection;
+use App\Http\Resources\UserResource;
+use App\Models\User;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Storage;
 
-class User extends Authenticatable
+class UserController extends Controller
 {
-    use HasApiTokens;
-    use HasFactory;
-    use HasProfilePhoto;
-    use Notifiable;
-    use TwoFactorAuthenticatable;
-
-    // Constantes pour l'état du compte
-    public const ETAT_ACTIF = 'actif';
-    public const ETAT_BLOQUE = 'bloque';
+    /**
+     * Relations à charger automatiquement
+     */
+    private const RELATIONS = ['compte', 'distributeur', 'agent'];
 
     /**
-     * Les attributs qui sont assignables en masse.
+     * Afficher la liste des utilisateurs
      */
-    protected $fillable = [
-        'nom',
-        'prenom',
-        'email',
-        'photo',
-        'password',
-        'role',
-        'telephone',
-        'adresse',
-        'date_naissance',
-        'numero_identite',
-        'etat_compte'
-    ];
-
-    /**
-     * Les attributs qui doivent être cachés pour la sérialisation.
-     */
-    protected $hidden = [
-        'password',
-        'remember_token',
-        'two_factor_recovery_codes',
-        'two_factor_secret',
-    ];
-
-    /**
-     * Les attributs qui doivent être convertis.
-     */
-    protected $casts = [
-        'email_verified_at' => 'datetime',
-        'date_naissance' => 'date',
-        'etat_compte' => 'string',
-        'role' => UserRole::class
-    ];
-
-    /**
-     * Les accesseurs à ajouter au tableau du modèle.
-     */
-    protected $appends = [
-        'profile_photo_url',
-        'nom_complet'
-    ];
-
-    /**
-     * Valeurs par défaut des attributs
-     */
-    protected $attributes = [
-        'etat_compte' => self::ETAT_ACTIF
-    ];
-
-    /**
-     * Boot du modèle
-     */
-    protected static function boot()
+    public function index(Request $request)
     {
-        parent::boot();
-
-        static::created(function ($user) {
-            try {
-                switch ($user->role) {
-                    case UserRole::CLIENT:
-                        if (!$user->compte) {
-                            Compte::createWithNumber([
-                                'solde' => 0,
-                                'est_bloque' => false
-                            ], $user);
-                        }
-                        break;
-
-                    case UserRole::DISTRIBUTEUR:
-                        if (!$user->distributeur) {
-                            $user->distributeur()->create(['solde' => 0]);
-                            // Créer aussi un compte pour le distributeur
-                            if (!$user->compte) {
-                                Compte::createWithNumber([
-                                    'solde' => 0,
-                                    'est_bloque' => false
-                                ], $user);
-                            }
-                        }
-                        break;
-
-                    case UserRole::AGENT:
-                        if (!$user->agent) {
-                            $user->agent()->create([]);
-                        }
-                        break;
+        $users = User::query()
+            ->when(
+                $request->search,
+                function (Builder $query, string $search) {
+                    $query->where(function (Builder $query) use ($search) {
+                        $query->where('nom', 'like', "%{$search}%")
+                            ->orWhere('prenom', 'like', "%{$search}%")
+                            ->orWhere('email', 'like', "%{$search}%")
+                            ->orWhere('numero_identite', 'like', "%{$search}%");
+                    });
                 }
-            } catch (\Exception $e) {
-                report($e);
-                throw $e;
+            )
+            ->when(
+                $request->role,
+                fn (Builder $query, string $role) => $query->role($role)
+            )
+            ->when(
+                $request->etat,
+                fn (Builder $query, string $etat) => $etat === User::ETAT_ACTIF ? $query->actif() : $query->bloque()
+            )
+            ->orderBy($request->sort_by ?? 'created_at', $request->sort_direction ?? 'desc')
+            ->with(self::RELATIONS)
+            ->paginate($request->per_page ?? 10);
+
+        // Si c'est une requête AJAX, retourner du JSON
+        if ($request->ajax()) {
+            return new UserCollection($users);
+        }
+
+        // Sinon retourner la vue
+        return view('users.index', compact('users'));
+    }
+
+    /**
+     * Afficher un utilisateur spécifique
+     */
+    public function show(User $user)
+    {
+        try {
+            $user->load(self::RELATIONS);
+
+            if (request()->ajax()) {
+                return response()->json([
+                    'data' => new UserResource($user)
+                ]);
             }
-        });
 
-        // Suppression en cascade
-        static::deleting(function ($user) {
-            $user->compte()->delete();
-            $user->distributeur()->delete();
-            $user->agent()->delete();
-            $user->transactions()->delete();
-            $user->transactionsDistribuees()->delete();
-            $user->transactionsAgent()->delete();
-        });
-    }
-
-    /**
-     * Relations
-     */
-    public function distributeur(): HasOne
-    {
-        return $this->hasOne(Distributeur::class, 'user_id');
-    }
-
-    public function agent(): HasOne
-    {
-        return $this->hasOne(Agent::class, 'user_id');
-    }
-
-    public function compte(): HasOne
-    {
-        return $this->hasOne(Compte::class);
-    }
-
-    public function transactions(): HasMany
-    {
-        return $this->hasMany(Transaction::class);
-    }
-
-    public function transactionsDistribuees(): HasMany
-    {
-        return $this->hasMany(Transaction::class, 'distributeur_id');
-    }
-
-    public function transactionsAgent(): HasMany
-    {
-        return $this->hasMany(Transaction::class, 'agent_id');
-    }
-
-    /**
-     * Accesseurs et Mutateurs
-     */
-    public function getNomCompletAttribute(): string
-    {
-        return "{$this->nom} {$this->prenom}";
-    }
-
-    /**
-     * Scopes
-     */
-    public function scopeRole($query, $role)
-    {
-        return $query->where('role', $role);
-    }
-
-    public function scopeActif($query)
-    {
-        return $query->where('etat_compte', self::ETAT_ACTIF);
-    }
-
-    public function scopeBloque($query)
-    {
-        return $query->where('etat_compte', self::ETAT_BLOQUE);
-    }
-
-    /**
-     * Méthodes d'assistance
-     */
-    public function isAgent(): bool
-    {
-        return $this->role === UserRole::AGENT;
-    }
-
-    public function isDistributeur(): bool
-    {
-        return $this->role === UserRole::DISTRIBUTEUR;
-    }
-
-    public function isClient(): bool
-    {
-        return $this->role === UserRole::CLIENT;
-    }
-
-    public function isActive(): bool
-    {
-        return $this->etat_compte === self::ETAT_ACTIF;
-    }
-
-    public function getSolde()
-    {
-        return match ($this->role) {
-            UserRole::CLIENT => $this->compte?->solde ?? 0,
-            UserRole::DISTRIBUTEUR => $this->distributeur?->solde ?? 0,
-            default => 0
-        };
-    }
-
-    /**
-     * Méthodes de gestion
-     */
-    public function bloquerCompte(): bool
-    {
-        $this->etat_compte = self::ETAT_BLOQUE;
-        if ($this->compte) {
-            $this->compte->est_bloque = true;
-            $this->compte->save();
+            return view('users.show', compact('user'));
+        } catch (\Exception $e) {
+            report($e);
+            if (request()->ajax()) {
+                return response()->json([
+                    'message' => 'Erreur lors de la récupération de l\'utilisateur',
+                    'error' => $e->getMessage()
+                ], 500);
+            }
+            return back()->with('error', 'Erreur lors de la récupération de l\'utilisateur');
         }
-        return $this->save();
     }
 
-    public function debloquerCompte(): bool
+    /**
+     * Afficher le formulaire d'édition
+     */
+    public function edit(User $user)
     {
-        $this->etat_compte = self::ETAT_ACTIF;
-        if ($this->compte) {
-            $this->compte->est_bloque = false;
-            $this->compte->save();
+        try {
+            $user->load(self::RELATIONS);
+            return view('users.edit', compact('user'));
+        } catch (\Exception $e) {
+            report($e);
+            return back()->with('error', 'Erreur lors du chargement du formulaire d\'édition');
         }
-        return $this->save();
     }
 
-    public function getProfilSpecifique()
+    /**
+     * Mettre à jour un utilisateur
+     */
+    public function update(UpdateUserRequest $request, User $user)
     {
-        return match ($this->role) {
-            UserRole::CLIENT => $this->compte,
-            UserRole::DISTRIBUTEUR => $this->distributeur,
-            UserRole::AGENT => $this->agent,
-            default => null
-        };
+        try {
+            DB::beginTransaction();
+
+            $userData = $request->validated();
+            
+            // Gestion du mot de passe
+            if (isset($userData['password']) && !empty($userData['password'])) {
+                $userData['password'] = Hash::make($userData['password']);
+            } else {
+                unset($userData['password']);
+            }
+
+            // Gestion de la photo
+            if ($request->hasFile('photo')) {
+                // Supprimer l'ancienne photo si elle existe
+                if ($user->photo) {
+                    Storage::disk('public')->delete($user->photo);
+                }
+                // Stocker la nouvelle photo
+                $userData['photo'] = $request->file('photo')->store('users/photos', 'public');
+            }
+
+            // Mise à jour de l'utilisateur
+            $user->update($userData);
+
+            // Gestion de l'état du compte
+            if (isset($userData['etat_compte']) && $userData['etat_compte'] !== $user->getOriginal('etat_compte')) {
+                $userData['etat_compte'] === User::ETAT_ACTIF
+                    ? $user->debloquerCompte()
+                    : $user->bloquerCompte();
+            }
+
+            DB::commit();
+
+            if ($request->ajax()) {
+                return response()->json([
+                    'message' => 'Utilisateur mis à jour avec succès',
+                    'data' => new UserResource($user->load(self::RELATIONS))
+                ]);
+            }
+
+            return redirect()
+                ->route('users.index')
+                ->with('success', 'Utilisateur mis à jour avec succès');
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            report($e);
+            
+            if ($request->ajax()) {
+                return response()->json([
+                    'message' => 'Erreur lors de la mise à jour de l\'utilisateur',
+                    'error' => $e->getMessage()
+                ], 500);
+            }
+
+            return back()
+                ->withInput()
+                ->with('error', 'Erreur lors de la mise à jour de l\'utilisateur');
+        }
+    }
+
+    /**
+     * Supprimer un utilisateur
+     */
+    public function destroy(User $user)
+    {
+        try {
+            DB::beginTransaction();
+
+            // Supprimer la photo si elle existe
+            if ($user->photo) {
+                Storage::disk('public')->delete($user->photo);
+            }
+
+            $user->delete();
+
+            DB::commit();
+
+            if (request()->ajax()) {
+                return response()->json([
+                    'message' => 'Utilisateur supprimé avec succès'
+                ]);
+            }
+
+            return back()->with('success', 'Utilisateur supprimé avec succès');
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            report($e);
+            
+            if (request()->ajax()) {
+                return response()->json([
+                    'message' => 'Erreur lors de la suppression de l\'utilisateur',
+                    'error' => $e->getMessage()
+                ], 500);
+            }
+
+            return back()->with('error', 'Erreur lors de la suppression de l\'utilisateur');
+        }
+    }
+
+    /**
+     * Activer/désactiver le compte d'un utilisateur
+     */
+    public function toggleStatus(User $user)
+    {
+        try {
+            DB::beginTransaction();
+
+            $user->etat_compte === User::ETAT_ACTIF
+                ? $user->bloquerCompte()
+                : $user->debloquerCompte();
+
+            DB::commit();
+
+            if (request()->ajax()) {
+                return response()->json([
+                    'message' => 'État du compte modifié avec succès',
+                    'data' => new UserResource($user->load(self::RELATIONS))
+                ]);
+            }
+
+            return back()->with('success', 'État du compte modifié avec succès');
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            report($e);
+            
+            if (request()->ajax()) {
+                return response()->json([
+                    'message' => 'Erreur lors de la modification de l\'état du compte',
+                    'error' => $e->getMessage()
+                ], 500);
+            }
+
+            return back()->with('error', 'Erreur lors de la modification de l\'état du compte');
+        }
     }
 }

@@ -113,7 +113,6 @@ class PropertyGenerator extends AbstractMemberGenerator
      * @configkey omitdefaultvalue   bool
      * @configkey readonly           bool
      * @configkey type               null|TypeGenerator
-     * @param  array  $array
      * @return static
      * @throws Exception\InvalidArgumentException
      */

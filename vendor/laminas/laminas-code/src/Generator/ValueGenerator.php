@@ -62,7 +62,6 @@ class ValueGenerator extends AbstractGenerator
     /** @var self::OUTPUT_* */
     protected string $outputMode = self::OUTPUT_MULTIPLE_LINE;
 
-    /** @var array */
     protected array $allowedTypes = [];
 
     /**
