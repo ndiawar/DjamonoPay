@@ -4,7 +4,6 @@
 @section('style')
 <link rel="stylesheet" type="text/css" href="{{ asset('assets/css/vendors/animate.css') }}">
 <link rel="stylesheet" type="text/css" href="{{ asset('assets/css/vendors/datatables.css') }}">
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 @endsection
 
 @section('breadcrumb-title')
@@ -27,12 +26,14 @@
               <div class="card p-3" style="width: 18rem;">
                 <!-- Solde masqué/affiché -->
                 <h3 id="balance" class="text-center">
-                    <span id="balanceValue">1542789 F</span>
-                    <i class="text-dark bi bi-eye-slash" id="toggleBalance" onclick="toggleBalance()" style="cursor:pointer;"></i>
+                    <span id="balanceValue">{{ number_format($balance, 0, ',', ' ') }} F</span>
+                    <i class="bi bi-eye-slash" id="toggleBalance" onclick="toggleBalance()" style="cursor:pointer;"></i>
                 </h3>
 
                 <!-- QR Code -->
-                
+                <div class="text-center">
+                    <img src="data:image/png;base64, {{ $qrCodeBase64 }}" alt="QR Code">
+                </div>
 
                 <!-- Bouton pour transférer (ouvre le modal) -->
                 <div class="text-center mt-3">
@@ -218,20 +219,5 @@
 <script src="{{ asset('assets/js/datatable/datatables/jquery.dataTables.min.js') }}"></script>
 <script src="{{ asset('assets/js/datatable/datatables/datatable.custom.js') }}"></script>
 <script src="{{ asset('assets/js/dashboard/dashboard_5.js') }}"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
-<script>
-function toggleBalance() {
-    const balance = document.getElementById('balanceValue');
-    const icon = document.getElementById('toggleBalance');
-    if (balance.style.display === 'none') {
-        balance.style.display = 'inline';
-        icon.className = 'bi bi-eye-slash';
-    } else {
-        balance.style.display = 'none';
-        icon.className = 'bi bi-eye';
-    }
-}
-</script>
 
 @endsection

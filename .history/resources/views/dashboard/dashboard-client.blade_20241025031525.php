@@ -4,7 +4,6 @@
 @section('style')
 <link rel="stylesheet" type="text/css" href="{{ asset('assets/css/vendors/animate.css') }}">
 <link rel="stylesheet" type="text/css" href="{{ asset('assets/css/vendors/datatables.css') }}">
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 @endsection
 
 @section('breadcrumb-title')
@@ -28,7 +27,7 @@
                 <!-- Solde masqué/affiché -->
                 <h3 id="balance" class="text-center">
                     <span id="balanceValue">1542789 F</span>
-                    <i class="text-dark bi bi-eye-slash" id="toggleBalance" onclick="toggleBalance()" style="cursor:pointer;"></i>
+                    <i class="bi bi-eye-slash" id="toggleBalance" onclick="toggleBalance()" style="cursor:pointer;"></i>
                 </h3>
 
                 <!-- QR Code -->
@@ -218,8 +217,6 @@
 <script src="{{ asset('assets/js/datatable/datatables/jquery.dataTables.min.js') }}"></script>
 <script src="{{ asset('assets/js/datatable/datatables/datatable.custom.js') }}"></script>
 <script src="{{ asset('assets/js/dashboard/dashboard_5.js') }}"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
 <script>
 function toggleBalance() {
     const balance = document.getElementById('balanceValue');

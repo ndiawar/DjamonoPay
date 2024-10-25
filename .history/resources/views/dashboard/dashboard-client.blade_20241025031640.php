@@ -28,7 +28,7 @@
                 <!-- Solde masqué/affiché -->
                 <h3 id="balance" class="text-center">
                     <span id="balanceValue">1542789 F</span>
-                    <i class="text-dark bi bi-eye-slash" id="toggleBalance" onclick="toggleBalance()" style="cursor:pointer;"></i>
+                    <i class="bi bi-eye-slash" id="toggleBalance" onclick="toggleBalance()" style="cursor:pointer;"></i>
                 </h3>
 
                 <!-- QR Code -->
