@@ -42,7 +42,6 @@
             </div>
           </div>
           <ul class="profile-dropdown onhover-show-div">
-          <li><a href="#"><i data-feather="user"></i><span>Account </span></a></li>
             <li>
                 <a href="{{ route('logout') }}" 
                    onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
@@ -64,6 +63,6 @@
       </div>
       </div>
     </script>
-    <!-- <script class="empty-template" type="text/x-handlebars-template"><div class="EmptyMessage">Your search turned up 0 results. This most likely means the backend is down, yikes!</div></script> -->
+    <script class="empty-template" type="text/x-handlebars-template"><div class="EmptyMessage">Your search turned up 0 results. This most likely means the backend is down, yikes!</div></script>
   </div>
 </div>
