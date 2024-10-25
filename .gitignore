@@ -1,34 +1,38 @@
 # Laravel
 /vendor
 /node_modules
-/public/hot
-/public/storage
-/storage/*.key
 
-# Environnement
+# Composer
+composer.lock
+
+# Laravel environment variables
 .env
-.env.local
-.env.*.local
+.env.backup
 
-# Fichiers de logs
-/storage/logs
-/storage/framework/cache
+# Laravel cached files
+/storage/*.key
+/storage/app/public
 /storage/framework/sessions
 /storage/framework/views
+/storage/framework/cache
 
-# Cache de l'application
-/bootstrap/cache/*.php
+# Laravel logs
+/storage/logs
+/public/hot
+/public/storage
+/public/mix-manifest.json
 
-# Autres fichiers de configuration
-*.sublime-project
+# IDEs and editors
+.idea
+.vscode
 *.sublime-workspace
 
-# IDEs
-/.idea
-/.vscode
-*.log
-*.swp
-
-# OS generated files
+# OS specific files
 .DS_Store
 Thumbs.db
+
+# Other files
+npm-debug.log
+yarn-error.log
+# Ignorer le dossier .history de VSCode ou autres extensions
+.history
