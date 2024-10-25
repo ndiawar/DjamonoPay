@@ -1104,12 +1104,12 @@
     "src": "public/assets/images/details_open.png"
   },
   "public/assets/scss/app.scss": {
-    "file": "assets/app-ada41474.css",
+    "file": "assets/app-c89f1bca.css",
     "isEntry": true,
     "src": "public/assets/scss/app.scss"
   },
   "resources/css/app.css": {
-    "file": "assets/app-68457e87.css",
+    "file": "assets/app-74aa6698.css",
     "isEntry": true,
     "src": "resources/css/app.css"
   },
@@ -1119,7 +1119,7 @@
     "src": "resources/css/register.css"
   },
   "resources/css/style.css": {
-    "file": "assets/style-8cb61faf.css",
+    "file": "assets/style-097e0ee8.css",
     "isEntry": true,
     "src": "resources/css/style.css"
   },

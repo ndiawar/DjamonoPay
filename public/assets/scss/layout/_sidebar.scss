@@ -31,7 +31,7 @@
   transform: translateY(-50%);
   left: 25px;
   border-radius: 100%;
-  background: var(--theme-deafult);
+  background: #1f8feb;
   opacity: 0;
   visibility: hidden;
 
@@ -396,7 +396,7 @@
                 transition: all 0.3s ease;
 
                 &:hover {
-                  stroke: var(--theme-deafult);
+                  stroke: #1f8feb;
                   transition: all 0.3s ease;
                 }
               }
@@ -694,16 +694,16 @@
             &:hover {
               a {
                 span {
-                  color: var(--theme-deafult);
+                  color: #1f8feb;
                   transition: color 0.3s ease;
                 }
 
                 svg {
-                  stroke: var(--theme-deafult);
+                  stroke: #1f8feb;
                   transition: stroke 0.3s ease;
 
                   path {
-                    stroke: var(--theme-deafult);
+                    stroke: #1f8feb;
                     transition: stroke 0.3s ease;
                   }
                 }
@@ -811,7 +811,7 @@
           }
 
           &.active {
-            color: var(--theme-deafult);
+            color: #1f8feb;
             font-weight: 500;
           }
 
@@ -843,11 +843,11 @@
                           transition: all 0.3s ease;
 
                           &.stroke-icon {
-                            stroke: var(--theme-deafult);
+                            stroke: #1f8feb;
                           }
 
                           &.fill-icon {
-                            fill: var(--theme-deafult);
+                            fill: #1f8feb;
                           }
                         }
                       }
@@ -1031,10 +1031,10 @@
                   li {
                     a {
                       &.active {
-                        color: var(--theme-deafult);
+                        color: #1f8feb;
 
                         &:after {
-                          background-color: var(--theme-deafult);
+                          background-color: #1f8feb;
                         }
                       }
                     }
@@ -1066,7 +1066,7 @@
                       &:hover {
                         >a {
                           >span {
-                            color: var(--theme-deafult);
+                            color: #1f8feb;
                             transition: all 0.3s ease;
                           }
                         }
@@ -1077,12 +1077,12 @@
 
                           svg {
                             &.stroke-icon {
-                              stroke: var(--theme-deafult);
+                              stroke: #1f8feb;
                               transition: all 0.3s ease;
                             }
 
                             &.fill-icon {
-                              fill: var(--theme-deafult);
+                              fill: #1f8feb;
                               transition: all 0.3s ease;
                             }
                           }
@@ -1113,7 +1113,7 @@
 
                           svg,
                           span {
-                            color: var(--theme-deafult);
+                            color: #1f8feb;
                             transition: all 0.3s ease;
                           }
                         }
@@ -1165,12 +1165,12 @@
                             }
 
                             &:hover {
-                              color: var(--theme-deafult);
+                              color: #1f8feb;
                               letter-spacing: 1.5px;
                               transition: all 0.3s ease;
 
                               &:after {
-                                background-color: var(--theme-deafult);
+                                background-color: #1f8feb;
                               }
                             }
                           }
@@ -1230,12 +1230,12 @@
                                   transition: all 0.3s ease;
 
                                   &:hover {
-                                    color: var(--theme-deafult);
+                                    color: #1f8feb;
                                     letter-spacing: 1.5px;
                                     transition: all 0.3s ease;
 
                                     &:after {
-                                      color: var(--theme-deafult);
+                                      color: #1f8feb;
                                       transition: all 0.3s ease;
                                     }
                                   }
@@ -1812,23 +1812,23 @@
                             &:hover {
                               svg {
                                 fill: rgba($primary-color, 0.10%);
-                                stroke: var(--theme-deafult);
+                                stroke: #1f8feb;
                                 transition: all 0.3s ease;
 
                                 &.fill-icon {
-                                  fill: var(--theme-deafult);
+                                  fill: #1f8feb;
                                   stroke: none;
                                 }
                               }
 
                               span {
-                                color: var(--theme-deafult);
+                                color: #1f8feb;
                                 transition: all 0.3s ease;
                               }
 
                               .according-menu {
                                 i {
-                                  color: var(--theme-deafult);
+                                  color: #1f8feb;
                                   transition: all 0.3s ease;
                                 }
                               }
@@ -1890,7 +1890,7 @@
                           li {
                             &:hover {
                               >a {
-                                color: var(--theme-deafult);
+                                color: #1f8feb;
                                 transition: all 0.3s ease;
                               }
                             }
@@ -1936,7 +1936,7 @@
                               }
 
                               &.active {
-                                color: var(--theme-deafult);
+                                color: #1f8feb;
 
                                 &::before {
                                   opacity: 1;
@@ -2008,7 +2008,7 @@
 
                                 &.active {
                                   h5 {
-                                    color: var(--theme-deafult);
+                                    color: #1f8feb;
 
                                     &::before {
                                       opacity: 1;
@@ -2042,7 +2042,7 @@
                                       }
 
                                       &.active {
-                                        color: var(--theme-deafult);
+                                        color: #1f8feb;
                                       }
                                     }
                                   }
@@ -2122,12 +2122,12 @@
 
                             .according-menu {
                               i {
-                                color: var(--theme-deafult);
+                                color: #1f8feb;
                               }
                             }
 
                             span {
-                              color: var(--theme-deafult);
+                              color: #1f8feb;
                               transition: all 0.3s ease;
                             }
                           }
@@ -2207,7 +2207,7 @@
 
       .toggle-sidebar {
         svg {
-          stroke: var(--theme-deafult);
+          stroke: #1f8feb;
         }
       }
 
@@ -2234,11 +2234,11 @@
                           &.active {
                             svg {
                               &.stroke-icon {
-                                stroke: var(--theme-deafult);
+                                stroke: #1f8feb;
                               }
 
                               &.fill-icon {
-                                fill: var(--theme-deafult);
+                                fill: #1f8feb;
                               }
                             }
                           }
@@ -2319,8 +2319,8 @@
                           background-color: rgba($primary-color, 0.2);
 
                           svg {
-                            color: var(--theme-deafult);
-                            stroke: var(--theme-deafult);
+                            color: #1f8feb;
+                            stroke: #1f8feb;
                           }
                         }
                       }
@@ -2347,7 +2347,7 @@
                     }
 
                     &.active {
-                      color: var(--theme-deafult);
+                      color: #1f8feb;
                     }
                   }
                 }
@@ -3513,7 +3513,7 @@
       margin: 0 -15px;
 
       h5 {
-        color: var(--theme-deafult);
+        color: #1f8feb;
       }
 
       svg {
