@@ -355,15 +355,19 @@
 					<form action="" method="POST">
 						@csrf
 						
-						<button type="submit" class="btn btn-light text-dark w-75 d-flex align-items-center border border-radius m-5 shadow p-3 mb-5 bg-body rounded rounded-5 fw-bold">
+						<a href="{{ route('distributeur-agent') }}" class="btn btn-light text-dark w-75 d-flex align-items-center border border-radius m-5 shadow p-3 mb-5 bg-body rounded rounded-5 fw-bold">
 							<span class="bg-info text-white rounded-circle d-flex justify-content-center align-items-center" style="width: 25px; height: 25px; margin-right: 10px;">+</span>
 							Un Distributeur / Agent
-						</button>
+						</a>
+						
 
-						<button type="submit" class="btn btn-light text-dark w-75  d-flex align-items-center border border-radius m-5 shadow p-3 mb-5 bg-body rounded rounded-5 fw-bold">
-							<span class="bg-info text-white rounded-circle d-flex justify-content-center align-items-center" style="width: 25px; height: 25px; margin-right: 10px;">+</span>
+				<a href="{{ route('register') }}" 
+						class="btn btn-light text-dark w-75 d-flex align-items-center border border-radius m-5 shadow p-3 mb-5 bg-body rounded rounded-5 fw-bold">
+							<span class="bg-info text-white rounded-circle d-flex justify-content-center align-items-center" 
+								style="width: 25px; height: 25px; margin-right: 10px;">+</span>
 							Un Client
-						</button>
+				</a>
+
 
 					</form>
 				</div>
