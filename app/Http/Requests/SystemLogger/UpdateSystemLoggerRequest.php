@@ -6,23 +6,26 @@ use Illuminate\Foundation\Http\FormRequest;
 
 class UpdateSystemLoggerRequest extends FormRequest
 {
-    /**
-     * Determine if the user is authorized to make this request.
-     */
     public function authorize(): bool
     {
-        return false;
+        return true; // Changez cela selon vos besoins d'autorisation
     }
 
-    /**
-     * Get the validation rules that apply to the request.
-     *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
-     */
     public function rules(): array
     {
-        return [
-            //
-        ];
+        $loggerId = $this->route('system_logger'); // Récupérer l'ID du logger à partir de la route
+        $method = $this->method();
+
+        if ($method === 'PUT') {
+            return [
+                'action' => 'required|string|max:255',
+                'description' => 'required|string|max:255',
+            ];
+        } else { // PATCH
+            return [
+                'action' => 'sometimes|required|string|max:255',
+                'description' => 'sometimes|required|string|max:255',
+            ];
+        }
     }
 }

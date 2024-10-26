@@ -7,13 +7,14 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 class AgentResource extends JsonResource
 {
-    /**
-     * Transform the resource into an array.
-     *
-     * @return array<string, mixed>
-     */
     public function toArray(Request $request): array
     {
-        return parent::toArray($request);
+        return [
+            'id' => $this->id,
+            'user_id' => $this->user_id, // Si vous le conservez
+            // Ajoutez d'autres champs spécifiques à l'agent ici
+            'transactions' => TransactionResource::collection($this->transactions),
+            // Notez que les agents n'ont pas de comptes
+        ];
     }
 }

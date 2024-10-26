@@ -3,15 +3,9 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Laravel\Fortify\TwoFactorAuthenticatable;
-use Laravel\Jetstream\HasProfilePhoto;
-use Laravel\Sanctum\HasApiTokens;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\HasOne;
-use App\Enums\UserRole;
+
 
 class User extends Authenticatable
 {
@@ -66,112 +60,11 @@ class User extends Authenticatable
         'profile_photo_url',
         'nom_complet'
     ];
-
-    /**
-     * Obtenir la relation avec le modèle Distributeur
-     *
-     * @return HasOne
-     */
-    public function distributeur(): HasOne
-    {
-        return $this->hasOne(Distributeur::class, 'user_id');
+    public function comptes() {
+        return $this->hasMany(Compte::class); // Ok, la clé étrangère est 'user_id'
     }
 
-    /**
-     * Obtenir le nom complet de l'utilisateur
-     *
-     * @return string
-     */
-    public function getNomCompletAttribute(): string
-    {
-        return "{$this->nom} {$this->prenom}";
-    }
-
-    /**
-     * Obtenir toutes les transactions où l'utilisateur est le client
-     *
-     * @return HasMany
-     */
-    public function transactions(): HasMany
-    {
-        return $this->hasMany(Transaction::class);
-    }
-
-    /**
-     * Obtenir toutes les transactions où l'utilisateur est le distributeur
-     *
-     * @return HasMany
-     */
-    public function transactionsDistribuees(): HasMany
-    {
-        return $this->hasMany(Transaction::class, 'distributeur_id');
-    }
-
-    /**
-     * Obtenir toutes les transactions où l'utilisateur est l'agent
-     *
-     * @return HasMany
-     */
-    public function transactionsAgent(): HasMany
-    {
-        return $this->hasMany(Transaction::class, 'agent_id');
-    }
-
-    /**
-     * Définir une requête pour inclure uniquement les utilisateurs d'un rôle donné
-     *
-     * @param  \Illuminate\Database\Eloquent\Builder  $query
-     * @param  string  $role
-     * @return \Illuminate\Database\Eloquent\Builder
-     */
-    public function scopeRole($query, $role)
-    {
-        return $query->where('role', $role);
-    }
-
-    /**
-     * Vérifier si l'utilisateur est un agent
-     *
-     * @return bool
-     */
-
-    /**
-     * Vérifier si l'utilisateur est un distributeur
-     *
-     * @return bool
-     */
-    public function isDistributeur(): bool
-    {
-        return $this->role === 'distributeur';
-    }
-
-    /**
-     * Vérifier si l'utilisateur est un client
-     *
-     * @return bool
-     */
-    public function isClient(): bool
-    {
-        return $this->role === 'client';
-    }
-
-    /**
-     * Obtenir les transactions actives de l'utilisateur
-     *
-     * @return HasMany
-     */
-    public function transactionsActives(): HasMany
-    {
-        return $this->transactions()->where('etat', 'en_attente');
-    }
-
-    public function compte()
-{
-    return $this->hasOne(Compte::class);
-}
-    // Fonction pour vérifier si l'utilisateur est un agent
-    public function isAgent()
-    {
-        return $this->role === UserRole::AGENT;
+    public function transactions() {
+        return $this->hasMany(Transaction::class); // Pas de clé étrangère définie ici. Cela dépend de la logique d'association.
     }
 }

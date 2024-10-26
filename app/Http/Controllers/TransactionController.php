@@ -2,239 +2,102 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Transaction\StoreTransactionRequest;
+use App\Http\Requests\Transaction\UpdateTransactionRequest;
+use App\Http\Resources\TransactionResource;
 use App\Models\Transaction;
-use App\Models\User;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Database\QueryException;
+use Exception;
 
 class TransactionController extends Controller
 {
     /**
-     * Afficher la liste des transactions
+     * Enregistre une nouvelle transaction.
      */
-    public function index(Request $request)
-    {
-        $transactions = Transaction::with(['client', 'distributeur'])
-            ->when($request->type, function($query, $type) {
-                return $query->where('type', $type);
-            })
-            ->when($request->etat, function($query, $etat) {
-                return $query->where('etat', $etat);
-            })
-            ->when($request->date_debut, function($query, $date) {
-                return $query->whereDate('date', '>=', $date);
-            })
-            ->when($request->date_fin, function($query, $date) {
-                return $query->whereDate('date', '<=', $date);
-            })
-            ->orderBy('date', 'desc')
-            ->paginate(10);
-
-        return response()->json($transactions);
-    }
-
-    /**
-     * Créer une nouvelle transaction
-     */
-    public function store(Request $request): JsonResponse
+    public function enregistrerTransaction(StoreTransactionRequest $request)
     {
         try {
-            $request->validate([
-                'client_id' => 'required|exists:users,id',
-                'type' => 'required|in:depot,retrait,transfert',
-                'montant' => 'required|numeric|min:0'
-            ]);
+            $validated = $request->validated();
 
-            DB::beginTransaction();
-
-            $client = User::findOrFail($request->client_id);
-            
-            // Vérifier si le compte est bloqué
-            if ($client->compte->est_bloque) {
-                throw new \Exception('Le compte client est bloqué');
+            // Calcul des frais ou commissions selon le type de transaction
+            if ($validated['type'] === 'transfert') {
+                $validated['frais'] = $validated['montant'] * 0.02; // 2% de frais
+            } elseif ($validated['type'] === 'depot' && isset($validated['distributeur_id'])) {
+                $validated['commission'] = $validated['montant'] * 0.01; // 1% de commission pour dépôt
+            } elseif ($validated['type'] === 'transfert' && isset($validated['distributeur_id'])) {
+                $validated['commission'] = $validated['montant'] * 0.02; // 2% de commission pour transfert
             }
 
-            switch ($request->type) {
-                case 'depot':
-                    $transaction = Transaction::creerDepot(
-                        $client->id,
-                        auth()->id(),
-                        $request->montant,
-                        $request->montant * 0.01 // 1% commission
-                    );
-                    break;
+            $transaction = Transaction::create($validated);
 
-                case 'retrait':
-                    if ($client->compte->solde < $request->montant) {
-                        throw new \Exception('Solde insuffisant');
-                    }
-                    $transaction = Transaction::creerRetrait(
-                        $client->id,
-                        auth()->id(),
-                        $request->montant,
-                        $request->montant * 0.01 // 1% commission
-                    );
-                    break;
-
-                case 'transfert':
-                    $frais = $request->montant * 0.02; // 2% frais
-                    if ($client->compte->solde < ($request->montant + $frais)) {
-                        throw new \Exception('Solde insuffisant avec les frais');
-                    }
-                    $transaction = Transaction::creerTransfert(
-                        $client->id,
-                        $request->montant,
-                        $frais
-                    );
-                    break;
-            }
-
-            DB::commit();
-
-            return response()->json([
-                'message' => 'Transaction créée avec succès',
-                'transaction' => $transaction
-            ], 201);
-
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return response()->json([
-                'message' => 'Erreur lors de la création de la transaction',
-                'error' => $e->getMessage()
-            ], 500);
+            return new TransactionResource($transaction);
+        } catch (QueryException $e) {
+            return response()->json(['message' => 'Erreur lors de l\'enregistrement de la transaction : ' . $e->getMessage()], 400);
+        } catch (Exception $e) {
+            return response()->json(['message' => 'Erreur inattendue : ' . $e->getMessage()], 500);
         }
     }
 
     /**
-     * Afficher une transaction spécifique
+     * Annule une transaction.
      */
-    public function show(Transaction $transaction): JsonResponse
-    {
-        return response()->json([
-            'transaction' => $transaction->load(['client', 'distributeur'])
-        ]);
-    }
-
-    /**
-     * Annuler une transaction
-     */
-    public function annuler(Transaction $transaction): JsonResponse
+    public function annulerTransaction(Transaction $transaction)
     {
         try {
-            DB::beginTransaction();
+            $transaction->etat = 'annulé';
+            $transaction->save();
 
-            // Vérifier si la transaction peut être annulée
-            if ($transaction->etat !== 'en_attente') {
-                throw new \Exception('Cette transaction ne peut pas être annulée');
-            }
-
-            // Si c'est une transaction avec un distributeur, retirer sa commission
-            if ($transaction->distributeur_id) {
-                $transaction->distributeur->compte->decrement('solde', $transaction->commission);
-            }
-
-            // Rembourser le montant selon le type de transaction
-            switch ($transaction->type) {
-                case 'depot':
-                    $transaction->client->compte->decrement('solde', $transaction->montant);
-                    break;
-
-                case 'retrait':
-                    $transaction->client->compte->increment('solde', $transaction->montant);
-                    break;
-
-                case 'transfert':
-                    $transaction->client->compte->increment('solde', $transaction->montant + $transaction->frais);
-                    break;
-            }
-
-            $transaction->annuler();
-
-            DB::commit();
-
-            return response()->json([
-                'message' => 'Transaction annulée avec succès',
-                'transaction' => $transaction->fresh()
-            ]);
-
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return response()->json([
-                'message' => 'Erreur lors de l\'annulation',
-                'error' => $e->getMessage()
-            ], 500);
+            return response()->json(['message' => 'Transaction annulée avec succès'], 200);
+        } catch (QueryException $e) {
+            return response()->json(['message' => 'Erreur lors de l\'annulation de la transaction : ' . $e->getMessage()], 400);
+        } catch (Exception $e) {
+            return response()->json(['message' => 'Erreur inattendue : ' . $e->getMessage()], 500);
         }
     }
 
     /**
-     * Historique des transactions pour un utilisateur
+     * Consulte l'historique des transactions d'un utilisateur.
      */
-    public function historique(Request $request): JsonResponse
+    public function consulterHistorique(Request $request)
     {
-        $user = auth()->user();
-        
-        $transactions = Transaction::where(function($query) use ($user) {
-                if ($user->role === 'client') {
-                    $query->where('client_id', $user->id);
-                } else {
-                    $query->where('distributeur_id', $user->id);
-                }
-            })
-            ->when($request->type, function($query, $type) {
-                return $query->where('type', $type);
-            })
-            ->when($request->etat, function($query, $etat) {
-                return $query->where('etat', $etat);
-            })
-            ->when($request->date_debut, function($query, $date) {
-                return $query->whereDate('date', '>=', $date);
-            })
-            ->when($request->date_fin, function($query, $date) {
-                return $query->whereDate('date', '<=', $date);
-            })
-            ->with(['client', 'distributeur'])
-            ->orderBy('date', 'desc')
-            ->paginate($request->per_page ?? 10);
+        try {
+            $userId = $request->query('user_id'); // Obtenez l'ID de l'utilisateur depuis la requête
 
-        return response()->json($transactions);
+            $transactions = Transaction::where('client_id', $userId)->with(['user', 'distributeur'])->get();
+
+            return TransactionResource::collection($transactions);
+        } catch (Exception $e) {
+            return response()->json(['message' => 'Erreur lors de la récupération de l\'historique des transactions : ' . $e->getMessage()], 500);
+        }
     }
 
     /**
-     * Statistiques des transactions
+     * Calcule les frais d'une transaction.
      */
-    public function statistiques(): JsonResponse
+    public function calculerFrais($montant, $type)
     {
-        $user = auth()->user();
+        if ($type === 'transfert') {
+            return $montant * 0.02; // 2% de frais pour transfert
+        }
 
-        $stats = [
-            'total_transactions' => Transaction::where(function($query) use ($user) {
-                if ($user->role === 'client') {
-                    $query->where('client_id', $user->id);
-                } else {
-                    $query->where('distributeur_id', $user->id);
-                }
-            })->count(),
-            'montant_total' => Transaction::where(function($query) use ($user) {
-                if ($user->role === 'client') {
-                    $query->where('client_id', $user->id);
-                } else {
-                    $query->where('distributeur_id', $user->id);
-                }
-            })->sum('montant'),
-            'commission_totale' => Transaction::where('distributeur_id', $user->id)->sum('commission'),
-            'transactions_par_type' => Transaction::where(function($query) use ($user) {
-                if ($user->role === 'client') {
-                    $query->where('client_id', $user->id);
-                } else {
-                    $query->where('distributeur_id', $user->id);
-                }
-            })
-            ->selectRaw('type, count(*) as total')
-            ->groupBy('type')
-            ->get()
-        ];
+        return 0; // Aucun frais par défaut
+    }
 
-        return response()->json($stats);
+    /**
+     * Calcule la commission d'une transaction.
+     */
+    public function calculerCommission($montant, $type, $isDistributeur = false)
+    {
+        if ($isDistributeur) {
+            if ($type === 'depot') {
+                return $montant * 0.01; // 1% de commission pour dépôt
+            } elseif ($type === 'transfert') {
+                return $montant * 0.02; // 2% de commission pour transfert
+            }
+        }
+
+        return 0; // Aucun commission par défaut
     }
 }

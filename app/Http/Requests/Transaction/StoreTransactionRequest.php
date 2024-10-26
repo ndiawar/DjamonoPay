@@ -6,23 +6,22 @@ use Illuminate\Foundation\Http\FormRequest;
 
 class StoreTransactionRequest extends FormRequest
 {
-    /**
-     * Determine if the user is authorized to make this request.
-     */
     public function authorize(): bool
     {
-        return false;
+        return true; // Changez cela selon vos besoins d'autorisation
     }
 
-    /**
-     * Get the validation rules that apply to the request.
-     *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
-     */
     public function rules(): array
     {
         return [
-            //
+            'user_id' => 'required|exists:users,id', // Assurez-vous que l'utilisateur existe
+            'distributeur_id' => 'nullable|exists:users,id',
+            'type' => 'required|in:depot,retrait,transfert,annulé',
+            'montant' => 'required|numeric|min:0',
+            'frais' => 'nullable|numeric|min:0',
+            'commission' => 'nullable|numeric|min:0',
+            'etat' => 'required|string',
+            'motif' => 'nullable|string|max:255',
         ];
     }
 }

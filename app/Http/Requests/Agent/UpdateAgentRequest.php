@@ -3,65 +3,45 @@
 namespace App\Http\Requests\Agent;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
 
 class UpdateAgentRequest extends FormRequest
 {
-    /**
-     * Determine if the user is authorized to make this request.
-     */
     public function authorize(): bool
     {
-        return true; // À adapter selon votre logique d'authentification
+        return true; // Changez cela selon vos besoins d'autorisation
     }
 
-    /**
-     * Get the validation rules that apply to the request.
-     *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
-     */
     public function rules(): array
     {
-        return [
-            'nom' => ['sometimes', 'string', 'max:255'],
-            'prenom' => ['sometimes', 'string', 'max:255'],
-            'email' => ['sometimes', 'string', 'email', Rule::unique('user')->ignore($this->agent->user->id)],
-            'photo' => ['nullable', 'string'],
-            'mot_de_passe' => ['sometimes', 'string', 'min:8'],
-            'telephone' => ['sometimes', 'string'],
-            'adresse' => ['sometimes', 'string'],
-            'date_naissance' => ['sometimes', 'date'],
-            'numero_identite' => ['sometimes', 'string', Rule::unique('user')->ignore($this->agent->user->id)]
-        ];
-    }
+        $agentId = $this->route('agent'); // Récupérer l'ID de l'agent à partir de la route
+        $method = $this->method();
 
-    /**
-     * Get custom messages for validator errors.
-     *
-     * @return array
-     */
-    public function messages(): array
-    {
-        return [
-            'nom.string' => 'Le nom doit être une chaîne de caractères',
-            'prenom.string' => 'Le prénom doit être une chaîne de caractères',
-            'email.email' => 'L\'email doit être une adresse email valide',
-            'email.unique' => 'Cet email est déjà utilisé',
-            'mot_de_passe.min' => 'Le mot de passe doit contenir au moins 8 caractères',
-            'date_naissance.date' => 'La date de naissance doit être une date valide',
-            'numero_identite.unique' => 'Ce numéro d\'identité est déjà utilisé'
-        ];
-    }
-
-    /**
-     * Prepare the data for validation.
-     *
-     * @return void
-     */
-    protected function prepareForValidation()
-    {
-        if ($this->mot_de_passe === null) {
-            $this->request->remove('mot_de_passe');
+        if ($method === 'PUT') {
+            return [
+                'nom' => 'required|string|max:255',
+                'prenom' => 'required|string|max:255',
+                'email' => "required|email|unique:users,email,{$agentId}",
+                'password' => 'nullable|string|min:8|confirmed',
+                'role' => 'required|in:agent,client,distributeur',
+                'telephone' => "required|string|unique:users,telephone,{$agentId}",
+                'adresse' => 'nullable|string',
+                'date_naissance' => 'nullable|date',
+                'numero_identite' => "required|string|unique:users,numero_identite,{$agentId}",
+                'photo' => 'nullable|image|max:2048', // 2MB max
+            ];
+        } else { // PATCH
+            return [
+                'nom' => 'sometimes|required|string|max:255',
+                'prenom' => 'sometimes|required|string|max:255',
+                'email' => "sometimes|required|email|unique:users,email,{$agentId}",
+                'password' => 'sometimes|nullable|string|min:8|confirmed',
+                'role' => 'sometimes|required|in:agent,client,distributeur',
+                'telephone' => "sometimes|required|string|unique:users,telephone,{$agentId}",
+                'adresse' => 'sometimes|nullable|string',
+                'date_naissance' => 'sometimes|nullable|date',
+                'numero_identite' => "sometimes|required|string|unique:users,numero_identite,{$agentId}",
+                'photo' => 'sometimes|nullable|image|max:2048', // 2MB max
+            ];
         }
     }
 }

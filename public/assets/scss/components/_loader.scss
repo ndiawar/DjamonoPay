@@ -24,7 +24,7 @@
       content: "";
       width: 4em;
       height: 4em;
-      background: var(--theme-deafult);
+      background: #1f8feb;
       border-radius: 50%;
       position: absolute;
       transform: scale(0.5);
@@ -34,7 +34,7 @@
     span {
       width: 2em;
       height: 2em;
-      background: var(--theme-secondary);
+      background: #2F2F3B;
       border-radius: 50%;
       margin-right: 2em;
       position: relative;
@@ -45,7 +45,7 @@
         content: "";
         width: 2em;
         height: 2em;
-        background: var(--theme-deafult);
+        background: #1f8feb;
         border-radius: 50%;
         position: absolute;
         left: 3em;
@@ -75,7 +75,7 @@
 
     50% {
       transform: scale(1);
-      background: var(--theme-secondary);
+      background: #2F2F3B;
     }
   }
 
@@ -128,7 +128,7 @@
       position: absolute;
       content: "";
       height: 1px;
-      background: linear-gradient(to right, var(--theme-secondary), var(--theme-deafult), $info-color);
+      background: linear-gradient(to right, #2F2F3B, #1f8feb, $info-color);
       color: #fff;
       top: 2.75em;
       left: 0.75em;
@@ -161,7 +161,7 @@
   }
 
   .loader-1 {
-    border: .2em dotted var(--theme-deafult);
+    border: .2em dotted #1f8feb;
     border-radius: 50%;
     animation: 1s loader-01 linear infinite;
   }
@@ -178,8 +178,8 @@
 
   .loader-2 {
     border: .2em solid transparent;
-    border-left-color: var(--theme-secondary);
-    border-right-color: var(--theme-secondary);
+    border-left-color: #2F2F3B;
+    border-right-color: #2F2F3B;
     border-radius: 50%;
     animation: 1s loader-02 linear infinite;
   }
@@ -304,7 +304,7 @@
     &:before,
     &:after {
       content: '';
-      border: .2em solid var(--theme-deafult);
+      border: .2em solid #1f8feb;
       border-radius: 50%;
       width: inherit;
       height: inherit;
@@ -349,7 +349,7 @@
       width: inherit;
       height: inherit;
       border-radius: 50%;
-      background-color: var(--theme-secondary);
+      background-color: #2F2F3B;
       opacity: 0.6;
       position: absolute;
       top: 0;
@@ -503,7 +503,7 @@
   }
 
   .loader-13 {
-    color: var(--theme-deafult);
+    color: #1f8feb;
     position: relative;
     transform: translateZ(0);
     animation-delay: -0.16s;
@@ -544,7 +544,7 @@
 
   .loader-14 {
     border-radius: 50%;
-    box-shadow: 0 1em 0 -.2em var(--theme-secondary);
+    box-shadow: 0 1em 0 -.2em #2F2F3B;
     position: relative;
     animation: loader-14 0.8s ease-in-out alternate infinite;
     animation-delay: 0.32s;
@@ -574,11 +574,11 @@
 
   @keyframes loader-14 {
     0% {
-      box-shadow: 0 2em 0 -.2em var(--theme-secondary);
+      box-shadow: 0 2em 0 -.2em #2F2F3B;
     }
 
     100% {
-      box-shadow: 0 1em 0 -.2em var(--theme-secondary);
+      box-shadow: 0 1em 0 -.2em #2F2F3B;
     }
   }
 
@@ -793,7 +793,7 @@
   }
 
   .loader-19 {
-    border-top: .2em solid var(--theme-deafult);
+    border-top: .2em solid #1f8feb;
     border-right: .2em solid transparent;
     animation: loader-19 1s linear infinite;
     border-radius: 100%;
@@ -808,7 +808,7 @@
 
   .loader-20 {
     background-color: transparent;
-    box-shadow: inset 0px 0px 0px .1em var(--theme-secondary);
+    box-shadow: inset 0px 0px 0px .1em #2F2F3B;
     border-radius: 50%;
     position: relative;
 
@@ -816,7 +816,7 @@
     &:before {
       position: absolute;
       content: "";
-      background-color: var(--theme-secondary);
+      background-color: #2F2F3B;
       top: 24px;
       left: 24px;
       height: .1em;
@@ -1004,7 +1004,7 @@
   }
 
   .loader-25 {
-    border: .1em var(--theme-deafult) solid;
+    border: .1em #1f8feb solid;
     position: relative;
     animation: loader-25-1 5s linear infinite;
 
@@ -1013,7 +1013,7 @@
       height: .2em;
       position: absolute;
       content: "";
-      background-color: var(--theme-deafult);
+      background-color: #1f8feb;
       bottom: calc(100% + .2em);
       left: -.4em;
       animation: loader-25-2 1s ease-in-out infinite;
@@ -1022,11 +1022,11 @@
 
   @keyframes loader-25-1 {
     0% {
-      box-shadow: inset 0 0 0 0 var(--theme-deafult);
+      box-shadow: inset 0 0 0 0 #1f8feb;
     }
 
     100% {
-      box-shadow: inset 0 -1em 0 0 var(--theme-deafult);
+      box-shadow: inset 0 -1em 0 0 #1f8feb;
     }
   }
 
@@ -1055,8 +1055,8 @@
   .loader-26 {
     width: .5em;
     height: .5em;
-    background-color: var(--theme-secondary);
-    box-shadow: 1em 0px 0px var(--theme-secondary);
+    background-color: #2F2F3B;
+    box-shadow: 1em 0px 0px #2F2F3B;
     border-radius: 50%;
     animation: loader-26 1s ease-in-out infinite alternate;
   }
@@ -1223,7 +1223,7 @@
       height: .4em;
       width: .4em;
       top: 0;
-      background-color: var(--theme-deafult);
+      background-color: #1f8feb;
       border-radius: 50%;
     }
 
@@ -1280,7 +1280,7 @@
 
     &:before {
       border-radius: 50%;
-      background-color: var(--theme-secondary);
+      background-color: #2F2F3B;
       animation: loader-35 3s cubic-bezier(0.77, 0, 0.175, 1) infinite;
       content: '';
       width: inherit;
@@ -1520,11 +1520,11 @@
   }
 
   .loader-41 {
-    border: .05em var(--theme-deafult) solid;
+    border: .05em #1f8feb solid;
     border-radius: .2em;
     position: relative;
-    background: linear-gradient(45deg, transparent 48%, var(--theme-deafult) 50%, var(--theme-deafult) 50%, transparent 52%, transparent),
-      linear-gradient(-45deg, transparent 48%, var(--theme-deafult) 50%, var(--theme-deafult) 50%, transparent 52%, transparent);
+    background: linear-gradient(45deg, transparent 48%, #1f8feb 50%, #1f8feb 50%, transparent 52%, transparent),
+      linear-gradient(-45deg, transparent 48%, #1f8feb 50%, #1f8feb 50%, transparent 52%, transparent);
     background-size: .5em .5em;
     background-position: 0% 0%;
     animation: loader-41 1s infinite linear;
@@ -1543,9 +1543,9 @@
   .loader-42 {
     width: 2em;
     height: .66em;
-    border: .05em var(--theme-secondary) solid;
+    border: .05em #2F2F3B solid;
     border-radius: .1em;
-    background: linear-gradient(-60deg, transparent 0%, transparent 50%, var(--theme-secondary) 50%, var(--theme-secondary) 75%, transparent 75%, transparent);
+    background: linear-gradient(-60deg, transparent 0%, transparent 50%, #2F2F3B 50%, #2F2F3B 75%, transparent 75%, transparent);
     background-size: 1em 2em;
     background-position: 0 0;
     animation: loader-42 0.8s infinite linear;

@@ -4,28 +4,22 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
+class CreateAgentsTable extends Migration
 {
     /**
-     * Run the migrations.
+     * Exécuter les migrations.
      */
     public function up(): void
     {
         Schema::create('agents', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('user_id')  // 
-                  ->unique()
-                  ->constrained('users')    // Référence à la table users
-                  ->onDelete('cascade');
-            $table->timestamps();
+            $table->id(); // Clé primaire auto-incrémentée
+            // Pas besoin de user_id, car c'est un héritage de la table users
+            $table->timestamps(); // created_at et updated_at
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('agents');
     }
-};
+}

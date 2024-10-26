@@ -4,41 +4,118 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Session;
 use App\Http\Controllers\DistributeurController;
+use App\Http\Controllers\AgentController;
 use App\Http\Controllers\CompteController;
 use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\UserController;
+use App\Http\Controllers\SystemLoggerController;
 use App\Enums\UserRole;
 use Illuminate\Support\Facades\Auth;
 
 /**
- * Route pour la page d'accueil.
+ * Route pour la page d'accueil, redirige vers le tableau de bord.
  */
 Route::get('/', function () {
     return redirect()->route('dashboard');
 })->name('/');
 
 /**
- * Groupe de routes sous le préfixe 'dashboard'.
+ * Groupe de routes pour le tableau de bord.
  */
-// Route::prefix('dashboard')->group(function () {
-//     Route::view('index', 'dashboard.index')->name('index');
-//     Route::view('dashboard-distributeur', 'dashboard.dashboard-distributeur')->name('dashboard-distributeur');
-//     Route::view('dashboard-client', 'dashboard.dashboard-client')->name('dashboard-client');
-// });
-
 Route::prefix('dashboard')->group(function () {
     Route::view('index', 'dashboard.index')->name('index');
     Route::view('dashboard-transactions', 'dashboard.dashboard-transactions')->name('dashboard-transactions');
     Route::view('dashboard-distributeur', 'dashboard.dashboard-distributeur')->name('dashboard-distributeur');
     Route::get('dashboard-distributeur', [DistributeurController::class, 'index'])->name('dashboard-distributeur');
     Route::view('dashboard-client', 'dashboard.dashboard-client')->name('dashboard-client');
-    Route::view('dashboard-activitées', 'dashboard.dashboard-activitées')->name('dashboard-activitées');
+    Route::view('dashboard-activites', 'dashboard.dashboard-activites')->name('dashboard-activites');
     Route::view('dashboard-utilisateurs', 'dashboard.dashboard-utilisateurs')->name('dashboard-utilisateurs');
     Route::view('dashboard-approvisionner', 'dashboard.dashboard-approvisionner')->name('dashboard-approvisionner');
 });
 
+/**
+ * Routes pour les comptes, incluant les opérations CRUD.
+ */
+Route::resource('comptes', CompteController::class); // Index, create, store, show, edit, update, destroy
 
+// Routes spécifiques pour les opérations sur les comptes
+Route::post('comptes/{compte}/debiter', [CompteController::class, 'debiter'])->name('comptes.debiter');
+Route::post('comptes/{compte}/crediter', [CompteController::class, 'crediter'])->name('comptes.crediter');
+Route::post('comptes/{compte}/bloquer', [CompteController::class, 'bloquer'])->name('comptes.bloquer');
+Route::post('comptes/{compte}/debloquer', [CompteController::class, 'debloquer'])->name('comptes.debloquer');
+Route::post('comptes/{compte}/generate-qr-code', [CompteController::class, 'generateQrCode'])->name('comptes.generateQrCode');
+Route::post('comptes/verifier-qr-code', [CompteController::class, 'verifierQrCode'])->name('comptes.verifierQrCode');
+
+/**
+ * Routes pour la gestion des utilisateurs.
+ */
+Route::prefix('utilisateurs')->group(function () {
+    Route::get('/', [UserController::class, 'index'])->name('utilisateurs.index'); // Affiche tous les utilisateurs
+    Route::get('/{user}', [UserController::class, 'show'])->name('utilisateurs.show'); // Affiche un utilisateur
+    Route::post('/', [UserController::class, 'creerUtilisateur'])->name('utilisateurs.creer'); // Crée un nouvel utilisateur
+    Route::put('/{user}', [UserController::class, 'modifierUtilisateur'])->name('utilisateurs.modifier'); // Modifie un utilisateur
+    Route::post('/{user}/bloquer', [UserController::class, 'bloquerCompte'])->name('utilisateurs.bloquer'); // Bloque un compte
+    Route::delete('/{user}', [UserController::class, 'supprimerUtilisateur'])->name('utilisateurs.supprimer'); // Supprime un utilisateur
+});
+
+/**
+ * Routes pour la gestion des distributeurs.
+ */
+Route::prefix('distributeurs')->group(function () {
+    Route::get('/', [DistributeurController::class, 'index'])->name('distributeurs.index');
+    Route::get('/{distributeur}', [DistributeurController::class, 'show'])->name('distributeurs.show');
+    Route::post('/', [DistributeurController::class, 'store'])->name('distributeurs.store');
+    Route::put('/{distributeur}', [DistributeurController::class, 'update'])->name('distributeurs.update');
+    Route::delete('/{distributeur}', [DistributeurController::class, 'destroy'])->name('distributeurs.destroy');
+
+    // Actions spécifiques pour les distributeurs
+    Route::post('/{distributeur}/consulter-solde', [DistributeurController::class, 'consulterSolde'])->name('distributeurs.consulter_solde');
+    Route::post('/{distributeur}/crediter-compte-client', [DistributeurController::class, 'crediterCompteClient'])->name('distributeurs.crediter_compte_client');
+    Route::post('/{distributeur}/effectuer-retrait', [DistributeurController::class, 'effectuerRetrait'])->name('distributeurs.effectuer_retrait');
+    Route::post('/{distributeur}/voir-solde', [DistributeurController::class, 'voirSolde'])->name('distributeurs.voir_solde');
+    Route::get('/{distributeur}/transactions', [DistributeurController::class, 'voirTransactions'])->name('distributeurs.voir_transactions');
+    Route::post('/{distributeur}/annuler-transaction/{transaction}', [DistributeurController::class, 'annulerTransaction'])->name('distributeurs.annuler_transaction');
+    Route::post('/{distributeur}/scanner-qrcode', [DistributeurController::class, 'scannerQRCode'])->name('distributeurs.scanner_qrcode');
+});
+
+/**
+ * Routes pour la gestion des agents.
+ */
+Route::prefix('agents')->group(function () {
+    Route::get('/', [AgentController::class, 'index'])->name('agents.index');
+    Route::get('/{agent}', [AgentController::class, 'show'])->name('agents.show');
+    Route::post('/', [AgentController::class, 'store'])->name('agents.store');
+    Route::put('/{agent}', [AgentController::class, 'update'])->name('agents.update');
+    Route::delete('/{agent}', [AgentController::class, 'destroy'])->name('agents.destroy');
+
+    // Actions spécifiques pour les agents
+    Route::post('/{agent}/creer-compte-client', [AgentController::class, 'creerCompteClient'])->name('agents.creer_compte_client');
+    Route::put('/{agent}/modifier-compte/{clientId}', [AgentController::class, 'modifierCompte'])->name('agents.modifier_compte');
+    Route::post('/{agent}/crediter-compte-distributeur/{distributeurId}', [AgentController::class, 'crediterCompteDistributeur'])->name('agents.crediter_compte_distributeur');
+    Route::post('/{agent}/bloquer-compte/{clientId}', [AgentController::class, 'bloquerCompte'])->name('agents.bloquer_compte');
+    Route::post('/{agent}/annuler-transaction/{transaction}', [AgentController::class, 'annulerTransaction'])->name('agents.annuler_transaction');
+});
+/**
+ * Routes pour la gestion des transactions.
+ */
+Route::prefix('transactions')->name('transactions.')->group(function () {
+    Route::get('/', [TransactionController::class, 'index'])->name('index');
+    Route::post('/', [TransactionController::class, 'store'])->name('store');
+    Route::get('{transaction}', [TransactionController::class, 'show'])->name('show');
+    Route::post('{transaction}/annuler', [TransactionController::class, 'annuler'])->name('annuler');
+    Route::get('historique', [TransactionController::class, 'historique'])->name('historique');
+    Route::get('statistiques', [TransactionController::class, 'statistiques'])->name('statistiques');
+});
+/**
+ * Routes pour le système de log.
+ */
+Route::prefix('logs')->group(function () {
+    Route::post('/', [SystemLoggerController::class, 'enregistrerLog'])->name('logs.enregistrer'); // Enregistrer un log
+    Route::get('/', [SystemLoggerController::class, 'recupererLogs'])->name('logs.recuperer'); // Récupérer des logs
+    Route::post('/rapport', [SystemLoggerController::class, 'genererRapport'])->name('logs.rapport'); // Générer un rapport
+});
 /**
  * Routes pour l'authentification.
  */
@@ -47,16 +124,15 @@ Route::post('/login', [AuthenticatedSessionController::class, 'store']);
 Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
 
 /**
- * Routes pour l'inscription.
+ * Routes pour l'inscription des utilisateurs.
  */
 Route::get('/register', function () {
     return view('auth.register');
 })->name('register');
-
 Route::post('/register', [RegisterController::class, 'register']);
 
 /**
- * Route pour afficher le formulaire d'inscription d'un distributeur/agent
+ * Route pour afficher le formulaire d'inscription d'un distributeur/agent.
  */
 Route::get('/distributeur-agent', function () {
     return view('auth.distributeur_agent'); // Assurez-vous que le chemin vers la vue est correct
@@ -65,7 +141,7 @@ Route::get('/distributeur-agent', function () {
 /**
  * Routes pour gérer les erreurs spécifiques.
  */
-Route::prefix('others')->group(function () {
+Route::prefix('errors')->group(function () {
     Route::view('400', 'errors.400')->name('error-400');
     Route::view('401', 'errors.401')->name('error-401');
     Route::view('403', 'errors.403')->name('error-403');
@@ -89,11 +165,7 @@ Route::get('/clear-cache', function () {
 /**
  * Groupe de routes protégées par le middleware 'auth'.
  */
-Route::middleware([
-    'auth:sanctum',
-    config('jetstream.auth_session'),
-    'verified',
-])->group(function () {
+Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified'])->group(function () {
     Route::get('/dashboard', function () {
         // Vérification de l'authentification de l'utilisateur
         if ($user = Auth::user()) {
@@ -113,72 +185,3 @@ Route::middleware([
     })->name('dashboard');
 });
 
- // Routes pour les transactions
- Route::prefix('transactions')->name('transactions.')->group(function () {
-    Route::get('/', [TransactionController::class, 'index'])->name('index');
-    Route::post('/', [TransactionController::class, 'store'])->name('store');
-    Route::get('{transaction}', [TransactionController::class, 'show'])->name('show');
-    Route::post('{transaction}/annuler', [TransactionController::class, 'annuler'])->name('annuler');
-    Route::get('historique', [TransactionController::class, 'historique'])->name('historique');
-    Route::get('statistiques', [TransactionController::class, 'statistiques'])->name('statistiques');
-});
-
-// Routes pour les comptes
-Route::prefix('comptes')->name('comptes.')->group(function () {
-    Route::post('{compte}/crediter', [CompteController::class, 'crediter'])->name('crediter');
-    Route::post('{compte}/debiter', [CompteController::class, 'debiter'])->name('debiter');
-    Route::post('{compte}/bloquer', [CompteController::class, 'bloquer'])->name('bloquer');
-    Route::post('{compte}/debloquer', [CompteController::class, 'debloquer'])->name('debloquer');
-    Route::post('{compte}/transfert', [CompteController::class, 'transfert'])->name('transfert');
-    Route::post('{compte}/qr-code', [CompteController::class, 'generateQrCode'])->name('qr-code');
-    Route::post('{compte}/verifier-qr-code', [CompteController::class, 'verifierQrCode'])->name('verifier-qr-code');
-});
-
-
-
-
-
-
-
-
-
-Route::middleware([
-    'auth:sanctum',
-    config('jetstream.auth_session'),
-    'verified',
-])->group(function () {
-    Route::get('/dashboard', function () {
-        return view('dashboard');
-    })->name('dashboard');
-
-    // Routes pour les distributeurs
-    Route::resource('distributeur', DistributeurController::class);
-    
-    // Route supplémentaire pour la mise à jour du solde
-    // Route::patch('distributeur/{distributeur}/update-solde', [DistributeurController::class, 'updateSolde'])
-    //     ->name('distributeur.update-solde');
-    // Route::patch('distributeur/{distributeur}/update-solde', [DistributeurController::class, 'updateSolde'])
-    // ->name('distributeur.update-solde');
-
-    // Nouvelles routes pour les fonctionnalités du distributeur
-    Route::prefix('distributeur')->name('distributeur.')->group(function () {
-        // Opérations sur les clients
-        Route::post('/crediter-client', [DistributeurController::class, 'crediterClient'])
-            ->name('crediter-client');
-        Route::post('/retrait-client', [DistributeurController::class, 'retraitClient'])
-            ->name('retrait-client');
-        Route::post('/verifier-client-qr', [DistributeurController::class, 'verifierClientQRCode'])
-            ->name('verifier-client-qr');
-        
-        // Gestion des transactions
-        Route::post('/annuler-transaction/{transaction}', [DistributeurController::class, 'annulerTransaction'])
-            ->name('annuler-transaction');
-            
-        // Consultation
-        Route::get('/consulter-solde', [DistributeurController::class, 'consulterSolde'])
-            ->name('consulter-solde');
-        Route::get('/historique-transactions', [DistributeurController::class, 'historiqueTrasactions'])
-            ->name('historique-transactions');
-    });
-
-});

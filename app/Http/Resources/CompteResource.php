@@ -7,13 +7,16 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 class CompteResource extends JsonResource
 {
-    /**
-     * Transform the resource into an array.
-     *
-     * @return array<string, mixed>
-     */
     public function toArray(Request $request): array
     {
-        return parent::toArray($request);
+        return [
+            'id' => $this->id,
+            'user_id' => $this->user_id,
+            'numero' => $this->numero,
+            'solde' => $this->solde,
+            'qr_code' => $this->qr_code,
+            'est_bloque' => $this->est_bloque,
+            'qr_code_creation' => $this->qr_code_creation,
+        ];
     }
 }

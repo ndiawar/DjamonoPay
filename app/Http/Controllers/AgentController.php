@@ -2,149 +2,176 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Agent;
 use App\Http\Requests\Agent\StoreAgentRequest;
 use App\Http\Requests\Agent\UpdateAgentRequest;
 use App\Http\Resources\AgentResource;
-use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Resources\Json\JsonResource;
-use App\Enums\UserRole;
+use App\Http\Resources\AgentCollection;
+use App\Models\Agent;
+use App\Models\Client;
+use App\Models\Distributeur;
+use App\Models\Transaction;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Hash;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class AgentController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Affiche tous les agents.
      */
-    public function index(): JsonResource
+    public function index(Request $request)
     {
-        $agents = Agent::with('user')
-            ->when(request('search'), function($query, $search) {
-                $query->where('numero_identite', 'like', "%{$search}%")
-                    ->orWhereHas('user', function($q) use ($search) {
-                        $q->where('nom', 'like', "%{$search}%")
-                          ->orWhere('email', 'like', "%{$search}%");
-                    });
-            })
-            ->orderBy(request('sort_by', 'created_at'), request('sort_direction', 'desc'))
-            ->paginate(request('per_page', 10));
-        
-        return AgentResource::collection($agents);
+        $agents = Agent::paginate(10);
+        return new AgentCollection($agents);
     }
 
     /**
-     * Show the form for creating a new resource.
+     * Affiche un agent spécifique.
      */
-    public function create()
+    public function show(Agent $agent)
     {
-        //
+        return new AgentResource($agent->load('transactions'));
     }
 
     /**
-     * Créer un nouvel agent
+     * Enregistre un nouvel agent.
      */
-    public function store(StoreAgentRequest $request): JsonResponse
-{
-    try {
-        DB::beginTransaction();
-
-        // Pas besoin d'exclure numero_identite car il fait partie des données utilisateur
-        $userData = $request->validated();
-        $userData['role'] = UserRole::AGENT;
-        $userData['mot_de_passe'] = Hash::make($userData['mot_de_passe']);
-
-        $agent = Agent::createWithUser($userData);
-
-        DB::commit();
-
-        return response()->json([
-            'message' => 'Agent créé avec succès',
-            'data' => new AgentResource($agent)
-        ], 201);
-
-    } catch (\Exception $e) {
-        DB::rollBack();
-        return response()->json([
-            'message' => 'Erreur lors de la création de l\'agent',
-            'error' => $e->getMessage()
-        ], 500);
-    }
-}
-
-    /**
-     * Afficher un agent spécifique
-     */
-    public function show(Agent $agent): JsonResource
+    public function store(StoreAgentRequest $request)
     {
-        return new AgentResource($agent->load('user'));
+        $validated = $request->validated();
+        $agent = Agent::create($validated);
+        return new AgentResource($agent);
     }
 
     /**
-     * Show the form for editing the specified resource.
+     * Met à jour un agent existant.
      */
-    // public function edit(Agent $agent)
-    // {
-    //     //
-    // }
+    public function update(UpdateAgentRequest $request, Agent $agent)
+    {
+        $validated = $request->validated();
+        $agent->update($validated);
+        return new AgentResource($agent);
+    }
 
     /**
-     * Mettre à jour un agent
+     * Supprime un agent.
      */
-    public function update(UpdateAgentRequest $request, Agent $agent): JsonResponse
-{
-    try {
-        DB::beginTransaction();
+    public function destroy(Agent $agent)
+    {
+        $agent->delete();
+        return response()->json(['message' => 'Agent supprimé avec succès'], 200);
+    }
 
-        $userData = $request->validated();
-        if (isset($userData['mot_de_passe'])) {
-            $userData['mot_de_passe'] = Hash::make($userData['mot_de_passe']);
-        }
-
-        // Mise à jour des données de l'utilisateur
-        if (!empty($userData)) {
-            $agent->user->update($userData);
-        }
-
-        DB::commit();
-
-        return response()->json([
-            'message' => 'Agent mis à jour avec succès',
-            'data' => new AgentResource($agent->load('user'))
+    /**
+     * Crée un compte client.
+     */
+    public function creerCompteClient(Request $request)
+    {
+        $request->validate([
+            'nom' => 'required|string|max:255',
+            'prenom' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email',
+            'password' => 'required|string|min:8|confirmed',
+            'telephone' => 'required|string|unique:users,telephone',
+            'adresse' => 'nullable|string',
+            'date_naissance' => 'nullable|date',
+            'numero_identite' => 'required|string|unique:users,numero_identite',
         ]);
+        
+        DB::beginTransaction();
 
-    } catch (\Exception $e) {
-        DB::rollBack();
-        return response()->json([
-            'message' => 'Erreur lors de la mise à jour de l\'agent',
-            'error' => $e->getMessage()
-        ], 500);
-    }
-}
-
-    /**
-     * Supprimer un agent
-     */
-    public function destroy(Agent $agent): JsonResponse
-    {
         try {
-            DB::beginTransaction();
-
-            // Supprimer l'utilisateur (cascade supprimera aussi l'agent)
-            $agent->user->delete();
-
+            $client = Client::create($request->all());
             DB::commit();
-
-            return response()->json([
-                'message' => 'Agent supprimé avec succès'
-            ]);
-
+            return response()->json(['message' => 'Compte client créé avec succès', 'client' => new AgentResource($client)]);
         } catch (\Exception $e) {
             DB::rollBack();
-            return response()->json([
-                'message' => 'Erreur lors de la suppression de l\'agent',
-                'error' => $e->getMessage()
-            ], 500);
+            return response()->json(['message' => 'Erreur lors de la création du compte client'], 500);
+        }
+    }
+
+    /**
+     * Modifie un compte client.
+     */
+    public function modifierCompte(Request $request, $clientId)
+    {
+        $request->validate([
+            // Ajoutez les validations nécessaires
+        ]);
+
+        DB::beginTransaction();
+
+        try {
+            $client = Client::findOrFail($clientId);
+            $client->update($request->all());
+            DB::commit();
+            return response()->json(['message' => 'Compte client modifié avec succès', 'client' => new AgentResource($client)]);
+        } catch (ModelNotFoundException $e) {
+            DB::rollBack();
+            return response()->json(['message' => 'Client non trouvé'], 404);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json(['message' => 'Erreur lors de la modification du compte client'], 500);
+        }
+    }
+
+    /**
+     * Crédite le compte d'un distributeur.
+     */
+    public function crediterCompteDistributeur(Request $request, $distributeurId)
+    {
+        $request->validate(['montant' => 'required|numeric|min:0.01']);
+        DB::beginTransaction();
+
+        try {
+            $distributeur = Distributeur::findOrFail($distributeurId);
+            // Logique pour créditer le compte du distributeur
+            // Mettez à jour le solde
+
+            DB::commit();
+            return response()->json(['message' => 'Crédit effectué avec succès']);
+        } catch (ModelNotFoundException $e) {
+            DB::rollBack();
+            return response()->json(['message' => 'Distributeur non trouvé'], 404);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json(['message' => 'Erreur lors du crédit'], 500);
+        }
+    }
+
+    /**
+     * Bloque un compte client.
+     */
+    public function bloquerCompte(Request $request, $clientId)
+    {
+        DB::beginTransaction();
+
+        try {
+            $client = Client::findOrFail($clientId);
+            $client->etat = 'bloqué'; // Par exemple, une colonne pour l'état
+            $client->save();
+            DB::commit();
+            return response()->json(['message' => 'Compte bloqué avec succès']);
+        } catch (ModelNotFoundException $e) {
+            DB::rollBack();
+            return response()->json(['message' => 'Client non trouvé'], 404);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json(['message' => 'Erreur lors du blocage du compte'], 500);
+        }
+    }
+
+    /**
+     * Annule une transaction.
+     */
+    public function annulerTransaction(Request $request, Transaction $transaction)
+    {
+        try {
+            $transaction->etat = 'annulé';
+            $transaction->save();
+            return response()->json(['message' => 'Transaction annulée avec succès'], 200);
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'Erreur lors de l\'annulation de la transaction'], 500);
         }
     }
 }

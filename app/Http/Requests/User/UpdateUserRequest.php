@@ -2,71 +2,46 @@
 
 namespace App\Http\Requests\User;
 
-use App\Enums\UserRole;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
 
 class UpdateUserRequest extends FormRequest
 {
-    /**
-     * Determine if the user is authorized to make this request.
-     */
     public function authorize(): bool
     {
-        return false;
+        return true; // Changez cela selon vos besoins d'autorisation
     }
 
-    /**
-     * Get the validation rules that apply to the request.
-     *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
-     */
     public function rules(): array
     {
-        return [
-            'nom' => ['sometimes', 'string', 'max:255'],
-            'prenom' => ['sometimes', 'string', 'max:255'],
-            'email' => ['sometimes', 'string', 'email', Rule::unique('user', 'email')->ignore($this->users->id)],
-            'photo' => ['nullable', 'string'],
-            'mot_de_passe' => ['sometimes', 'string', 'min:8'],
-            'role' => ['sometimes', 'string', Rule::enum(UserRole::class)],
-            'telephone' => ['sometimes', 'string'], // Corrigé numero_telephone en telephone
-            'adresse' => ['sometimes', 'string'],
-            'date_naissance' => ['sometimes', 'date'],
-            'numero_identite' => ['sometimes', 'string', Rule::unique('user', 'numero_identite')->ignore($this->users->id)], // Corrigé le nom du champ
-            'etat_compte' => ['sometimes', 'boolean'],
-        ];
+        $userId = $this->route('user'); // Récupérer l'ID de l'utilisateur à partir de la route
+        $method = $this->method();
 
-    }
-    /**
-     * Get custom messages for validator errors.
-     *
-     * @return array
-     */
-    public function messages(): array
-    {
-        return [
-            'nom.string' => 'Le nom doit être une chaîne de caractères',
-            'prenom.string' => 'Le prénom doit être une chaîne de caractères',
-            'email.email' => 'L\'email doit être une adresse email valide',
-            'email.unique' => 'Cet email est déjà utilisé',
-            'mot_de_passe.min' => 'Le mot de passe doit contenir au moins 8 caractères',
-            'role.enum' => 'Le rôle sélectionné n\'est pas valide',
-            'date_naissance.date' => 'La date de naissance doit être une date valide',
-            'numero_identite.unique' => 'Ce numéro d\'identité est déjà utilisé'
-        ];
-    }
-
-    /**
-     * Prepare the data for validation.
-     *
-     * @return void
-     */
-    protected function prepareForValidation()
-    {
-        // Retirer le mot de passe s'il est vide
-        if ($this->has('mot_de_passe') && empty($this->mot_de_passe)) {
-            $this->request->remove('mot_de_passe');
+        if ($method === 'PUT') {
+            return [
+                'nom' => 'required|string|max:255',
+                'prenom' => 'required|string|max:255',
+                'email' => "required|email|unique:users,email,{$userId}",
+                'password' => 'required|string|min:8|confirmed',
+                'role' => 'required|in:client,distributeur,agent',
+                'telephone' => "required|string|unique:users,telephone,{$userId}",
+                'adresse' => 'nullable|string',
+                'date_naissance' => 'nullable|date',
+                'numero_identite' => "required|string|unique:users,numero_identite,{$userId}",
+                'photo' => 'nullable|image|max:2048', // 2MB max
+            ];
+        } else { // PATCH
+            return [
+                'nom' => 'sometimes|required|string|max:255',
+                'prenom' => 'sometimes|required|string|max:255',
+                'email' => "sometimes|required|email|unique:users,email,{$userId}",
+                'password' => 'sometimes|nullable|string|min:8|confirmed',
+                'role' => 'sometimes|required|in:client,distributeur,agent',
+                'telephone' => "sometimes|required|string|unique:users,telephone,{$userId}",
+                'adresse' => 'sometimes|nullable|string',
+                'date_naissance' => 'sometimes|nullable|date',
+                'numero_identite' => "sometimes|required|string|unique:users,numero_identite,{$userId}",
+                'photo' => 'sometimes|nullable|image|max:2048', // 2MB max
+            ];
         }
     }
 }

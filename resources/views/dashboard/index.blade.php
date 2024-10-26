@@ -105,7 +105,7 @@
 
 @section('content')
 	<div class="container-fluid">
-		<div class="row widget-grid">
+	<div class="row widget-grid">
 			<div class="col-md-3">
 				<div class="ms-3 card profile-box" >
 					<div class="card-body">

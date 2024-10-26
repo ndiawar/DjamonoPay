@@ -7,13 +7,13 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 class ClientResource extends JsonResource
 {
-    /**
-     * Transform the resource into an array.
-     *
-     * @return array<string, mixed>
-     */
     public function toArray(Request $request): array
     {
-        return parent::toArray($request);
+        return [
+            'id' => $this->id,
+            'user_id' => $this->user_id, // Si vous le conservez
+            'transactions' => TransactionResource::collection($this->transactions),
+            'comptes' => CompteResource::collection($this->comptes),
+        ];
     }
 }
