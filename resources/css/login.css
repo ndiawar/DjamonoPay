@@ -1,4 +1,12 @@
-Réinitialisation du style
+/* Réinitialisation du style */
+ /* Styles pour les messages d'erreur */
+ .error-message {
+    color: red; /* Couleur du texte en rouge */
+    font-weight: bold; /* Mettre en gras */
+    margin-bottom: 10px; /* Espacement en bas */
+}
+
+/* Réinitialisation du style */
 * {
     margin: 0;
     padding: 0;
@@ -8,14 +16,13 @@ Réinitialisation du style
 body {
     font-family: 'Poppins', sans-serif;
     height: 100vh;
-    overflow: hidden;
     display: flex;
     align-items: center;
     justify-content: center;
     background-color: #f5f5f5;
+    overflow: hidden;
 }
 
-/* Image en arrière-plan avec flou */
 .background-blur {
     position: absolute;
     top: 0;
@@ -23,7 +30,6 @@ body {
     width: 100%;
     height: 100%;
     background: url('/images/paie-removebg-preview.png') no-repeat center center / cover;
-
     filter: blur(120px); /* Flou uniquement sur l'arrière-plan */
     z-index: -1; /* Envoie l'image derrière le container */
 }
@@ -41,7 +47,7 @@ body {
     background: rgba(255, 255, 255, 0.8); /* Couche blanche légère */
 }
 
-/* Section gauche */
+
 /* Section gauche */
 .left-section {
     flex: 1;
@@ -71,11 +77,11 @@ body {
     font-weight: bold;
 }
 
+
 #handal-image {
     max-width: 400px; /* Augmente la taille maximale de l'image */
     height: auto;
 }
-
 
 /* Section droite */
 .right-section {
@@ -101,26 +107,26 @@ body {
     font-size: 1rem;
     color: #fff;
     font-weight: 500;
-    transition: color 0.3s, background-color 0.3s, border-color 0.3s; /* Ajout de la transition pour la bordure */
+    transition: color 0.3s, background-color 0.3s, border-color 0.3s;
     padding: 10px 20px;
-    border: 2px solid transparent; /* Bordure transparente par défaut */
-    border-radius: 12px;
+    border: 5px solid transparent;
+    border-radius: 20px;
     cursor: pointer;
 }
 
 .nav-link.active {
-    background-color: #0095FF; /* Couleur de fond lorsque le lien est actif */
-    border-color: #0095FF; /* Bordure bleue lorsque le lien est actif */
+    background-color: #0095FF;
+    border-color: #0095FF;
 }
 
 .nav-link:not(.active) {
-    background-color: #ffffff; /* Couleur de fond pour les liens inactifs */
-    color: #0095FF; /* Couleur du texte pour les liens inactifs */
+    background-color: #ffffff;
+    color: #0095FF;
 }
 
 .nav-link:hover {
-    background-color: #e6f4ff; /* Légère couleur de fond au survol */
-    color: #006bbf; /* Couleur du texte au survol */
+    background-color: #e6f4ff;
+    color: #006bbf;
 }
 
 .btn-connect {
@@ -144,13 +150,14 @@ body {
 .input-group {
     position: relative;
     margin-bottom: 20px;
+    border-radius: 5px;
 }
 
 .input-group input {
     width: 100%;
     padding: 15px 15px 15px 40px;  /* Espace pour l'icône à gauche */
     border: 1px solid #ddd;
-    border-radius: 12px;
+    border-radius: 5px;
     font-size: 1rem;
     background-color: #f9f9f9;
     transition: border-color 0.3s;
@@ -171,23 +178,6 @@ body {
     text-decoration: none;
     color: #0095FF;
     font-size: 0.9rem;
-}
-
-.btn-connect {
-    width: 100%;
-    padding: 15px;
-    background-color: #0095FF;
-    color: white;
-    font-size: 1.1rem;
-    border: none;
-    border-radius: 12px;
-    cursor: pointer;
-    transition: background-color 0.3s;
-    font-weight: bold;
-}
-
-.btn-connect:hover {
-    background-color: #006bbf;
 }
 
 /* Icones des champs de formulaire */
@@ -215,11 +205,10 @@ body {
 
 /* Ajustement général */
 .left-section img {
-    max-width: 350px;  /* Augmenter la taille de l'image */
+    max-width: 350px;
     height: auto;
     margin-top: 20px;
 }
-
 /* Styles pour les écrans de moins de 768px (tablettes et téléphones) */
 @media (max-width: 768px) {
     .container {
@@ -272,12 +261,3 @@ body {
         margin-bottom: 10px; /* Réduire la marge */
     }
 }
-
-.text-green-500 {
-    color: green; /* Vert pour le succès */
-}
-
-.text-red-500 {
-    color: red; /* Rouge pour l'erreur */
-}
-

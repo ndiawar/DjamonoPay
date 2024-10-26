@@ -1,147 +1,76 @@
-document.addEventListener('DOMContentLoaded', function() {
-    const togglePassword = document.getElementById('togglePassword');
-    const passwordInput = document.getElementById('password');
-    
-    togglePassword.addEventListener('click', function() {
-        const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
-        passwordInput.setAttribute('type', type);
-        this.classList.toggle('fa-eye');
-        this.classList.toggle('fa-eye-slash');
-    });
+document.addEventListener("DOMContentLoaded", function () {
+    const form = document.getElementById("registrationForm");
+    const nomInput = document.querySelector("input[name='nom']");
+    const prenomInput = document.querySelector("input[name='prenom']");
+    const emailInput = document.querySelector("input[name='email']");
+    const telephoneInput = document.querySelector("input[name='telephone']");
+    const adresseInput = document.querySelector("input[name='adresse']");
+    const dateNaissanceInput = document.querySelector("input[name='date_naissance']");
+    const passwordInput = document.querySelector("input[name='password']");
+    const numeroIdentiteInput = document.querySelector("input[name='numero_identite']");
 
-    const form = document.getElementById('registrationForm');
-    const registerButton = document.getElementById('registerButton'); // Remplacez par l'ID de votre bouton de soumission
+    const nomError = document.getElementById("nomError");
+    const prenomError = document.getElementById("prenomError");
+    const emailError = document.getElementById("emailError");
+    const telephoneError = document.getElementById("telephoneError");
+    const adresseError = document.getElementById("adresseError");
+    const dateNaissanceError = document.getElementById("dateNaissanceError");
+    const passwordError = document.getElementById("passwordError");
+    const numeroIdentiteError = document.getElementById("numeroIdentiteError");
+
+    // Fonction pour afficher les messages d'erreur
+    function showError(input, errorMessage, errorElement) {
+        if (!input.validity.valid) {
+            errorElement.textContent = errorMessage;
+            errorElement.style.display = 'block';
+        } else {
+            errorElement.style.display = 'none';
+        }
+    }
 
     // Validation en temps réel
-    form.addEventListener('input', function(event) {
-        const target = event.target;
-        const errorMessageElement = document.getElementById(`${target.name}Error`);
-        let isValid = true;
-        
-        // Réinitialiser le message d'erreur
-        errorMessageElement.textContent = '';
-        target.classList.remove('valid', 'invalid');
+    nomInput.addEventListener("input", () => {
+        showError(nomInput, "Le nom doit contenir uniquement des lettres sans espaces ni chiffres.", nomError);
+    });
 
-        if (target.name === 'nom' || target.name === 'prenom') {
-            const regex = /^[A-Z][a-zA-Z]*(\s[A-Z][a-zA-Z]*)*$/; // Commence par une majuscule, suivi de lettres (plusieurs mots possibles)
-            if (!regex.test(target.value)) {
-                isValid = false;
-                errorMessageElement.textContent = 'Doit commencer par une majuscule et ne contenir que des lettres.';
-            }
-        }
+    prenomInput.addEventListener("input", () => {
+        showError(prenomInput, "Le prénom doit contenir uniquement des lettres sans espaces ni chiffres.", prenomError);
+    });
 
-        if (target.name === 'email') {
-            const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; // Regex pour l'email
-            if (!regex.test(target.value)) {
-                isValid = false;
-                errorMessageElement.textContent = 'Adresse e-mail invalide.';
-            }
-        }
+    emailInput.addEventListener("input", () => {
+        showError(emailInput, "Veuillez entrer une adresse e-mail valide.", emailError);
+    });
 
-        if (target.name === 'telephone') {
-            const regex = /^\d{9}$/; // Numéro de téléphone doit contenir exactement 9 chiffres
-            if (!regex.test(target.value)) {
-                isValid = false;
-                errorMessageElement.textContent = 'Numéro de téléphone invalide (exactement 9 chiffres).';
-            }
-        }
+    telephoneInput.addEventListener("input", () => {
+        showError(telephoneInput, "Le numéro de téléphone doit être un numéro valide de 9 chiffres.", telephoneError);
+    });
 
-        if (target.name === 'adresse') {
-            if (target.value.trim() === '') {
-                isValid = false;
-                errorMessageElement.textContent = 'L\'adresse ne peut pas être vide.';
-            }
-        }
+    adresseInput.addEventListener("input", () => {
+        showError(adresseInput, "L'adresse est requise.", adresseError);
+    });
 
-        if (target.name === 'date_naissance') {
-            const birthDate = new Date(target.value);
-            const today = new Date();
-            if (birthDate >= today) {
-                isValid = false;
-                errorMessageElement.textContent = 'La date de naissance doit être dans le passé.';
-            }
-        }
-
-        if (target.name === 'password') {
-            const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/; // Au moins 8 caractères, une majuscule, une minuscule, un chiffre et un caractère spécial
-            if (!regex.test(target.value)) {
-                isValid = false;
-                errorMessageElement.textContent = 'Doit contenir au moins 8 caractères, une majuscule, une minuscule, un chiffre et un caractère spécial.';
-            }
-        }
-
-        if (target.name === 'numero_identite') {
-            const regex = /^\d{9}$/; // Exactement 9 chiffres
-            if (!regex.test(target.value)) {
-                isValid = false;
-                errorMessageElement.textContent = 'Le numéro d\'identité doit contenir exactement 9 chiffres.';
-            }
-        }
-
-        if (target.name === 'role') {
-            if (target.value.trim() === '') {
-                isValid = false;
-                errorMessageElement.textContent = 'Le rôle ne peut pas être vide.';
-            }
-        }
-
-        // Afficher l'état de validation
-        if (isValid) {
-            target.classList.add('valid');
-            target.classList.remove('invalid');
+    dateNaissanceInput.addEventListener("input", () => {
+        if (!dateNaissanceInput.validity.valid) {
+            dateNaissanceError.textContent = "La date de naissance est requise.";
+            dateNaissanceError.style.display = 'block';
         } else {
-            target.classList.add('invalid');
-            target.classList.remove('valid');
+            dateNaissanceError.style.display = 'none';
         }
     });
 
-    registerButton.addEventListener('click', function(event) {
-        event.preventDefault(); // Empêcher l'envoi du formulaire pour validation
-        let isFormValid = true;
-        const inputs = form.querySelectorAll('input, select');
-
-        inputs.forEach(input => {
-            if (!input.classList.contains('valid')) {
-                isFormValid = false; // S'il y a un champ invalide, le formulaire n'est pas valide
-            }
-        });
-
-        if (isFormValid) {
-            form.submit(); // Soumettre le formulaire si tout est valide
-        }
-    });
-});
-document.addEventListener('DOMContentLoaded', function () {
-    const form = document.getElementById('registrationForm');
-    const successModal = document.getElementById('successModal');
-    const closeModal = document.getElementById('closeModal');
-
-    form.addEventListener('submit', function (event) {
-        // Empêcher l'envoi du formulaire si besoin pour validation
-        event.preventDefault();
-        
-        // Simuler la soumission du formulaire (à remplacer par la soumission réelle)
-        // Vérifiez si l'inscription est réussie ici
-        const isRegisteredSuccessfully = true; // Remplacez par la logique de validation
-
-        if (isRegisteredSuccessfully) {
-            successModal.style.display = 'block'; // Affiche le modal
-        } else {
-            // Gérer les erreurs d'inscription ici
-        }
+    passwordInput.addEventListener("input", () => {
+        showError(passwordInput, "Le mot de passe doit comporter au moins 8 caractères, incluant une majuscule, un chiffre, et un caractère spécial.", passwordError);
     });
 
-    // Lorsque l'utilisateur clique sur la croix (x), fermer le modal et rediriger
-    closeModal.addEventListener('click', function () {
-        successModal.style.display = 'none';
-        window.location.href = '/'; // Rediriger vers la page d'index
+    numeroIdentiteInput.addEventListener("input", () => {
+        showError(numeroIdentiteInput, "Le numéro de carte d'identité doit contenir exactement 14 chiffres.", numeroIdentiteError);
     });
 
-    // Fermer le modal si l'utilisateur clique à l'extérieur du contenu du modal
-    window.addEventListener('click', function (event) {
-        if (event.target === successModal) {
-            successModal.style.display = 'none';
-            window.location.href = '/'; // Rediriger vers la page d'index
-        }
+    // Affichage/Masquage du mot de passe
+    const togglePassword = document.getElementById("togglePassword");
+    togglePassword.addEventListener("click", () => {
+        const type = passwordInput.getAttribute("type") === "password" ? "text" : "password";
+        passwordInput.setAttribute("type", type);
+        this.classList.toggle("fa-eye-slash");
     });
 });

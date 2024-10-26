@@ -85,22 +85,22 @@ p {
 }
 
 .input-icon {
-    position: relative;
+    position: relative; /* Positionner les icônes par rapport à l'input */
     flex: 1; /* Permet à l'input de prendre tout l'espace disponible */
 }
 
 .input-icon i {
     position: absolute;
-    top: 50%;
-    left: 10px;
-    transform: translateY(-50%);
+    top: 50%; /* Centrer verticalement */
+    left: 10px; /* Ajustez pour le placement */
+    transform: translateY(-50%); /* Correction pour centrer exactement */
     color: #aaa;
-    pointer-events: none; /* L'icône ne doit pas interférer avec le clic */
+    pointer-events: none; /* Les icônes ne doivent pas interférer avec le clic */
 }
 
 /* Espacement et bordures */
 input, select {
-    width: 100%;
+    width: 100%; /* Prendre toute la largeur disponible */
     padding: 15px 15px 15px 40px; /* Ajuste le padding pour l'icône */
     border: 1px solid #07446F; /* Bordure colorée */
     border-radius: 5px;
@@ -135,11 +135,28 @@ select {
     border-radius: 25px;
     cursor: pointer;
     font-size: 18px;
+    text-decoration: none;
+}
+
+.btn-submit  a {
+    background-color: #007bff;
+    color: white;
+    padding: 15px;
+    border: none;
+    border-radius: 25px;
+    cursor: pointer;
+    font-size: 18px;
+    text-decoration: none;
 }
 
 .btn-submit:hover {
     background-color: #0056b3;
 }
+
+.btn-submit:hover a {
+    background-color: #0056b3;
+}
+
 
 .login-link {
     margin-top: 1rem;
@@ -212,4 +229,3 @@ footer {
     text-decoration: none;
     cursor: pointer;
 }
-

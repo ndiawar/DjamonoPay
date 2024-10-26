@@ -15,7 +15,6 @@
     <div class="container">
         <div class="header">
             <img src="{{ asset('images/logo.png') }}" alt="Logo" class="logo">
-           
         </div>
 
         <h1>S’inscrire à DjomanoPay</h1>
@@ -37,12 +36,12 @@
             <div class="input-group">
                 <div class="input-icon">
                     <i class="fas fa-user"></i>
-                    <input type="text" name="nom" placeholder="Nom" value="{{ old('nom') }}" required>
+                    <input type="text" name="nom" placeholder="Nom" value="{{ old('nom') }}" required pattern="[A-Za-z]+" title="Veuillez entrer uniquement des lettres sans espaces ni chiffres.">
                     <div class="error-message" id="nomError"></div>
                 </div>
                 <div class="input-icon">
                     <i class="fas fa-user"></i>
-                    <input type="text" name="prenom" placeholder="Prénom" value="{{ old('prenom') }}" required>
+                    <input type="text" name="prenom" placeholder="Prénom" value="{{ old('prenom') }}" required pattern="[A-Za-z]+" title="Veuillez entrer uniquement des lettres sans espaces ni chiffres.">
                     <div class="error-message" id="prenomError"></div>
                 </div>
             </div>
@@ -55,7 +54,7 @@
                 </div>
                 <div class="input-icon">
                     <i class="fas fa-phone"></i>
-                    <input type="tel" name="telephone" placeholder="Téléphone" value="{{ old('telephone') }}" required>
+                    <input type="tel" name="telephone" placeholder="Téléphone" value="{{ old('telephone') }}" required pattern="^7[01][0-9]{7}$" title="Veuillez entrer un numéro de téléphone valide (9 chiffres) entre 701000000 et 789999999.">
                     <div class="error-message" id="telephoneError"></div>
                 </div>
             </div>
@@ -75,7 +74,7 @@
                 
                 <div class="input-icon password-container">
                     <i class="fas fa-lock"></i>
-                    <input type="password" name="password" placeholder="Mot de passe" id="password" required>
+                    <input type="password" name="password" placeholder="Mot de passe" id="password" required pattern="^(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$" title="Le mot de passe doit contenir au moins 8 caractères, une majuscule, un chiffre et un caractère spécial.">
                     <div class="error-message" id="passwordError"></div>
                     <i class="fas fa-eye" id="togglePassword" style="cursor: pointer; position: absolute; right: -200px; top: 50%; transform: translateY(-50%);"></i>
                 </div>
@@ -84,17 +83,16 @@
             <div class="input-group">
                 <div class="input-icon">
                     <i class="fas fa-id-card"></i>
-                    <input type="text" name="numero_identite" placeholder="Numéro carte d'identité" value="{{ old('numero_identite') }}" required>
+                    <input type="text" name="numero_identite" placeholder="Numéro carte d'identité" value="{{ old('numero_identite') }}" required pattern="^[0-9]{14}$" title="Veuillez entrer un numéro d'identité valide (14 chiffres sans espaces).">
                     <div class="error-message" id="numeroIdentiteError"></div>
                 </div>
                 <div class="input-icon">
                     <i class="fas fa-users"></i>
                     <select name="role" required>
-                        <option value="distributeur">Choisi un role</option>
+                        <option value="">Choisissez un rôle</option>
                         <option value="distributeur">Distributeur</option>
                         <option value="agent">Agent</option>
                     </select>
-                    
                     <div class="error-message" id="roleError"></div>
                 </div>
             </div>
@@ -108,8 +106,7 @@
             </div>
 
             <button type="submit" class="btn-submit">S'inscrire</button>
-
-            
+            <button type="buutton" class="btn-submit"> <a href="{{ route('index') }}">Retour</a></button>
         </form>
 
         <footer>
@@ -118,14 +115,13 @@
     </div>
 
     <!-- Modal -->
-<div id="successModal" class="modal" style="display: none;">
-    <div class="modal-content">
-        <span class="close" id="closeModal">&times;</span>
-        <h2>Inscription réussie !</h2>
-        <p>Votre inscription a été effectuée avec succès.</p>
+    <div id="successModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <span class="close" id="closeModal">&times;</span>
+            <h2>Inscription réussie !</h2>
+            <p>Votre inscription a été effectuée avec succès.</p>
+        </div>
     </div>
-</div>
-
 
 </body>
 </html>

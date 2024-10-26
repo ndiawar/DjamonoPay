@@ -5,17 +5,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Connexion - DjamonoPay</title>
-    @vite(['resources/css/style.css', 'resources/js/login.js'])
-    <!-- Intégration de Font Awesome -->
+    @vite(['resources/css/login.css', 'resources/js/login.js'])
+    <!-- Intégration de Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.5/font/bootstrap-icons.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <style>
-        /* Styles pour les messages d'erreur */
-        .error-message {
-            color: red; /* Couleur du texte en rouge */
-            font-weight: bold; /* Mettre en gras */
-            margin-bottom: 10px; /* Espacement en bas */
-        }
-    </style>
+    
 </head>
 
 <body>
@@ -34,58 +29,52 @@
         <!-- Section droite : Formulaire de connexion -->
         <div class="right-section">
             <div class="top-nav">
-                <a href="#" class="nav-link active">Se connecter</a>
-                <a href="{{ route('register') }}" class="nav-link">S'inscrire</a>
+                <a href="{{ route('login') }}" class="nav-link active">Connexion</a>
+                <a href="{{ route('register') }}" class="nav-link">Inscription</a>
             </div>
+
+            <!-- Message d'erreur -->
+            @if ($errors->any())
+            <div class="error-message">
+                <strong>{{ $errors->first() }}</strong>
+            </div>
+            @endif
 
             <form method="POST" action="{{ route('login') }}">
                 @csrf
-
                 <div class="input-group">
-                    <i class="fas fa-user icon"></i>
-                    <input 
-                        type="email" 
-                        name="email" 
-                        placeholder="Entrer Email" 
-                        required 
-                        autofocus 
-                    >
+                    <i class="bi bi-person-circle icon"></i>
+                    <input type="text" name="email" placeholder="Adresse e-mail" required autofocus>
                 </div>
-                <div class="message email-message"></div> <!-- Message pour l'email -->
-
                 <div class="input-group">
-                    <i class="fas fa-lock icon"></i>
-                    <input 
-                        type="password" 
-                        name="password" 
-                        placeholder="Mot de passe" 
-                        id="password" 
-                        required 
-                    >
-                    <i class="fas fa-eye toggle-password" id="togglePassword"></i>
+                    <i class="bi bi-lock icon"></i>
+                    <input type="password" name="password" placeholder="Mot de passe" required>
+                    <i class="bi bi-eye toggle-password" onclick="togglePasswordVisibility()"></i>
                 </div>
-                <div class="message password-message"></div> <!-- Message pour le mot de passe -->
-
                 <div class="forgot-password">
-                    <a href="{{ route('password.request') }}">Mot de passe oublié ?</a>
+                    <a href="#">Mot de passe oublié ?</a>
                 </div>
-
                 <button type="submit" class="btn-connect">Se connecter</button>
-
-                @if ($errors->any())
-                    <div class="error-message">
-                        <ul>
-                            @foreach ($errors->all() as $error)
-                                <li>{{ $error }}</li>
-                            @endforeach
-                        </ul>
-                    </div>
-                @endif
             </form>
         </div>
     </div>
 
-    <script src="{{ asset('js/login.js') }}"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        function togglePasswordVisibility() {
+            const passwordInput = document.querySelector('input[name="password"]');
+            const passwordIcon = document.querySelector('.toggle-password');
+            if (passwordInput.type === "password") {
+                passwordInput.type = "text";
+                passwordIcon.classList.remove('bi-eye');
+                passwordIcon.classList.add('bi-eye-slash');
+            } else {
+                passwordInput.type = "password";
+                passwordIcon.classList.remove('bi-eye-slash');
+                passwordIcon.classList.add('bi-eye');
+            }
+        }
+    </script>
 </body>
 
 </html>

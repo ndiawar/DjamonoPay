@@ -7,7 +7,7 @@ export default defineConfig({
             input: [
                 'public/assets/scss/app.scss', // Assurez-vous que le chemin est correct
                 'resources/js/app.js',
-                'resources/css/style.css',
+                'resources/css/login.css',
                 'resources/js/login.js',
                 'resources/css/app.css',
                 'resources/css/register.css',
