@@ -48,7 +48,7 @@
                     </li> 
                     
                     <li class="sidebar-list"><i class="fa fa-thumb-tack"></i><a
-                            class="sidebar-link sidebar-title link-nav" href="{{ route('dashboard-activitées') }}">
+                            class="sidebar-link sidebar-title link-nav" href="{{ route('dashboard-activites') }}">
                             <svg class="stroke-icon">
                                 <use href="{{ asset('assets/svg/icon-sprite.svg#24-hour') }}"></use>
                             </svg>

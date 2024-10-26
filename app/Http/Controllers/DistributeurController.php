@@ -19,10 +19,13 @@ class DistributeurController extends Controller
     /**
      * Affiche tous les distributeurs.
      */
+  /**
+ * Affiche tous les distributeurs.
+ */
     public function index(Request $request)
     {
         $distributeurs = Distributeur::paginate(10);
-        return new DistributeurCollection($distributeurs);
+        return view('dashboard.dashboard-distributeur', compact('distributeurs'));
     }
 
     /**

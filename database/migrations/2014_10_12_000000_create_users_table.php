@@ -35,7 +35,6 @@ class CreateUsersTable extends Migration
             $table->string('profile_photo_path')->nullable(); // Si vous n'avez pas besoin de la longueur, pas besoin de spécifier
             
             // Gestion d'équipe et vérification
-            $table->foreignId('current_team_id')->nullable()->constrained()->onDelete('set null'); // Assurez-vous que cela fait référence à une table d'équipe
             $table->timestamp('email_verified_at')->nullable();
             $table->rememberToken();
             $table->timestamps();
