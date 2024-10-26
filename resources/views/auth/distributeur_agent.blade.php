@@ -15,10 +15,7 @@
     <div class="container">
         <div class="header">
             <img src="{{ asset('images/logo.png') }}" alt="Logo" class="logo">
-            <div class="buttons">
-                <a href="{{ route('login') }}" class="btn-secondary">Se connecter</a>
-                <button class="btn-primary">S'inscrire</button>
-            </div>
+           
         </div>
 
         <h1>S’inscrire à DjomanoPay</h1>
@@ -93,10 +90,11 @@
                 <div class="input-icon">
                     <i class="fas fa-users"></i>
                     <select name="role" required>
-                        <option value="" disabled selected>Choisir un rôle</option>
-                        <option value="agent" {{ old('role') == 'agent' ? 'selected' : '' }}>Agent</option>
-                        <option value="distributeur" {{ old('role') == 'distributeur' ? 'selected' : '' }}>Distributeur</option>
+                        <option value="distributeur">Choisi un role</option>
+                        <option value="distributeur">Distributeur</option>
+                        <option value="agent">Agent</option>
                     </select>
+                    
                     <div class="error-message" id="roleError"></div>
                 </div>
             </div>
@@ -111,15 +109,23 @@
 
             <button type="submit" class="btn-submit">S'inscrire</button>
 
-            <p class="login-link">
-                Vous avez déjà un compte ? <a href="{{ route('login') }}">Connectez-vous ici</a>
-            </p>
+            
         </form>
 
         <footer>
             © 2024 DjomanoPay. Tous droits réservés.
         </footer>
     </div>
+
+    <!-- Modal -->
+<div id="successModal" class="modal" style="display: none;">
+    <div class="modal-content">
+        <span class="close" id="closeModal">&times;</span>
+        <h2>Inscription réussie !</h2>
+        <p>Votre inscription a été effectuée avec succès.</p>
+    </div>
+</div>
+
 
 </body>
 </html>

@@ -1114,7 +1114,7 @@
     "src": "resources/css/app.css"
   },
   "resources/css/register.css": {
-    "file": "assets/register-1206f7ff.css",
+    "file": "assets/register-f6ca59c6.css",
     "isEntry": true,
     "src": "resources/css/register.css"
   },
@@ -1137,7 +1137,7 @@
     "src": "resources/js/login.js"
   },
   "resources/js/register.js": {
-    "file": "assets/register-692df319.js",
+    "file": "assets/register-d19b0927.js",
     "isEntry": true,
     "src": "resources/js/register.js"
   }

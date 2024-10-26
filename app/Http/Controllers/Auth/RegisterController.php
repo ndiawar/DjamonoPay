@@ -5,84 +5,79 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Models\Compte;
-use App\Enums\UserRole; // Assurez-vous d'importer votre énumération
+use App\Enums\UserRole;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 
-class RegisterController extends Controller
-{
+class RegisterController extends Controller {
+
     // Affiche le formulaire d'inscription
     public function showRegistrationForm()
     {
         return view('auth.register'); // Assurez-vous que cette vue existe
     }
 
-    // Gère l'inscription des utilisateurs
     public function register(Request $request)
-    {
-        // Vérifiez quel type d'utilisateur s'inscrit
-        $typeUser = $request->input('type_user'); // Assurez-vous que ce champ est inclus dans le formulaire
+{
+    $validatedData = $request->validate([
+        'nom' => ['required', 'string', 'max:255'],
+        'prenom' => ['required', 'string', 'max:255'],
+        'email' => ['required', 'email', 'max:255', 'unique:users,email'],
+        'telephone' => ['required', 'string', 'max:15'],
+        'adresse' => ['required', 'string', 'max:255'],
+        'date_naissance' => ['required', 'date'],
+        'password' => ['required', 'string', 'min:8'],
+        'numero_identite' => ['required', 'string', 'max:255'],
+        'photo' => ['required', 'image', 'mimes:jpeg,png', 'max:2048'],
+        'role' => ['nullable', Rule::in(UserRole::getValues())],
+    ]);
+    
+    // Définir une valeur par défaut pour le rôle
+    $role = $validatedData['role'] ?? UserRole::CLIENT;
 
-        // Validation des données
-        $validatedData = $request->validate([
-            'nom' => ['required', 'string', 'max:255'],
-            'prenom' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
-            'telephone' => ['required', 'string', 'max:15'],
-            'adresse' => ['required', 'string', 'max:255'],
-            'date_naissance' => ['required', 'date'],
-            'password' => ['required', 'string', 'min:8'],
-            'numero_identite' => ['required', 'string', 'max:255'],
-            'photo' => ['required', 'image', 'mimes:jpeg,png', 'max:2048'], // Limite à 2 Mo
-        ]);
+    try {
+        $photoPath = $validatedData['photo']->store('photos', 'public');
+    } catch (\Exception $e) {
+        return back()->withErrors(['photo' => 'Erreur de téléchargement de la photo.'])->withInput();
+    }
 
-        // Si l'utilisateur est un distributeur ou un agent, vérifier le rôle
-        if ($typeUser === 'distributeur' || $typeUser === 'agent') {
-            $validatedData['role'] = $request->validate([
-                'role' => ['required', 'in:' . implode(',', UserRole::getValues())], // Validation du rôle
-            ])['role'];
-        } else {
-            // Assignation du rôle par défaut pour les clients
-            $validatedData['role'] = UserRole::CLIENT;
-        }
+    $user = User::create([
+        'nom' => $validatedData['nom'],
+        'prenom' => $validatedData['prenom'],
+        'email' => $validatedData['email'],
+        'telephone' => $validatedData['telephone'],
+        'adresse' => $validatedData['adresse'],
+        'date_naissance' => $validatedData['date_naissance'],
+        'password' => Hash::make($validatedData['password']),
+        'numero_identite' => $validatedData['numero_identite'],
+        'photo' => $photoPath,
+        'role' => $role,
+    ]);
 
-        // Créer l'utilisateur
-        $user = User::create([
-            'nom' => $validatedData['nom'],
-            'prenom' => $validatedData['prenom'],
-            'email' => $validatedData['email'],
-            'telephone' => $validatedData['telephone'],
-            'adresse' => $validatedData['adresse'],
-            'date_naissance' => $validatedData['date_naissance'],
-            'password' => Hash::make($validatedData['password']),
-            'numero_identite' => $validatedData['numero_identite'],
-            'photo' => $validatedData['photo']->store('photos', 'public'), // Assurez-vous de gérer le stockage de la photo
-            'role' => $validatedData['role'],
-        ]);
+    $soldeInitial = ($role === UserRole::DISTRIBUTEUR) ? 2000000 : 0;
 
-        // Définir le solde initial en fonction du rôle
-        $soldeInitial = ($validatedData['role'] === UserRole::DISTRIBUTEUR) ? 2000000 : 500000;
+    $numeroCompte = strtoupper(substr($validatedData['nom'], 0, 1)) .
+                    strtoupper(substr($validatedData['prenom'], 0, 1)) .
+                    str_pad(rand(0, 999), 3, '0', STR_PAD_LEFT);
 
-        // Générer un numéro de compte unique
-        $numeroCompte = strtoupper(substr($validatedData['nom'], 0, 1)) . 
-                        strtoupper(substr($validatedData['prenom'], 0, 1)) . 
-                        str_pad(rand(0, 999), 3, '0', STR_PAD_LEFT);
+    Compte::create([
+        'user_id' => $user->id,
+        'numero' => $numeroCompte,
+        'solde' => $soldeInitial,
+        'qr_code' => Str::random(10),
+        'est_bloque' => false,
+        'qr_code_creation' => now(),
+    ]);
 
-        // Créer un compte associé à l'utilisateur
-        Compte::create([
-            'user_id' => $user->id,
-            'numero' => $numeroCompte,
-            'solde' => $soldeInitial,
-            'qr_code' => Str::random(10),
-            'est_bloque' => false,
-            'qr_code_creation' => now(),
-        ]);
+    auth()->login($user);
 
-        // Authentifier l'utilisateur
-        auth()->login($user);
-
-        // Rediriger vers la page de connexion avec un message de succès
+    // Redirection basée sur le rôle
+    if ($role === UserRole::CLIENT) {
         return redirect()->route('login')->with('success', 'Inscription réussie !');
+    } else {
+        return redirect()->view('index')->with('success', 'Inscription réussie !');
     }
 }
+ }

@@ -24,6 +24,16 @@
         <h1>S’inscrire à DjomanoPay</h1>
         <p>Rejoignez DjomanoPay et profitez de paiements rapides et sécurisés !</p>
 
+        @if ($errors->any())
+            <div class="alert alert-danger">
+                <ul>
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
+
         <form method="POST" action="{{ route('register') }}" enctype="multipart/form-data" id="registrationForm">
             @csrf
 
@@ -31,16 +41,12 @@
                 <div class="input-icon">
                     <i class="fas fa-user"></i>
                     <input type="text" name="nom" placeholder="Nom" value="{{ old('nom') }}" required>
-                    @error('nom')
-                        <div class="error-message" style="color: red;">{{ $message }}</div>
-                    @enderror
+                    <div class="error-message" id="nomError"></div>
                 </div>
                 <div class="input-icon">
                     <i class="fas fa-user"></i>
                     <input type="text" name="prenom" placeholder="Prénom" value="{{ old('prenom') }}" required>
-                    @error('prenom')
-                        <div class="error-message" style="color: red;">{{ $message }}</div>
-                    @enderror
+                    <div class="error-message" id="prenomError"></div>
                 </div>
             </div>
 
@@ -48,42 +54,33 @@
                 <div class="input-icon">
                     <i class="fas fa-envelope"></i>
                     <input type="email" name="email" placeholder="Adresse E-mail" value="{{ old('email') }}" required>
-                    @error('email')
-                        <div class="error-message" style="color: red;">{{ $message }}</div>
-                    @enderror
+                    <div class="error-message" id="emailError"></div>
                 </div>
                 <div class="input-icon">
                     <i class="fas fa-phone"></i>
                     <input type="tel" name="telephone" placeholder="Téléphone" value="{{ old('telephone') }}" required>
-                    @error('telephone')
-                        <div class="error-message" style="color: red;">{{ $message }}</div>
-                    @enderror
+                    <div class="error-message" id="telephoneError"></div>
                 </div>
             </div>
 
-            <div class="input-group">
+            
                 <div class="input-icon">
                     <i class="fas fa-home"></i>
                     <input type="text" name="adresse" placeholder="Adresse" value="{{ old('adresse') }}" required>
-                    @error('adresse')
-                        <div class="error-message" style="color: red;">{{ $message }}</div>
-                    @enderror
+                    <div class="error-message" id="adresseError"></div>
                 </div>
                 <div class="input-icon">
                     <i class="fas fa-calendar-alt"></i>
                     <input type="date" name="date_naissance" value="{{ old('date_naissance') }}" required 
                            min="1000-01-01" max="2012-12-31">
-                    @error('date_naissance')
-                        <div class="error-message" style="color: red;">{{ $message }}</div>
-                    @enderror
+                    <div class="error-message" id="dateNaissanceError"></div>
                 </div>
                 
                 <div class="input-icon password-container">
                     <i class="fas fa-lock"></i>
                     <input type="password" name="password" placeholder="Mot de passe" id="password" required>
-                    @error('password')
-                        <div class="error-message" style="color: red;">{{ $message }}</div>
-                    @enderror
+                    <div class="error-message" id="passwordError"></div>
+                    <i class="fas fa-eye" id="togglePassword" style="cursor: pointer; position: absolute; right: -200px; top: 50%; transform: translateY(-50%);"></i>
                 </div>
             </div>
 
@@ -91,9 +88,7 @@
                 <div class="input-icon">
                     <i class="fas fa-id-card"></i>
                     <input type="text" name="numero_identite" placeholder="Numéro carte d'identité" value="{{ old('numero_identite') }}" required>
-                    @error('numero_identite')
-                        <div class="error-message" style="color: red;">{{ $message }}</div>
-                    @enderror
+                    <div class="error-message" id="numeroIdentiteError"></div>
                 </div>
             </div>
 
@@ -101,9 +96,7 @@
                 <div class="input-icon">
                     <i class="fas fa-file-image"></i>
                     <input type="file" name="photo" accept=".png, .jpeg" required>
-                    @error('photo')
-                        <div class="error-message" style="color: red;">{{ $message }}</div>
-                    @enderror
+                    <div class="error-message" id="photoError"></div>
                 </div>
             </div>
 
@@ -118,6 +111,40 @@
             © 2024 DjomanoPay. Tous droits réservés.
         </footer>
     </div>
+
+    <!-- Modal -->
+    <div id="successModal" class="modal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Inscription Réussie</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p class="text-success">Votre inscription a été réalisée avec succès !</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Fermer</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Assurez-vous d'inclure jQuery et Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        $(document).ready(function() {
+            // Vérifiez si le message de succès existe
+            @if(session('success'))
+                // Affichez le modal
+                $('#successModal').modal('show');
+            @endif
+        });
+    </script>
 
 </body>
 </html>

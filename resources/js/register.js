@@ -81,11 +81,11 @@ document.addEventListener('DOMContentLoaded', function() {
         if (target.name === 'role') {
             if (target.value.trim() === '') {
                 isValid = false;
-                errorMessageElement.textContent = 'Veuillez choisir un rôle.';
+                errorMessageElement.textContent = 'Le rôle ne peut pas être vide.';
             }
         }
 
-        // Ajouter les classes de validation
+        // Afficher l'état de validation
         if (isValid) {
             target.classList.add('valid');
             target.classList.remove('invalid');
@@ -93,12 +93,55 @@ document.addEventListener('DOMContentLoaded', function() {
             target.classList.add('invalid');
             target.classList.remove('valid');
         }
+    });
 
-        // Vérifier si le formulaire est valide et activer/désactiver le bouton d'enregistrement
-        const allInputsValid = Array.from(form.elements).every(input => {
-            return input.classList.contains('valid') || input.type === 'submit';
+    registerButton.addEventListener('click', function(event) {
+        event.preventDefault(); // Empêcher l'envoi du formulaire pour validation
+        let isFormValid = true;
+        const inputs = form.querySelectorAll('input, select');
+
+        inputs.forEach(input => {
+            if (!input.classList.contains('valid')) {
+                isFormValid = false; // S'il y a un champ invalide, le formulaire n'est pas valide
+            }
         });
 
-        registerButton.disabled = !allInputsValid; // Activer ou désactiver le bouton d'enregistrement
+        if (isFormValid) {
+            form.submit(); // Soumettre le formulaire si tout est valide
+        }
+    });
+});
+document.addEventListener('DOMContentLoaded', function () {
+    const form = document.getElementById('registrationForm');
+    const successModal = document.getElementById('successModal');
+    const closeModal = document.getElementById('closeModal');
+
+    form.addEventListener('submit', function (event) {
+        // Empêcher l'envoi du formulaire si besoin pour validation
+        event.preventDefault();
+        
+        // Simuler la soumission du formulaire (à remplacer par la soumission réelle)
+        // Vérifiez si l'inscription est réussie ici
+        const isRegisteredSuccessfully = true; // Remplacez par la logique de validation
+
+        if (isRegisteredSuccessfully) {
+            successModal.style.display = 'block'; // Affiche le modal
+        } else {
+            // Gérer les erreurs d'inscription ici
+        }
+    });
+
+    // Lorsque l'utilisateur clique sur la croix (x), fermer le modal et rediriger
+    closeModal.addEventListener('click', function () {
+        successModal.style.display = 'none';
+        window.location.href = '/'; // Rediriger vers la page d'index
+    });
+
+    // Fermer le modal si l'utilisateur clique à l'extérieur du contenu du modal
+    window.addEventListener('click', function (event) {
+        if (event.target === successModal) {
+            successModal.style.display = 'none';
+            window.location.href = '/'; // Rediriger vers la page d'index
+        }
     });
 });
