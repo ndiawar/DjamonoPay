@@ -18,9 +18,7 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class DistributeurController extends Controller
 {
-    /**
-     * Affiche tous les distributeurs.
-     */
+    
   /**
  * Affiche tous les distributeurs.
  */
@@ -82,73 +80,122 @@ class DistributeurController extends Controller
             return response()->json(['message' => 'Erreur lors de la récupération du solde'], 500);
         }
     }
+/**
+ * Crediter le compte du client
+ */
+    
 
     public function crediterCompteClient(Request $request)
-    {
-        $request->validate([
-            'numero_compte' => 'required|string',
-            'montant' => 'required|numeric|min:0.01'
-        ]);
-        // dd($request->all());
+{
+    // Validation des données d'entrée
+    $request->validate([
+        'numero_compte' => 'required|string',
+        'montant' => 'required|numeric|min:0.01',
         
-        DB::beginTransaction();
+    ]);
 
-        try {
-            // Rechercher le compte par numéro de compte
-            $compte = Compte::where('numero_compte', $request->numero_compte)->firstOrFail();
-           
+    DB::beginTransaction();
 
-            // Logique pour créditer le compte
-            // Ajouter le montant au solde existant
-            $compte->solde += $request->montant;
-            $compte->save();
+    try {
+        // Rechercher le compte par numéro de compte
+        $compte = Compte::where('numero_compte', $request->numero_compte)->firstOrFail();
 
-            DB::commit();
-            return response()->json(['message' => 'Crédit effectué avec succès']);
-        } catch (ModelNotFoundException $e) {
-            DB::rollBack();
-            return response()->json(['message' => 'Compte non trouvé'], 404);
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return response()->json(['message' => 'Erreur lors du crédit'], 500);
+
+        // Vérifier si user_id est un client
+        $user = User::find($compte->user_id);
+        if (!$user || !$user->isClient()) {
+            return response()->json(['message' => 'Le compte ne correspond pas à un client valide'], 400);
         }
+        // Logique pour créditer le compte
+        // Ajouter le montant au solde existant
+        $compte->solde += $request->montant;
+        $compte->save();
+
+        // Calculer la commission pour le distributeur (supposons un taux de 2%)
+        $commission = $request->montant * 0.01; // 1% de commission
+
+        // Enregistrer la transaction
+        Transaction::create([
+            'user_id' => $user->id, // ID du client
+            'type' => 'depot',
+            'montant' => $request->montant,
+            'frais' => 0, // Ajoutez la logique pour les frais si nécessaire
+            'commission' => $commission, // Ajoutez la logique pour la commission si nécessaire
+            'etat' => 'terminee',
+            'motif' => 'Dépôt effectué',
+            'date' => now(),
+        ]);
+
+        DB::commit();
+
+        // Si vous utilisez AJAX, renvoyez un JSON
+        return redirect()->route('dashboard-distributeur')->with('message', 'Dépôt effectué avec succès. Votre commission pour cette transaction : ' . number_format($commission, 2, ',', ' ') . ' Fcfa');
+    } catch (ModelNotFoundException $e) {
+        DB::rollBack();
+        return redirect()->route('dashboard-distributeur')->with('error', 'Compte non trouvé');
+    } catch (\Exception $e) {
+        DB::rollBack();
+        return redirect()->route('dashboard-distributeur')->with('error', 'Error lors du Depôt ');
     }
-    /**
+}
+
+/**
  * Effectue un retrait sur le compte du client.
  */
-public function effectuerRetrait(Request $request, $clientId)
+public function effectuerRetrait(Request $request)
 {
     // Validation des données entrantes
-    $request->validate(['montant' => 'required|numeric|min:0.01']);
+    $request->validate([
+        'numero_compte' => 'required|string',
+        'montant' => 'required|numeric|min:0.01',
+    ]);
 
     // Démarrer une transaction
     DB::beginTransaction();
 
     try {
-        // Trouver le client par son ID
-        $client = Client::findOrFail($clientId);
+        // Rechercher le compte par numéro de compte
+        $compte = Compte::where('numero_compte', $request->numero_compte)->firstOrFail();
 
-        // Supposons que le client a un compte avec un solde
-        $compte = $client->compte; // Assurez-vous que la relation est définie dans le modèle Client
+        // Trouver l'utilisateur associé au compte
+        $user = User::find($compte->user_id);
+
+        // Vérifier si l'utilisateur est bien un client
+        if (!$user || !$user->isClient()) {
+            return redirect()->route('dashboard-distributeur')->with('error', 'Le compte ne correspond pas à un client valide');
+        }
 
         // Vérifier si le solde est suffisant
         if ($compte->solde < $request->montant) {
-            return response()->json(['message' => 'Solde insuffisant pour effectuer ce retrait'], 400);
+            return redirect()->route('dashboard-distributeur')->with('error', 'Solde insuffisant pour effectuer ce retrait');
         }
 
         // Logique pour effectuer le retrait
-        // Déduire le montant du solde existant
         $compte->solde -= $request->montant;
         $compte->save(); // Enregistrer les modifications
 
-        DB::commit(); // Valider la transaction
-        return response()->json(['message' => 'Retrait effectué avec succès']);
+        // Enregistrer la transaction
+        Transaction::create([
+            'user_id' => $user->id, // ID du client
+            'type' => 'retrait',
+            'montant' => $request->montant,
+            'frais' => 0, // Ajoutez la logique pour les frais si nécessaire
+            'commission' => 0, // Ajoutez la logique pour la commission si nécessaire
+            'etat' => 'terminee',
+            'motif' => 'Retrait effectué',
+            'date' => now(),
+        ]);
+
+        DB::commit();
+
+        // Redirection avec un message de succès
+        return redirect()->route('dashboard-distributeur')->with('message', 'Retrait effectué avec succès');
     } catch (ModelNotFoundException $e) {
-        DB::rollBack(); // Annuler la transaction en cas d'erreur
-        return response()->json(['message' => 'Client non trouvé'], 404);
+        DB::rollBack();
+        return redirect()->route('dashboard-distributeur')->with('error', 'Compte non trouvé');
     } catch (\Exception $e) {
-        DB::rollBack(); // Annuler la transaction en cas d'erreur générale
-        return response()->json(['message' => 'Erreur lors du retrait'], 500);
+        DB::rollBack();
+        return redirect()->route('dashboard-distributeur')->with('error', 'Erreur lors du retrait');
     }
 }
 
@@ -205,5 +252,103 @@ public function effectuerRetrait(Request $request, $clientId)
         // Logique pour scanner et vérifier le QR Code
         // Par exemple, récupérer le QR Code depuis le request et valider
         return response()->json(['message' => 'QR Code scanné avec succès']);
+    }
+    /**
+     * Transfert entre deux clients effectuer par le distributeur
+     *
+     */
+    public function transfererEntreClients(Request $request)
+{
+    // Valider les données d'entrée
+    $request->validate([
+        'numero_compte_source' => 'required|string',
+        'numero_compte_destination' => 'required|string',
+        'montant' => 'required|numeric|min:0.01',
+    ]);
+
+    DB::beginTransaction();
+
+    try {
+        // Rechercher les comptes source et destination
+        $compteSource = Compte::where('numero_compte', $request->numero_compte_source)->firstOrFail();
+        $compteDestination = Compte::where('numero_compte', $request->numero_compte_destination)->firstOrFail();
+
+        // Récupérer les utilisateurs associés aux comptes
+        $userSource = User::findOrFail($compteSource->user_id);
+        $userDestination = User::findOrFail($compteDestination->user_id);
+
+        // Vérifier que les deux utilisateurs sont des clients
+        if (!$userSource->isClient() || !$userDestination->isClient()) {
+            return redirect()->route('dashboard-distributeur')->with('message', 'Les deux comptes doivent appartenir à des clients valides');
+        }
+
+        // Vérifier que le compte source a un solde suffisant
+        if ($compteSource->solde < $request->montant) {
+           return redirect()->route('dashboard-distributeur')->with('message','Solde insuffisant dans le compte source');
+        }
+
+        // Calculer la commission (1 % du montant transféré)
+        $commission = $request->montant * 0.01;
+
+        // Effectuer le transfert en déduisant le montant du compte source
+        $montantNet = $request->montant - $commission;
+        $compteSource->solde -= $request->montant;
+        $compteSource->save();
+
+        // Créditez le montant net au compte de destination
+        $compteDestination->solde += $montantNet;
+        $compteDestination->save();
+
+        // Enregistrer les transactions
+        Transaction::create([
+            'user_id' => $userSource->id,
+            'type' => 'retrait',
+            'montant' => $request->montant,
+            'frais' => $commission, // Ajoutez la logique pour les frais si nécessaire
+            'commission' => $commission,
+            'etat' => 'terminee',
+            'motif' => 'Transfert vers le compte ' . $compteDestination->numero_compte,
+            'date' => now(),
+        ]);
+
+        Transaction::create([
+            'user_id' => $userDestination->id,
+            'type' => 'depot',
+            'montant' => $request->montant,
+            'frais' => 0,
+            'commission' => 0,
+            'etat' => 'terminee',
+            'motif' => 'Transfert depuis le compte ' . $compteSource->numero_compte,
+            'date' => now(),
+        ]);
+
+        DB::commit();
+
+        // Redirection avec message de succès
+        return redirect()->route('dashboard-distributeur')->with('message', 'Transfert effectué avec succès. Votre commission pour cette transaction : ' . number_format($commission, 2, ',', ' ') . ' Fcfa');
+    } catch (ModelNotFoundException $e) {
+        DB::rollBack();
+        return redirect()->route('dashboard-distributeur')->with('error', 'Compte non trouvé');
+    } catch (\Exception $e) {
+        DB::rollBack();
+        return redirect()->route('dashboard-distributeur')->with('error', 'Erreur lors du transfert');
+    }
+}
+/**
+     * Historique transaction
+     *
+     */
+    public function afficherHistorique()
+    {
+        // Récupérer les transactions avec les informations des clients et comptes associés
+        $transactions = Transaction::join('comptes', 'transactions.compte_id', '=', 'comptes.id')
+            ->join('users', 'comptes.user_id', '=', 'users.id')
+            ->where('users.role', 'client') // Assurez-vous que le champ 'role' est défini pour filtrer par rôle client
+            ->select('transactions.*', 'users.nom', 'users.prenom', 'users.photo', 'comptes.numero_compte')
+            ->orderBy('transactions.date', 'desc')
+            ->get();
+            dd($transactions); // Cela affichera le contenu de $transactions
+    
+        return view('dashboard-distributeur', compact('transactions'));
     }
 }

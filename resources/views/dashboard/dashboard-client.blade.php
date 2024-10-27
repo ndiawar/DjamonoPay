@@ -64,17 +64,21 @@
                       <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
-                      <form action="/transfer" method="POST">
+                      <form action="{{ route('clients.transfert_clients') }}" method="POST">
                           @csrf
                           <div class="mb-3">
+                              <label for="recipient" class="form-label">Source</label>
+                              <input type="text" class="form-control" id="recipient" name="numero_compte_source" required>
+                          </div>
+                          <div class="mb-3">
                               <label for="recipient" class="form-label">Destinataire</label>
-                              <input type="text" class="form-control" id="recipient" name="recipient" required>
+                              <input type="text" class="form-control" id="recipient" name="numero_compte_destination" required>
                           </div>
                           <div class="mb-3">
                               <label for="amount" class="form-label">Montant</label>
-                              <input type="number" class="form-control" id="amount" name="amount" required>
+                              <input type="number" class="form-control" id="amount" name="montant" required>
                           </div>
-                          <button type="submit" class="btn btn-primary">Envoyer</button>
+                          <button type="submit" class="btn btn-secondary btn-custom me-2">Envoyer</button>
                       </form>
                     </div>
                   </div>

@@ -7,6 +7,8 @@ use App\Models\Client;
 use App\Models\Transaction;
 use Illuminate\Http\Request;
 use App\Http\Resources\TransactionCollection;
+use App\Models\Compte;
+use App\Models\User;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\DB;
@@ -35,61 +37,88 @@ class ClientController extends Controller
     }
 
     /**
-     * Masquer le solde du client.
-     */
-    public function masquerSolde(Client $client)
-    {
-        // Logique pour masquer le solde
-        return response()->json(['message' => 'Solde masqué']);
-    }
+ * Transfert entre deux clients effectué par un client
+ *
+ */
+public function transfertEntreClients(Request $request)
+{
+    // Valider les données d'entrée
+    $request->validate([
+        'numero_compte_source' => 'required|string',
+        'numero_compte_destination' => 'required|string',
+        'montant' => 'required|numeric|min:0.01',
+    ]);
 
-    /**
-     * Faire un transfert d'argent.
-     */
-    public function faireTransfert(Request $request, Client $client)
-    {
-        $request->validate([
-            'montant' => 'required|numeric|min:0.01',
-            'destinataire_id' => 'required|exists:clients,id',
+    DB::beginTransaction();
+
+    try {
+        // Récupérer le compte source de l'utilisateur authentifié
+        $compteSource = Compte::where('user_id', auth()->id())->firstOrFail();
+
+        // Rechercher le compte de destination
+        $compteDestination = Compte::where('numero_compte', $request->numero_compte_destination)->firstOrFail();
+
+        // Récupérer les utilisateurs associés aux comptes
+        $userSource = User::findOrFail($compteSource->user_id);
+        $userDestination = User::findOrFail($compteDestination->user_id);
+
+        // Vérifier que le compte source appartient à un client
+        if (!$userSource->isClient()) {
+            return redirect()->route('dashbord.dashboard-client')->with('message', 'Le compte source doit appartenir à un client valide');
+        }
+
+        // Vérifier que le compte source a un solde suffisant
+        if ($compteSource->solde < $request->montant) {
+            return redirect()->route('dashbord.dashboard-client')->with('message', 'Solde insuffisant dans le compte source');
+        }
+
+        // Calculer la commission (2 % du montant transféré)
+        $commission = $request->montant * 0.02;
+
+        // Effectuer le transfert en déduisant le montant du compte source
+        $montantNet = $request->montant - $commission;
+        $compteSource->solde -= $request->montant;
+        $compteSource->save();
+
+        // Créditez le montant net au compte de destination
+        $compteDestination->solde += $montantNet;
+        $compteDestination->save();
+
+        // Enregistrer les transactions
+        Transaction::create([
+            'user_id' => $userSource->id,
+            'type' => 'retrait',
+            'montant' => $request->montant,
+            'frais' => $commission, // Ajoutez la logique pour les frais si nécessaire
+            'commission' => $commission,
+            'etat' => 'terminee',
+            'motif' => 'Transfert vers le compte ' . $compteDestination->numero_compte,
+            'date' => now(),
         ]);
 
-        DB::beginTransaction();
+        Transaction::create([
+            'user_id' => $userDestination->id,
+            'type' => 'depot',
+            'montant' => $request->montant,
+            'frais' => 0,
+            'commission' => 0,
+            'etat' => 'terminee',
+            'motif' => 'Transfert depuis le compte ' . $compteSource->numero_compte,
+            'date' => now(),
+        ]);
 
-        try {
-            $destinataire = Client::findOrFail($request->destinataire_id);
+        DB::commit();
 
-            // Vérifiez si le client a suffisamment de solde
-            $soldeTotal = $client->comptes()->sum('solde');
-            if ($soldeTotal < $request->montant) {
-                return response()->json(['message' => 'Solde insuffisant pour le transfert'], 400);
-            }
-
-            // Enregistrer la transaction
-            Transaction::create([
-                'client_id' => $client->id,
-                'distributeur_id' => null, // Ou un ID spécifique si applicable
-                'type' => 'transfert',
-                'montant' => $request->montant,
-                'etat' => 'terminée',
-            ]);
-
-            // Logique pour mettre à jour les soldes
-            // Débiter et créditer ici selon votre logique
-
-            DB::commit();
-
-            return response()->json(['message' => 'Transfert effectué avec succès']);
-        } catch (ModelNotFoundException $e) {
-            DB::rollBack();
-            return response()->json(['message' => 'Destinataire non trouvé'], 404);
-        } catch (ValidationException $e) {
-            DB::rollBack();
-            return response()->json(['message' => 'Erreur de validation'], 422);
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return response()->json(['message' => 'Erreur lors du transfert'], 500);
-        }
+        // Redirection avec message de succès
+        return redirect()->route('dashboard.dashboard-client')->with('message', 'Transfert effectué avec succès. Votre commission pour cette transaction : ' . number_format($commission, 2, ',', ' ') . ' Fcfa');
+    } catch (ModelNotFoundException $e) {
+        DB::rollBack();
+        return redirect()->route('dashboard.dashboard-client')->with('error', 'Compte non trouvé');
+    } catch (\Exception $e) {
+        DB::rollBack();
+        return redirect()->route('dashboard.dashboard-client')->with('error', 'Erreur lors du transfert');
     }
+}
 
     /**
      * Voir les transactions du client.

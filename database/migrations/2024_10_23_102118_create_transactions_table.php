@@ -15,17 +15,11 @@ class CreateTransactionsTable extends Migration
             $table->id(); // Clé primaire auto-incrémentée
 
             // Ajouter client_id
-            $table->foreignId('client_id')
-                  ->constrained('clients')
+            $table->foreignId('user_id')
+                  ->constrained('users')
                   ->onDelete('restrict')
                   ->onUpdate('cascade');
-
-            $table->foreignId('distributeur_id')
-                  ->nullable()
-                  ->constrained('users')
-                  ->onDelete('set null')
-                  ->onUpdate('cascade');
-
+                  
             $table->enum('type', ['depot', 'retrait', 'transfert', 'annule']);
             $table->decimal('montant', 10, 2);
             $table->decimal('frais', 10, 2)->nullable();
@@ -35,12 +29,7 @@ class CreateTransactionsTable extends Migration
             $table->text('motif')->nullable();
             $table->timestamp('date');
             $table->timestamps();
-
-            // Index
-            $table->index('type');
-            $table->index('etat');
-            $table->index('date');
-            $table->index('client_id');
+            
         });
     }
 

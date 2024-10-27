@@ -68,6 +68,12 @@ class User extends Authenticatable
         {
             return $this->hasMany(Distributeur::class, 'user_id');
         }
+        
+       
+        public function isClient()
+        {
+            return $this->role === 'client';
+        }    
 
     public function transactions() {
         return $this->hasMany(Transaction::class); // Pas de clé étrangère définie ici. Cela dépend de la logique d'association.

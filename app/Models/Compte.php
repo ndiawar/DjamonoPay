@@ -34,4 +34,8 @@ class Compte extends Model
     public function transactions() {
         return $this->hasMany(Transaction::class); // Ok, la clé étrangère doit être 'compte_id' dans Transaction
     }
+    public function client()
+{
+    return $this->belongsTo(Client::class);
+}
 }

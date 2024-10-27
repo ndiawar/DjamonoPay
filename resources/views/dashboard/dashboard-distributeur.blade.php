@@ -53,23 +53,127 @@
                                     </div>
                                     <div class="d-flex flex-column align-items-center">
                                         <div class="mb-2">
-                                            <div class="icon-circle d-flex justify-content-center align-items-center" style="width: 40px; height: 40px; border-radius: 50%; background-color: #003f6b;"> <!-- Couleur de fond du bouton -->
+                                            <div class="icon-circle d-flex justify-content-center align-items-center" style="width: 40px; height: 40px; border-radius: 50%; background-color: #003f6b;"
+                                                data-bs-toggle="modal" 
+                                                data-bs-target="#transfertModal"> <!-- Bouton qui ouvre le modal -->
                                                 <i class="fs-5 bi bi-send-fill text-white"></i> <!-- Icône blanche -->
                                             </div>
                                             <span class="d-block mt-1 text-center text-muted">Envoyer</span>
                                         </div>
+                                        <!-- Modal pour le transfert -->
+                                        <div class="modal fade" id="transfertModal" tabindex="-1" aria-labelledby="transfertModalLabel" aria-hidden="true">
+                                            <div class="modal-dialog">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title" id="transfertModalLabel">Effectuer un Transfert</h5>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                    </div>
+                                                <div class="modal-body">
+                                                    <form action="{{ route('distributeurs.transfert_clients') }}" method="POST">
+                                                        @csrf
+                                                        <div class="mb-3">
+                                                            <label for="recipient" class="form-label">Numero Client Expediteur </label>
+                                                            <input type="text" class="form-control" id="recipient" name="numero_compte_source" required>
+                                                        </div>
+                                                        <div class="mb-3">
+                                                            <label for="recipient" class="form-label">Numero Client Destinataire</label>
+                                                            <input type="text" class="form-control" id="recipient" name="numero_compte_destination" required>
+                                                        </div>
+                                                        <div class="mb-3">
+                                                            <label for="amount" class="form-label">Montant</label>
+                                                            <input type="number" class="form-control" id="amount" name="montant" required>
+                                                        </div>
+                                                        <button type="submit" class="btn btn-secondary btn-custom me-2">Envoyer</button>
+                                                    </form>
+                                                </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- Fin Modal transfert-->
                                         <div>
-                                            <div class="icon-circle d-flex justify-content-center align-items-center" style="width: 40px; height: 40px; border-radius: 50%; background-color: #003f6b;"> <!-- Couleur de fond du bouton -->
+                                            <div class="icon-circle d-flex justify-content-center align-items-center" style="width: 40px; height: 40px; border-radius: 50%; background-color: #003f6b;"
+                                            data-bs-toggle="modal" 
+                                            data-bs-target="#retraitModal"> <!-- Bouton qui ouvre le modal -->
                                                 <i class="fs-5 bi bi-arrow-down-circle-fill text-white"></i> <!-- Icône blanche -->
                                             </div>
                                             <span class="d-block mt-1 text-center text-muted">Retrait</span>
+                                        </div>
+                                        <!-- Modal pour le REtrait -->
+                                        <div class="modal fade" id="retraitModal" tabindex="-1" aria-labelledby="retraitModalLabel" aria-hidden="true">
+                                            <div class="modal-dialog">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title" id="retraitModalLabel">Effectuer un Retrait</h5>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                    </div>
+                                                <div class="modal-body">
+                                                    <form action="{{ route('distributeurs.effectuer_retrait') }}" method="POST">
+                                                        @csrf
+                                                        <div class="mb-3">
+                                                            <label for="recipient" class="form-label">Numero Client</label>
+                                                            <input type="text" class="form-control" id="recipient" name="numero_compte" required>
+                                                        </div>
+                                                        <div class="mb-3">
+                                                            <label for="amount" class="form-label">Montant</label>
+                                                            <input type="number" class="form-control" id="amount" name="montant" required>
+                                                        </div>
+                                                        <button type="submit" class="btn btn-secondary btn-custom me-2">Envoyer</button>
+                                                    </form>
+                                                </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- Fin Modal retrait -->
+                                        <div>
+                                            <div class="icon-circle d-flex justify-content-center align-items-center" style="width: 40px; height: 40px; border-radius: 50%; background-color: #003f6b;"
+                                            data-bs-toggle="modal" 
+                                            data-bs-target="#depotModal"> <!-- Bouton qui ouvre le modal -->
+                                            <i class="fs-5 bi bi-arrow-down-left-circle text-white"></i> <!-- Icône blanche -->
+                                            </div>
+                                            <span class="d-block mt-1 text-center text-muted">Depôt</span>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
+                    @if(session('message'))
+                        <div class="alert alert-success">
+                            {{ session('message') }}
+                        </div>
+                    @endif
 
+                    @if(session('error'))
+                        <div class="alert alert-danger">
+                            {{ session('error') }}
+                        </div>
+                    @endif
+                    <!-- Modal pour le transfert -->
+                    <div class="modal fade" id="depotModal" tabindex="-1" aria-labelledby="depotModalLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="depotModalLabel">Effectuer un Depôt</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                            <div class="modal-body">
+                                <form action="{{ route('distributeurs.crediter_compte_client') }}" method="POST">
+                                    @csrf
+                                    <div class="mb-3">
+                                        <label for="recipient" class="form-label">Numero Client</label>
+                                        <input type="text" class="form-control" id="recipient" name="numero_compte" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="amount" class="form-label">Montant</label>
+                                        <input type="number" class="form-control" id="amount" name="montant" required>
+                                    </div>
+                                    <button type="submit" class="btn btn-secondary btn-custom me-2">Envoyer</button>
+                                </form>
+                            </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Fin Modal Depot -->
                     <!-- Envoie et Retrait summary section -->
                     <div class="row justify-content-center mt-3">
                         <div class="col-md-3 mb-3">
@@ -107,136 +211,19 @@
                             <table class="display" id="datatable-range">
                                 <thead>
                                     <tr>
-                                        <th>Distributeur</th>
-                                        <th>Adresse</th>
+                                        <th>Photo</th>
+                                        <th>Clients</th>
                                         <th>Numéro Compte</th>
-                                        <th>Transaction</th>
+                                        <th>Montant</th>
+                                        <th>Type_Transaction</th>
+                                        <th>Action</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr>
-                                        <td> <img class="img-fluid table-avtar" src="{{ asset('assets/images/user/2.jpg') }}"
-                                                alt="">Nom Client</td>
-                                        <td>Dakar</td>
-                                        <td>6145 7854 7485 9654 0012</td>
-                                        <td class="d-flex rounded" style="background-color: #d4edda;">
-                                            <p class="me-2">325.452 Fcfa</p> 
-                                            <p class="">Retrait</p>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td> <img class="img-fluid table-avtar" src="{{ asset('assets/images/user/2.jpg') }}"
-                                                alt="">Nom Client</td>
-                                        <td>Dakar</td>
-                                        <td>6145 7854 7485 9654 0012</td>
-                                        <td class="d-flex rounded" style="background-color: #d4edda;">
-                                            <p class="me-2">325.452 Fcfa</p> 
-                                            <p class="">Retrait</p>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td> <img class="img-fluid table-avtar" src="{{ asset('assets/images/user/2.jpg') }}"
-                                                alt="">Nom Client</td>
-                                        <td>Dakar</td>
-                                        <td>6145 7854 7485 9654 0012</td>
-                                        <td class="d-flex rounded" style="background-color: #d4edda;">
-                                            <p class="me-2">325.452 Fcfa</p> 
-                                            <p class="">Retrait</p>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td> <img class="img-fluid table-avtar" src="{{ asset('assets/images/user/2.jpg') }}"
-                                                alt="">Nom Client</td>
-                                        <td>Dakar</td>
-                                        <td>6145 7854 7485 9654 0012</td>
-                                        <td class="d-flex rounded" style="background-color: #d4edda;">
-                                            <p class="me-2">325.452 Fcfa</p> 
-                                            <p class="">Retrait</p>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td> <img class="img-fluid table-avtar" src="{{ asset('assets/images/user/2.jpg') }}"
-                                                alt="">Nom Client</td>
-                                        <td>Dakar</td>
-                                        <td>6145 7854 7485 9654 0012</td>
-                                        <td class="d-flex rounded" style="background-color: #d4edda;">
-                                            <p class="me-2">325.452 Fcfa</p> 
-                                            <p class="">Retrait</p>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td> <img class="img-fluid table-avtar" src="{{ asset('assets/images/user/2.jpg') }}"
-                                                alt="">Nom Client</td>
-                                        <td>Dakar</td>
-                                        <td>6145 7854 7485 9654 0012</td>
-                                        <td class="d-flex rounded" style="background-color: #cce5ff;">
-                                        <p class="me-2">325.452 Fcfa</p> 
-                                        <p class="">Dépôt</p>
-                                    </td>
+                                <tbody>
 
-                                    </tr>
-                                    <tr>
-                                        <td> <img class="img-fluid table-avtar" src="{{ asset('assets/images/user/2.jpg') }}"
-                                                alt="">Nom Client</td>
-                                        <td>Dakar</td>
-                                        <td>6145 7854 7485 9654 0012</td>
-                                        <td class="d-flex rounded" style="background-color: #cce5ff;">
-                                        <p class="me-2">325.452 Fcfa</p> 
-                                        <p class="">Dépôt</p>
-                                    </td>
-
-                                    </tr>
-                                    <tr>
-                                        <td> <img class="img-fluid table-avtar" src="{{ asset('assets/images/user/2.jpg') }}"
-                                                alt="">Nom Client</td>
-                                        <td>Dakar</td>
-                                        <td>6145 7854 7485 9654 0012</td>
-                                        <td class="d-flex rounded" style="background-color: #cce5ff;">
-                                        <p class="me-2">325.452 Fcfa</p> 
-                                        <p class="">Dépôt</p>
-                                    </td>
-
-                                    </tr>
-                                    <tr>
-                                        <td> <img class="img-fluid table-avtar" src="{{ asset('assets/images/user/2.jpg') }}"
-                                                alt="">Nom Client</td>
-                                        <td>Dakar</td>
-                                        <td>6145 7854 7485 9654 0012</td>
-                                        <td class="d-flex rounded" style="background-color: #f8d7da;">
-                                            <p class="me-5">325.452 Fcfa</p> 
-                                            <p class="">annulé</p>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td> <img class="img-fluid table-avtar" src="{{ asset('assets/images/user/2.jpg') }}"
-                                                alt="">Nom Client</td>
-                                        <td>Dakar</td>
-                                        <td>6145 7854 7485 9654 0012</td>
-                                        <td class="d-flex rounded" style="background-color: #f8d7da;">
-                                            <p class="me-5">325.452 Fcfa</p> 
-                                            <p class="">annulé</p>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td> <img class="img-fluid table-avtar" src="{{ asset('assets/images/user/2.jpg') }}"
-                                                alt="">Nom Client</td>
-                                        <td>Dakar</td>
-                                        <td>6145 7854 7485 9654 0012</td>
-                                        <td class="d-flex rounded" style="background-color: #f8d7da;">
-                                            <p class="me-5">325.452 Fcfa</p> 
-                                            <p class="">annulé</p>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td> <img class="img-fluid table-avtar" src="{{ asset('assets/images/user/2.jpg') }}"
-                                                alt="">Nom Client</td>
-                                        <td>Dakar</td>
-                                        <td>6145 7854 7485 9654 0012</td>
-                                        <td class="d-flex rounded" style="background-color: #f8d7da;">
-                                            <p class="me-5">325.452 Fcfa</p> 
-                                            <p class="">annulé</p>
-                                        </td>
-                                    </tr>
+                                </tbody>
+                               </table>
                                 </tbody>
                             </table>
                         </div>

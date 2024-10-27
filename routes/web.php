@@ -12,6 +12,7 @@ use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\SystemLoggerController;
 use App\Enums\UserRole;
+use App\Http\Controllers\ClientController;
 use Illuminate\Support\Facades\Auth;
 
 /**
@@ -75,8 +76,10 @@ Route::prefix('distributeurs')->group(function () {
 
     // Actions spécifiques pour les distributeurs
     Route::post('/{distributeur}/consulter-solde', [DistributeurController::class, 'consulterSolde'])->name('distributeurs.consulter_solde');
-    Route::post('/{distributeur}/crediter-compte-client', [DistributeurController::class, 'crediterCompteClient'])->name('distributeurs.crediter_compte_client');
-    Route::post('/{distributeur}/effectuer-retrait', [DistributeurController::class, 'effectuerRetrait'])->name('distributeurs.effectuer_retrait');
+    Route::post('/crediter-compte-client', [DistributeurController::class, 'crediterCompteClient'])->name('distributeurs.crediter_compte_client');
+    Route::post('/effectuer-retrait', [DistributeurController::class, 'effectuerRetrait'])->name('distributeurs.effectuer_retrait');
+    Route::post('/transferer-clients', [DistributeurController::class, 'transfererEntreClients'])->name('distributeurs.transfert_clients');
+    Route::get('/afficher-historique', [DistributeurController::class, 'afficherHistorique'])->name('distributeurs.afficher_Historique');
     Route::post('/{distributeur}/voir-solde', [DistributeurController::class, 'voirSolde'])->name('distributeurs.voir_solde');
     Route::get('/{distributeur}/transactions', [DistributeurController::class, 'voirTransactions'])->name('distributeurs.voir_transactions');
     Route::post('/{distributeur}/annuler-transaction/{transaction}', [DistributeurController::class, 'annulerTransaction'])->name('distributeurs.annuler_transaction');
@@ -116,6 +119,16 @@ Route::prefix('transactions')->name('transactions.')->group(function () {
     Route::get('historique', [TransactionController::class, 'historique'])->name('historique');
     Route::get('statistiques', [TransactionController::class, 'statistiques'])->name('statistiques');
 });
+
+
+
+
+/**
+ * Routes pour la gestion des CLients.
+ */
+Route::prefix('clients')->group(function () {
+    Route::post('/transfert-clients', [ClientController::class, 'transfertEntreClients'])->name('clients.transfert_clients');
+});   
 /**
  * Routes pour le système de log.
  */

@@ -141,6 +141,18 @@ class AgentController extends Controller
             $compte->solde += $request->montant;
             $compte->save();
 
+            // Enregistrer la transaction
+            Transaction::create([
+                'user_id' => $compte->user_id, // ID du distributeur (ou agent)
+                'type' => 'depot', // Type de la transaction
+                'montant' => $request->montant,
+                'frais' => 0, // Vous pouvez ajouter votre logique pour les frais
+                'commission' => 0, // Vous pouvez ajouter votre logique pour la commission
+                'etat' => 'terminee', // État de la transaction
+                'motif' => 'Créditation effectuée', // Motif de la transaction
+                'date' => now(), // Date de la transaction
+        ]);
+
             DB::commit();
             // Redirection vers la page dashboard-approvisionner avec un message de succès
             return redirect()->route('dashboard-approvisionner')->with('message', 'Créditation effectué avec succès');
@@ -150,7 +162,7 @@ class AgentController extends Controller
             return redirect()->route('dashboard-approvisionner')->with('error', 'Compte non trouvé');
         } catch (\Exception $e) {
             DB::rollBack();
-            return redirect()->route('dashboard-approvisionner')->with('error', 'Erreur lors du crédit');
+            return redirect()->route('dashboard-approvisionner')->with('error', 'Erreur lors de créditation');
         }
     }
 
