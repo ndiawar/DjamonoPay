@@ -34,7 +34,7 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     prenomInput.addEventListener("input", () => {
-        showError(prenomInput, "Le prénom doit contenir uniquement des lettres sans espaces ni chiffres.", prenomError);
+        showError(prenomInput, "Le prénom peut contenir jusqu'à trois mots avec des lettres uniquement, séparés par des espaces.", prenomError);
     });
 
     emailInput.addEventListener("input", () => {

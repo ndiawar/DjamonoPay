@@ -10,6 +10,7 @@ use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Enums\UserRole;
 use Illuminate\Support\Facades\Auth;
+use App\Models\Client\ClientController;
 
 /**
  * Route pour la page d'accueil.
@@ -85,6 +86,28 @@ Route::get('/clear-cache', function () {
     Artisan::call('route:clear');
     return "Cache is cleared";
 })->name('clear.cache');
+
+
+/**
+ * Middleware pour les utilisateurs avec le rôle 'DISTRIBUTEUR'.
+ */
+Route::middleware(['auth', 'role:DISTRIBUTEUR'])->group(function () {
+   
+});
+
+/**
+ * Middleware pour les utilisateurs avec le rôle 'CLIENT'.
+ */
+Route::middleware(['auth', 'role:CLIENT'])->group(function () {
+    
+});
+
+/**
+ * Middleware pour les utilisateurs avec le rôle 'AGENT'.
+ */
+Route::middleware(['auth', 'role:AGENT'])->group(function () {
+    
+});
 
 /**
  * Groupe de routes protégées par le middleware 'auth'.

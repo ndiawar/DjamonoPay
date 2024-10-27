@@ -113,7 +113,7 @@ class RegisterController extends Controller
 
         // Redirection en fonction du rôle
         if ($role === UserRole::CLIENT) {
-            return redirect()->route('login')->with('success', 'Inscription réussie !');
+            return redirect()->route('register')->with('success', 'Inscription réussie !');
         } else {
             return redirect()->route('index')->with('success', 'Inscription réussie !');
         }

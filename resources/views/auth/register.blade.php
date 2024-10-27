@@ -45,9 +45,16 @@
                 </div>
                 <div class="input-icon">
                     <i class="fas fa-user"></i>
-                    <input type="text" name="prenom" placeholder="Prénom" value="{{ old('prenom') }}" required pattern="^[A-Za-zÀ-ÿ]+$" title="Le prénom doit contenir uniquement des lettres sans espaces ni chiffres.">
+                    <input type="text" 
+                           name="prenom" 
+                           placeholder="Prénom" 
+                           value="{{ old('prenom') }}" 
+                           required 
+                           pattern="^([A-Za-zÀ-ÿ]+(?: [A-Za-zÀ-ÿ]+){0,2})$" 
+                           title="Le prénom peut contenir jusqu'à trois mots avec des lettres uniquement, séparés par des espaces.">
                     <div class="error-message" id="prenomError"></div>
                 </div>
+                
             </div>
 
             <div class="input-group">
@@ -58,9 +65,16 @@
                 </div>
                 <div class="input-icon">
                     <i class="fas fa-phone"></i>
-                    <input type="tel" name="telephone" placeholder="Téléphone" value="{{ old('telephone') }}" required pattern="^(7[01][0-9]{7})$" title="Le numéro de téléphone doit être un numéro valide de 9 chiffres entre 701000000 et 789999999.">
+                    <input type="tel" 
+                           name="telephone" 
+                           placeholder="Téléphone" 
+                           value="{{ old('telephone') }}" 
+                           required 
+                           pattern="^(70|75|76|77|78)[0-9]{7}$" 
+                           title="Le numéro doit commencer par 70, 75, 76, 77 ou 78 et contenir exactement 9 chiffres.">
                     <div class="error-message" id="telephoneError"></div>
                 </div>
+                
             </div>
 
             <div class="input-group">
