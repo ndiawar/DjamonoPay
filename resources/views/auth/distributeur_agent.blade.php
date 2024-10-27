@@ -128,14 +128,15 @@
         </footer>
     </div>
 
-    <!-- Modal -->
-    <div id="successModal" class="modal" style="display: none;">
-        <div class="modal-content">
-            <span class="close" id="closeModal">&times;</span>
-            <h2>Inscription réussie !</h2>
-            <p>Votre inscription a été effectuée avec succès.</p>
-        </div>
+  <!-- Modal de confirmation -->
+<div id="successModal" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2>Inscription réussie !</h2>
+        <p>Bienvenue sur DjomanoPay. Votre inscription a été effectuée avec succès.</p>
     </div>
+</div>
+
 
 </body>
 </html>

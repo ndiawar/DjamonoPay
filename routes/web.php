@@ -40,6 +40,7 @@ Route::prefix('dashboard')->group(function () {
 });
 
 
+
 /**
  * Routes pour l'authentification.
  */
@@ -51,7 +52,8 @@ Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])->name
  * Routes pour l'inscription.
  */
 Route::get('/register', function () {
-    return view('auth.register');
+    return redirect()->route('register')->with('success', true);
+
 })->name('register');
 
 Route::post('/register', [RegisterController::class, 'register']);

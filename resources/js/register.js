@@ -28,6 +28,30 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 
+    document.addEventListener('DOMContentLoaded', function () {
+        const modal = document.getElementById('successModal');
+        const closeButton = document.querySelector('.modal-content .close');
+    
+        // Fermer le modal au clic sur la croix
+        closeButton.onclick = function () {
+            modal.style.display = 'none';
+        };
+    
+        // Fermer le modal si on clique en dehors de celui-ci
+        window.onclick = function (event) {
+            if (event.target === modal) {
+                modal.style.display = 'none';
+            }
+        };
+    
+        // Vérifier si l'inscription a réussi (simuler ici avec un paramètre de requête)
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('success') === 'true') {
+            modal.style.display = 'flex'; // Afficher le modal
+        }
+    });
+    
+
     // Validation en temps réel
     nomInput.addEventListener("input", () => {
         showError(nomInput, "Le nom doit contenir uniquement des lettres sans espaces ni chiffres.", nomError);
@@ -74,3 +98,4 @@ document.addEventListener("DOMContentLoaded", function () {
         this.classList.toggle("fa-eye-slash");
     });
 });
+
