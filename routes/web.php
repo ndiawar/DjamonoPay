@@ -89,14 +89,17 @@ Route::prefix('agents')->group(function () {
     Route::post('/', [AgentController::class, 'store'])->name('agents.store');
     Route::put('/{agent}', [AgentController::class, 'update'])->name('agents.update');
     Route::delete('/{agent}', [AgentController::class, 'destroy'])->name('agents.destroy');
+    // Route avec contrôleur pour passer les variables dynamiques
+    Route::get('/{agent}/form/{distributeurId}', [AgentController::class, 'showForm'])->name('form.show');
 
+});
     // Actions spécifiques pour les agents
     Route::post('/{agent}/creer-compte-client', [AgentController::class, 'creerCompteClient'])->name('agents.creer_compte_client');
     Route::put('/{agent}/modifier-compte/{clientId}', [AgentController::class, 'modifierCompte'])->name('agents.modifier_compte');
     Route::post('/{agent}/crediter-compte-distributeur/{distributeurId}', [AgentController::class, 'crediterCompteDistributeur'])->name('agents.crediter_compte_distributeur');
     Route::post('/{agent}/bloquer-compte/{clientId}', [AgentController::class, 'bloquerCompte'])->name('agents.bloquer_compte');
     Route::post('/{agent}/annuler-transaction/{transaction}', [AgentController::class, 'annulerTransaction'])->name('agents.annuler_transaction');
-});
+
 /**
  * Routes pour la gestion des transactions.
  */

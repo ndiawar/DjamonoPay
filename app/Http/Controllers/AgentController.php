@@ -120,13 +120,19 @@ class AgentController extends Controller
      */
     public function crediterCompteDistributeur(Request $request, $distributeurId)
     {
-        $request->validate(['montant' => 'required|numeric|min:0.01']);
+        $request->validate([
+            'numero_compte' => 'required|string',
+            'montant' => 'required|numeric|min:0.01']);
         DB::beginTransaction();
 
         try {
-            $distributeur = Distributeur::findOrFail($distributeurId);
+            // Rechercher le distributeur par numéro de compte
+        $distributeur = Distributeur::where('numero_compte', $request->numero_compte)->firstOrFail();
             // Logique pour créditer le compte du distributeur
             // Mettez à jour le solde
+             // Ajouter le montant au solde existant
+        $distributeur->solde += $request->montant;
+        $distributeur->save();
 
             DB::commit();
             return response()->json(['message' => 'Crédit effectué avec succès']);
@@ -174,4 +180,16 @@ class AgentController extends Controller
             return response()->json(['message' => 'Erreur lors de l\'annulation de la transaction'], 500);
         }
     }
+    public function showForm($agentId, $distributeurId)
+{
+    // Trouver l'agent par son ID
+    $agent = Agent::findOrFail($agentId);
+
+    // Trouver le distributeur par son ID
+    $distributeur = Distributeur::findOrFail($distributeurId);
+    
+    // Passer les données à la vue
+    return view('dashboard.index', compact('agent', 'distributeur'));
 }
+}
+  

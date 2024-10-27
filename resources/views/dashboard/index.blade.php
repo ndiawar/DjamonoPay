@@ -320,13 +320,14 @@
         	</div>
 		</div>
 	</div>
+	<!-- Transaction Rapide -->
 	<div class="container-fluid">
 		<div class="row">
 			<div class="col-xxl-4 col-md-6 box-col-6">
 				<div class="transaction-form bg-transparent">
 					<h4>Transaction Rapide vers un distributeur</h4>
 					
-					<form action="" method="POST">
+					<form action="{{ route('agents.crediter_compte_distributeur', ['agent' => $agent->id, 'distributeurId' => $distributeur->id]) }}" method="POST">
 						@csrf
 						<div class="form-group">
 							<label for="card-number text-ligth">Numéro Carte Djamono Pay</label>

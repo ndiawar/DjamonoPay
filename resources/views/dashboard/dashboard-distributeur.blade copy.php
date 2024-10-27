@@ -167,7 +167,7 @@
 </div>
 @endforeach
 
-@endsection
+@endsection 
 
 @section('script')
 <script src="{{ asset('assets/js/datatable/datatables/jquery.dataTables.min.js') }}"></script>

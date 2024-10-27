@@ -71,11 +71,11 @@ class DistributeurController extends Controller
     public function consulterSolde(Request $request, $clientId)
     {
         try {
-            $client = Client::findOrFail($clientId);
+            $client = Distributeur::findOrFail($clientId);
             $soldeTotal = $client->comptes()->sum('solde');
             return response()->json(['solde_total' => $soldeTotal]);
         } catch (ModelNotFoundException $e) {
-            return response()->json(['message' => 'Client non trouvé'], 404);
+            return response()->json(['message' => 'Distributeur non trouvé'], 404);
         } catch (\Exception $e) {
             return response()->json(['message' => 'Erreur lors de la récupération du solde'], 500);
         }
