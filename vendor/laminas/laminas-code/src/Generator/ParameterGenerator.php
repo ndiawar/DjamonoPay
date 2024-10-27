@@ -72,7 +72,6 @@ class ParameterGenerator extends AbstractGenerator
      * @configkey sourcecontent         string
      * @configkey omitdefaultvalue      bool
      * @throws Exception\InvalidArgumentException
-     * @param  array $array
      * @return ParameterGenerator
      */
     public static function fromArray(array $array)
