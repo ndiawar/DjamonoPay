@@ -63,9 +63,19 @@ class User extends Authenticatable
     public function comptes() {
         return $this->hasMany(Compte::class); // Ok, la clé étrangère est 'user_id'
     }
+    
+    public function distributeurs()
+        {
+            return $this->hasMany(Distributeur::class, 'user_id');
+        }
 
     public function transactions() {
         return $this->hasMany(Transaction::class); // Pas de clé étrangère définie ici. Cela dépend de la logique d'association.
+    }
+    // Méthode pour vérifier si un utilisateur est un distributeur
+    public function isDistributeur()
+    {
+        return $this->role === 'distributeur';
     }
 }
  

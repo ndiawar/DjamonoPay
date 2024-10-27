@@ -11,4 +11,8 @@ class Distributeur extends User
     protected $fillable = [
         // Ajoutez ici les attributs spécifiques au distributeur, si nécessaire
     ];
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id');
+    }
 }

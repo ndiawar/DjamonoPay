@@ -131,4 +131,13 @@ class UserController extends Controller
     {
         return new UserResource($user);
     }
+
+    public function afficherUsers()
+    {
+        // Sélectionner tous les utilisateurs et leurs comptes
+        $users = User::with('comptes')->get();
+
+        return view('dashboard.dashboard-utilisateurs', compact('users'));
+    }
+    
 }

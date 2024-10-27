@@ -8,8 +8,10 @@ use App\Http\Resources\DistributeurResource;
 use App\Http\Resources\DistributeurCollection;
 use App\Http\Resources\TransactionCollection;
 use App\Models\Client;
+use App\Models\Compte;
 use App\Models\Distributeur;
 use App\Models\Transaction;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -81,54 +83,74 @@ class DistributeurController extends Controller
         }
     }
 
-    /**
-     * Crédite un compte client.
-     */
-    public function crediterCompteClient(Request $request, $clientId)
+    public function crediterCompteClient(Request $request)
     {
-        $request->validate(['montant' => 'required|numeric|min:0.01']);
+        $request->validate([
+            'numero_compte' => 'required|string',
+            'montant' => 'required|numeric|min:0.01'
+        ]);
+        // dd($request->all());
+        
         DB::beginTransaction();
 
         try {
-            $client = Client::findOrFail($clientId);
+            // Rechercher le compte par numéro de compte
+            $compte = Compte::where('numero_compte', $request->numero_compte)->firstOrFail();
+           
+
             // Logique pour créditer le compte
-            // Exemple : mettre à jour le solde des comptes
-            // Assurez-vous de mettre à jour la transaction
+            // Ajouter le montant au solde existant
+            $compte->solde += $request->montant;
+            $compte->save();
 
             DB::commit();
             return response()->json(['message' => 'Crédit effectué avec succès']);
         } catch (ModelNotFoundException $e) {
             DB::rollBack();
-            return response()->json(['message' => 'Client non trouvé'], 404);
+            return response()->json(['message' => 'Compte non trouvé'], 404);
         } catch (\Exception $e) {
             DB::rollBack();
             return response()->json(['message' => 'Erreur lors du crédit'], 500);
         }
     }
-
     /**
-     * Effectue un retrait sur le compte du client.
-     */
-    public function effectuerRetrait(Request $request, $clientId)
-    {
-        $request->validate(['montant' => 'required|numeric|min:0.01']);
-        DB::beginTransaction();
+ * Effectue un retrait sur le compte du client.
+ */
+public function effectuerRetrait(Request $request, $clientId)
+{
+    // Validation des données entrantes
+    $request->validate(['montant' => 'required|numeric|min:0.01']);
 
-        try {
-            $client = Client::findOrFail($clientId);
-            // Logique pour effectuer le retrait
-            // Exemple : déduire du solde des comptes
+    // Démarrer une transaction
+    DB::beginTransaction();
 
-            DB::commit();
-            return response()->json(['message' => 'Retrait effectué avec succès']);
-        } catch (ModelNotFoundException $e) {
-            DB::rollBack();
-            return response()->json(['message' => 'Client non trouvé'], 404);
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return response()->json(['message' => 'Erreur lors du retrait'], 500);
+    try {
+        // Trouver le client par son ID
+        $client = Client::findOrFail($clientId);
+
+        // Supposons que le client a un compte avec un solde
+        $compte = $client->compte; // Assurez-vous que la relation est définie dans le modèle Client
+
+        // Vérifier si le solde est suffisant
+        if ($compte->solde < $request->montant) {
+            return response()->json(['message' => 'Solde insuffisant pour effectuer ce retrait'], 400);
         }
+
+        // Logique pour effectuer le retrait
+        // Déduire le montant du solde existant
+        $compte->solde -= $request->montant;
+        $compte->save(); // Enregistrer les modifications
+
+        DB::commit(); // Valider la transaction
+        return response()->json(['message' => 'Retrait effectué avec succès']);
+    } catch (ModelNotFoundException $e) {
+        DB::rollBack(); // Annuler la transaction en cas d'erreur
+        return response()->json(['message' => 'Client non trouvé'], 404);
+    } catch (\Exception $e) {
+        DB::rollBack(); // Annuler la transaction en cas d'erreur générale
+        return response()->json(['message' => 'Erreur lors du retrait'], 500);
     }
+}
 
     /**
      * Voir le solde d'un distributeur.
@@ -160,6 +182,19 @@ class DistributeurController extends Controller
         } catch (\Exception $e) {
             return response()->json(['message' => 'Erreur lors de l\'annulation de la transaction'], 500);
         }
+    }
+
+    public function afficherDistributeurs()
+    {
+        // Sélectionner les utilisateurs ayant le rôle de distributeur et leurs comptes
+        $distributeurs = User::where('role', 'distributeur')
+                             ->with('comptes')
+                             ->get();
+        
+        // Récupérer la somme des soldes de tous les comptes
+        $totalCredits = Compte::sum('solde');
+
+        return view('dashboard.dashboard-approvisionner', compact('distributeurs', 'totalCredits'));
     }
 
     /**

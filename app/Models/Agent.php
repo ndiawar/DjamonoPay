@@ -14,4 +14,5 @@ class Agent extends User
 
     // Pas besoin de définir des relations ici, car Agent n'a pas de comptes
 }
+
  

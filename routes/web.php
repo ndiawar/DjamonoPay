@@ -33,6 +33,9 @@ Route::prefix('dashboard')->group(function () {
     Route::view('dashboard-activites', 'dashboard.dashboard-activites')->name('dashboard-activites');
     Route::view('dashboard-utilisateurs', 'dashboard.dashboard-utilisateurs')->name('dashboard-utilisateurs');
     Route::view('dashboard-approvisionner', 'dashboard.dashboard-approvisionner')->name('dashboard-approvisionner');
+    route::get('dashboard-approvisionner', [DistributeurController::class, 'afficherDistributeurs'])->name('dashboard-approvisionner');
+    route::get('dashboard-utilisateurs', [UserController::class, 'afficherUsers'])->name('dashboard-utilisateurs');
+   
 });
 
 /**
@@ -96,10 +99,12 @@ Route::prefix('agents')->group(function () {
     // Actions spécifiques pour les agents
     Route::post('/{agent}/creer-compte-client', [AgentController::class, 'creerCompteClient'])->name('agents.creer_compte_client');
     Route::put('/{agent}/modifier-compte/{clientId}', [AgentController::class, 'modifierCompte'])->name('agents.modifier_compte');
-    Route::post('/{agent}/crediter-compte-distributeur/{distributeurId}', [AgentController::class, 'crediterCompteDistributeur'])->name('agents.crediter_compte_distributeur');
-    Route::post('/{agent}/bloquer-compte/{clientId}', [AgentController::class, 'bloquerCompte'])->name('agents.bloquer_compte');
+    // Route::post('/{agent}/crediter-compte-distributeur/{distributeurId}', [AgentController::class, 'crediterCompteDistributeur'])->name('agents.crediter_compte_distributeur');
+    // Route::post('/{agent}/bloquer-compte/{clientId}', [AgentController::class, 'bloquerCompte'])->name('agents.bloquer_compte');
     Route::post('/{agent}/annuler-transaction/{transaction}', [AgentController::class, 'annulerTransaction'])->name('agents.annuler_transaction');
-
+    Route::post('/crediter-compte-distributeur/', [AgentController::class, 'crediterCompteDistributeur'])->name('agents.crediter_compte_distributeur');
+    Route::post('/crediter-rapide-distributeur/', [AgentController::class, 'crediterRapideDistributeur'])->name('agents.crediter_rapide_distributeur');
+    Route::post('/bloquer-utilisateur/{userId}', [AgentController::class, 'bloquerOuDebloquerCompte'])->name('agents.bloquer_utilisateur');
 /**
  * Routes pour la gestion des transactions.
  */

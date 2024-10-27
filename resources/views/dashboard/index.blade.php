@@ -327,16 +327,16 @@
 				<div class="transaction-form bg-transparent">
 					<h4>Transaction Rapide vers un distributeur</h4>
 					
-					<form action="{{ route('agents.crediter_compte_distributeur', ['agent' => $agent->id, 'distributeurId' => $distributeur->id]) }}" method="POST">
+					<form action="{{ route('agents.crediter_rapide_distributeur') }}" method="POST">
 						@csrf
 						<div class="form-group">
 							<label for="card-number text-ligth">Numéro Carte Djamono Pay</label>
-							<input type="text" class="form-control border border-primary rounded-5 bg-transparent" id="card-number" name="card_number" placeholder="1234 2345 7379 90" required>
+							<input type="text" class="form-control border border-primary rounded-5 bg-transparent" id="card-number" name="numero_compte" placeholder="1234 2345 7379 90" required>
 						</div>
 						
 						<div class="form-group">
 							<label for="amount">Montant à transférer</label>
-							<input type="text" class="form-control border border-primary rounded-5 bg-transparent "  id="amount" name="amount" placeholder="4.500.000" required>
+							<input type="text" class="form-control border border-primary rounded-5 bg-transparent "  id="amount" name="montant" placeholder="4.500.000" required>
 						</div>
 						
 						<button type="submit" class="submit-btn border border-radius p-3 text-center badge fw-bold w-50">Envoie D'argent</button>

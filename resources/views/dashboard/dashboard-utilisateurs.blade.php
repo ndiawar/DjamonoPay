@@ -94,76 +94,66 @@
                             <table class="display" id="datatable-range">
                                 <thead>
                                     <tr>
-                                        <th>Utilisateurs</th>
-                                        <th>Adresse</th>
-                                        <th>Carte Identité</th>
-                                        <th>Rôle</th>
+                                    <th>Photo</th>
+                                    <th>Nom</th>
+                                    <th>Numero_Compte</th>
+                                    <th>Solde</th>
+                                    <th>État compte</th>
+                                    <th>Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr>
-                                        <td> <img class="img-fluid table-avtar" src="{{ asset('assets/images/user/2.jpg') }}"
-                                                alt="">Mon Prenom</td>
-                                        <td>Dakar</td>
-                                        <td>2024 1997 00981</td>
-                                        <td>admin</td>
-                                    </tr>
-                                    <tr>
-                                        <td> <img class="img-fluid table-avtar" src="{{ asset('assets/images/user/2.jpg') }}"
-                                                alt="">Mon Prenom</td>
-                                        <td>Dakar</td>
-                                        <td>2024 1997 00981</td>
-                                        <td>admin</td>
-                                    </tr>
-                                    <tr>
-                                        <td> <img class="img-fluid table-avtar" src="{{ asset('assets/images/user/2.jpg') }}"
-                                                alt="">Mon Prenom</td>
-                                        <td>Dakar</td>
-                                        <td>2024 1997 00981</td>
-                                        <td>admin</td>
-                                    </tr>
-                                    <tr>
-                                        <td> <img class="img-fluid table-avtar" src="{{ asset('assets/images/user/2.jpg') }}"
-                                                alt="">Mon Prenom</td>
-                                        <td>Dakar</td>
-                                        <td>2024 1997 00981</td>
-                                        <td>admin</td>
-                                    </tr>
-                                    <tr>
-                                        <td> <img class="img-fluid table-avtar" src="{{ asset('assets/images/user/2.jpg') }}"
-                                                alt="">Mon Prenom</td>
-                                        <td>Dakar</td>
-                                        <td>2024 1997 00981</td>
-                                        <td>admin</td>
-                                    </tr>
-                                    <tr>
-                                        <td> <img class="img-fluid table-avtar" src="{{ asset('assets/images/user/2.jpg') }}"
-                                                alt="">Mon Prenom</td>
-                                        <td>Dakar</td>
-                                        <td>2024 1997 00981</td>
-                                        <td>admin</td>
-                                    </tr>
-                                    <tr>
-                                        <td> <img class="img-fluid table-avtar" src="{{ asset('assets/images/user/2.jpg') }}"
-                                                alt="">Mon Prenom</td>
-                                        <td>Dakar</td>
-                                        <td>2024 1997 00981</td>
-                                        <td>admin</td>
-                                    </tr>
-                                    <tr>
-                                        <td> <img class="img-fluid table-avtar" src="{{ asset('assets/images/user/2.jpg') }}"
-                                                alt="">Mon Prenom</td>
-                                        <td>Dakar</td>
-                                        <td>2024 1997 00981</td>
-                                        <td>admin</td>
-                                    </tr>
-                                    <tr>
-                                        <td> <img class="img-fluid table-avtar" src="{{ asset('assets/images/user/2.jpg') }}"
-                                                alt="">Mon Prenom</td>
-                                        <td>Dakar</td>
-                                        <td>2024 1997 00981</td>
-                                        <td>admin</td>
-                                    </tr>                              
+                                @foreach($users as $user)
+                                    @foreach($user->comptes as $compte) <!-- Itère sur les comptes de chaque utilisateur -->
+                                        <tr>
+                                            <td>
+                                                @if($user->photo)
+                                                    <img class="img-fluid table-avtar rounded-circle" 
+                                                        src="{{ asset('storage/' . $user->photo) }}" 
+                                                        alt="Photo"
+                                                        style="width: 40px; height: 40px; object-fit: cover;">
+                                                @else
+                                                    <img class="img-fluid table-avtar rounded-circle" 
+                                                        src="{{ asset('assets/images/user.jpg') }}" 
+                                                        alt="Default"
+                                                        style="width: 40px; height: 40px; object-fit: cover;">
+                                                @endif
+                                            </td>
+                                            <td>{{ $user->nom }} {{ $user->prenom }}</td>
+                                            <td>{{ $compte->numero_compte }}</td> <!-- Utilise le numéro de compte du compte associé -->
+                                            <td>{{ number_format($compte->solde ?? 0, 0, ',', ' ') }} FCFA</td>
+                                            <td>
+                                                <span class="badge {{ $user->etat_compte == 'actif' ? 'bg-success' : 'bg-warning' }}">
+                                                    {{ ucfirst($user->etat_compte) }}
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <div class="btn-group">
+                                                    @if($user->etat_compte == 'actif')
+                                                        <form action="{{ route('agents.bloquer_utilisateur', $user->id) }}" method="POST" style="display:inline;">
+                                                            @csrf
+                                                            <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Êtes-vous sûr de vouloir bloquer cet utilisateur ?');">
+                                                                Bloquer
+                                                            </button>
+                                                        </form>
+                                                    @else
+                                                        <form action="{{ route('agents.bloquer_utilisateur', $user->id) }}" method="POST" style="display:inline;">
+                                                            @csrf
+                                                            <button type="submit" class="btn btn-success btn-sm" onclick="return confirm('Êtes-vous sûr de vouloir débloquer cet utilisateur ?');">
+                                                                Débloquer
+                                                            </button>
+                                                        </form>
+                                                    @endif
+                                                    <button class="btn btn-primary btn-sm" 
+                                                            data-bs-toggle="modal" 
+                                                            data-bs-target="#detailsModal{{ $user->id }}">
+                                                        <i class="fa fa-eye"></i>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                @endforeach
                                 </tbody>
                             </table>
                         </div>
