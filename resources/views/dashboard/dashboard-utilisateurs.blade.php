@@ -97,6 +97,7 @@
                                     <th>Photo</th>
                                     <th>Nom</th>
                                     <th>Numero_Compte</th>
+                                    <th>Role</th>
                                     <th>Solde</th>
                                     <th>État compte</th>
                                     <th>Actions</th>
@@ -121,6 +122,7 @@
                                             </td>
                                             <td>{{ $user->nom }} {{ $user->prenom }}</td>
                                             <td>{{ $compte->numero_compte }}</td> <!-- Utilise le numéro de compte du compte associé -->
+                                            <td>{{ $user->role }}</td>
                                             <td>{{ number_format($compte->solde ?? 0, 0, ',', ' ') }} FCFA</td>
                                             <td>
                                                 <span class="badge {{ $user->etat_compte == 'actif' ? 'bg-success' : 'bg-warning' }}">
