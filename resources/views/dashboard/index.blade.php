@@ -237,11 +237,11 @@
 					<div class="card">
 						<div class="card-header card-no-border">
 							<div class="header-top">
-								<h5 class="m-0">Recent Sales</h5>
+								<h5 class="m-0">Transaction récentes</h5>
 								<div class="card-header-right-icon">
 									<div class="dropdown">
-										<button class="btn dropdown-toggle" id="recentButton" type="button" data-bs-toggle="dropdown" aria-expanded="false">Today</button>
-										<div class="dropdown-menu dropdown-menu-end" aria-labelledby="recentButton"><a class="dropdown-item" href="#">Today</a><a class="dropdown-item" href="#">Tomorrow</a><a class="dropdown-item" href="#">Yesterday</a></div>
+										<button class="btn dropdown-toggle" id="recentButton" type="button" data-bs-toggle="dropdown" aria-expanded="false">Ajourd'hui</button>
+										<div class="dropdown-menu dropdown-menu-end" aria-labelledby="recentButton"><a class="dropdown-item" href="#">Ajourd'hui</a><a class="dropdown-item" href="#">Tomorrow</a><a class="dropdown-item" href="#">Yesterday</a></div>
 									</div>
 								</div>
 							</div>
@@ -252,14 +252,14 @@
 							<tbody>
 								<tr>
 								<td><img class="img-fluid img-40 rounded-circle" src="{{ asset('assets/images/dashboard/user/1.jpg') }}" alt="user"></td>
-								<td class="img-content-box"><a class="d-block f-w-500">Jane Cooper</a><span class="f-light">10 minutes ago</span></td>
+								<td class="img-content-box"><a class="d-block f-w-500">Nom Prenom</a><span class="f-light">10 minutes ago</span></td>
 								<td class="text-end">
 									<p class="m-0 font-success">$200.00</p>
 								</td>
 								</tr>
 								<tr>
 								<td><img class="img-fluid img-40 rounded-circle" src="{{ asset('assets/images/dashboard/user/2.jpg') }}" alt="user"></td>
-								<td class="img-content-box"><a class="d-block f-w-500">Brooklyn Simmons</a><span class="f-light">19 minutes ago</span></td>
+								<td class="img-content-box"><a class="d-block f-w-500">Nom Prenom</a><span class="f-light">19 minutes ago</span></td>
 								<td class="text-end">
 									<p class="m-0 font-success">$970.00</p>
 								</td>
