@@ -83,7 +83,7 @@
                             <option value="{{ $compte->id }}"
                                     data-nom="{{ $distributeur->nom }}"
                                     data-prenom="{{ $distributeur->prenom }}"
-                                    data-numero="{{ $compte->numero }}"
+                                    data-numero="{{ $compte->numero_compte }}"
                                     data-solde="{{ $compte->solde }}">
                                 {{ $distributeur->nom }} {{ $distributeur->prenom }}
                             </option>
@@ -97,7 +97,7 @@
             <div class="mb-4">
                 <label for="card-number" class="form-label">Numéro de Compte</label>
                 <div class="input-group custom-input-group">
-                    <input type="text" class="form-control" id="card-number" name="numero" placeholder="Numéro de compte" readonly>
+                    <input type="text" class="form-control" id="card-number" name="numero_compte" placeholder="Numéro de compte" readonly>
                 </div>
             </div>
 
@@ -135,7 +135,7 @@
                             <tr>
                                 <td>{{ $distributeur->nom }}</td>
                                 <td>{{ $distributeur->prenom }}</td>
-                                <td>{{ $compte->numero }}</td>
+                                <td>{{ $compte->numero_compte }}</td>
                                 <td>{{ $compte->solde }}</td>
                             </tr>
                                 @endforeach

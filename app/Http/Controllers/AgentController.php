@@ -15,6 +15,8 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use App\Enums\UserRole;
+
 
 class AgentController extends Controller
 {
@@ -79,13 +81,16 @@ class AgentController extends Controller
             'date_naissance' => 'nullable|date',
             'numero_identite' => 'required|string|unique:users,numero_identite',
         ]);
-        
+
         DB::beginTransaction();
 
         try {
             $client = Client::create($request->all());
             DB::commit();
-            return response()->json(['message' => 'Compte client créé avec succès', 'client' => new AgentResource($client)]);
+            return response()->json([
+                'message' => 'Compte client créé avec succès',
+                'client' => new AgentResource($client)
+            ]);
         } catch (\Exception $e) {
             DB::rollBack();
             return response()->json(['message' => 'Erreur lors de la création du compte client'], 500);
@@ -97,17 +102,16 @@ class AgentController extends Controller
      */
     public function modifierCompte(Request $request, $clientId)
     {
-        $request->validate([
-            // Ajoutez les validations nécessaires
-        ]);
-
         DB::beginTransaction();
 
         try {
             $client = Client::findOrFail($clientId);
             $client->update($request->all());
             DB::commit();
-            return response()->json(['message' => 'Compte client modifié avec succès', 'client' => new AgentResource($client)]);
+            return response()->json([
+                'message' => 'Compte client modifié avec succès',
+                'client' => new AgentResource($client)
+            ]);
         } catch (ModelNotFoundException $e) {
             DB::rollBack();
             return response()->json(['message' => 'Client non trouvé'], 404);
@@ -118,94 +122,67 @@ class AgentController extends Controller
     }
 
     /**
-     * Crediter Distributeur
+     * Créditer un compte distributeur.
      */
-
     public function crediterCompteDistributeur(Request $request)
     {
         $request->validate([
             'numero_compte' => 'required|string',
             'montant' => 'required|numeric|min:0.01'
         ]);
-        //dd($request->all());
-        
+
         DB::beginTransaction();
 
         try {
-            // Rechercher le compte par numéro de compte
             $compte = Compte::where('numero_compte', $request->numero_compte)->firstOrFail();
-           
-
-            // Logique pour créditer le compte
-            // Ajouter le montant au solde existant
             $compte->solde += $request->montant;
             $compte->save();
 
-            // Enregistrer la transaction
             Transaction::create([
-                'user_id' => $compte->user_id, // ID du distributeur (ou agent)
-                'type' => 'depot', // Type de la transaction
+                'user_id' => $compte->user_id,
+                'type' => 'depot',
                 'montant' => $request->montant,
-                'frais' => 0, // Vous pouvez ajouter votre logique pour les frais
-                'commission' => 0, // Vous pouvez ajouter votre logique pour la commission
-                'etat' => 'terminee', // État de la transaction
-                'motif' => 'Créditation effectuée', // Motif de la transaction
-                'date' => now(), // Date de la transaction
-        ]);
+                'etat' => 'terminee',
+                'motif' => 'Créditation effectuée',
+                'date' => now()
+            ]);
 
             DB::commit();
-            // Redirection vers la page dashboard-approvisionner avec un message de succès
-            return redirect()->route('dashboard-approvisionner')->with('message', 'Créditation effectué avec succès');
-            return response()->json(['message' => 'Crédit effectué avec succès']);
+            return redirect()->route('dashboard-approvisionner')->with('message', 'Créditation effectuée avec succès');
         } catch (ModelNotFoundException $e) {
             DB::rollBack();
             return redirect()->route('dashboard-approvisionner')->with('error', 'Compte non trouvé');
         } catch (\Exception $e) {
             DB::rollBack();
-            return redirect()->route('dashboard-approvisionner')->with('error', 'Erreur lors de créditation');
+            return redirect()->route('dashboard-approvisionner')->with('error', 'Erreur lors de la créditation');
         }
     }
-
-   /**
- * Bloque un compte utilisateur.
- */
-public function bloquerOuDebloquerCompte(Request $request, $userId)
-{
-    DB::beginTransaction();
-
-    try {
-        // Récupérer l'utilisateur par son ID
-        $user = User::findOrFail($userId);
-
-        // Basculer l'état du compte
-        if ($user->etat_compte === 'actif') {
-            $user->etat_compte = 'inactif'; // Bloquer le compte
-        } else {
-            $user->etat_compte = 'actif'; // Débloquer le compte
-        }
-
-        // Sauvegarder les modifications
-        $user->save();
-
-        DB::commit();
-        
-        return redirect()->route('dashboard-utilisateurs')->with('success', 'L\'utilisateur a été mis à jour avec succès.');
-    } catch (ModelNotFoundException $e) {
-        DB::rollBack();
-        return response()->json(['message' => 'Utilisateur non trouvé'], 404);
-    } catch (\Exception $e) {
-        DB::rollBack();
-        // Enregistrer l'exception dans les logs pour le débogage
-        // Log::error('Erreur lors de la mise à jour de l\'état du compte utilisateur: ' . $e->getMessage());
-
-        return response()->json(['message' => 'Erreur lors de la mise à jour de l\'état du compte utilisateur'], 500);
-    }
-}
-
-
 
     /**
-     * Annule une transaction.
+     * Bloquer ou débloquer un compte utilisateur.
+     */
+    public function bloquerOuDebloquerCompte(Request $request, $userId)
+    {
+        DB::beginTransaction();
+
+        try {
+            $user = User::findOrFail($userId);
+            $user->etat_compte = $user->etat_compte === 'actif' ? 'inactif' : 'actif';
+            $user->save();
+            DB::commit();
+
+            return redirect()->route('dashboard-utilisateurs')->with('success', 'L\'état du compte a été mis à jour avec succès.');
+        } catch (ModelNotFoundException $e) {
+            DB::rollBack();
+            return response()->json(['message' => 'Utilisateur non trouvé'], 404);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json(['message' => 'Erreur lors de la mise à jour du compte'], 500);
+        }
+    }
+
+    /**
+     * Annuler une transaction.
      */
     public function annulerTransaction(Request $request, Transaction $transaction)
     {
@@ -214,62 +191,28 @@ public function bloquerOuDebloquerCompte(Request $request, $userId)
             $transaction->save();
             return response()->json(['message' => 'Transaction annulée avec succès'], 200);
         } catch (\Exception $e) {
-            return response()->json(['message' => 'Erreur lors de l\'annulation de la transaction'], 500);
+            return response()->json(['message' => 'Erreur lors de l\'annulation'], 500);
         }
     }
-    public function showForm($agentId, $distributeurId)
+    /**
+ * Affiche l'historique des transactions des distributeurs.
+ */
+public function afficherTransactions(Request $request)
 {
-    // Trouver l'agent par son ID
-    $agent = Agent::findOrFail($agentId);
+    // Récupérer les transactions pour le distributeur, vous pourriez avoir un filtre ici selon l'utilisateur connecté
+    $transactions = Transaction::with(['user' => function($query) {
+        $query->select('id', 'prenom', 'adresse', 'numero_identite');
+    }])->paginate(10); // Pagination si nécessaire
 
-    // Trouver le distributeur par son ID
-    $distributeur = Distributeur::findOrFail($distributeurId);
-    
-    // Passer les données à la vue
-    return view('dashboard.index', compact('agent', 'distributeur'));
+    return view('dashboard-transactions', compact('transactions')); // Remplacez par le nom de votre vue
 }
 
-public function crediterRapideDistributeur(Request $request)
-    {
-        $request->validate([
-            'numero_compte' => 'required|string',
-            'montant' => 'required|numeric|min:0.01'
-        ]);
-        //dd($request->all());
-        
-        DB::beginTransaction();
 
-        try {
-            // Rechercher le compte par numéro de compte
-            $compte = Compte::where('numero_compte', $request->numero_compte)->firstOrFail();
-           
 
-            // Logique pour créditer le compte
-            // Ajouter le montant au solde existant
-            $compte->solde += $request->montant;
-            $compte->save();
+   
+     
 
-            DB::commit();
-            return redirect()->back()->with('message', 'Depôt effectué avec succès'); // Redirection vers la même page
-            } catch (ModelNotFoundException $e) {
-                DB::rollBack();
-                return redirect()->back()->with('error', 'Compte non trouvé'); // Redirection vers la même page avec message d'erreur
-            } catch (\Exception $e) {
-                DB::rollBack();
-                return redirect()->back()->with('error', 'Erreur lors du crédit'); // Redirection vers la même page avec message d'erreur
-            }
-    }
-    //CalculUser pour les nombres d'agent, de distributeurs et de Client qu'il y a 
-    // public function CalculUser()
-    // {
-    //     $nombreClients = Client::count(); // Compte le nombre de clients
-    //     $nombreDistributeurs = Distributeur::count(); // Compte le nombre de distributeurs
-    //     $nombreAgents = Agent::count(); // Compte le nombre de distributeurs
     
-    //     return view('dashboard.index', compact('nombreClients', 'nombreDistributeurs','nombreAgents'));
-    // }
     
-
 
 }
-  

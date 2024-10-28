@@ -14,6 +14,13 @@ use App\Http\Controllers\SystemLoggerController;
 use App\Enums\UserRole;
 use App\Http\Controllers\ClientController;
 use Illuminate\Support\Facades\Auth;
+use App\Http\Controllers\DistribController;
+
+
+
+
+
+Route::get('/dashboard', [DistribController::class, 'index'])->name('distributeurs.index');
 
 /**
  * Route pour la page d'accueil, redirige vers le tableau de bord.
@@ -206,3 +213,7 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
     })->name('dashboard');
 });
 
+
+Route::get('/dashboard-utilisateurs', [UserController::class, 'CalculUser']);
+
+Route::get('/dashboard-transactions', [AgentController::class, 'afficherTransactions'])->name('transactions');

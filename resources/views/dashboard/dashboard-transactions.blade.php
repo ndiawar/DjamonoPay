@@ -92,90 +92,14 @@
                                         <td>Carte Identité</td>
                                         <td>610.000 Fcfa</td>
                                     </tr>
-                                    <tr>
-                                        <td> <img class="img-fluid table-avtar" src="{{ asset('assets/images/user/2.jpg') }}"
-                                                alt="">Votre Prenom </td>
-                                        <td>Adresse</td>
-                                        <td>Carte Identité</td>
-                                        <td>610.000 Fcfa</td>
-                                    </tr>
-                                    <tr>
-                                        <td> <img class="img-fluid table-avtar" src="{{ asset('assets/images/user/2.jpg') }}"
-                                                alt="">Votre Prenom </td>
-                                        <td>Adresse</td>
-                                        <td>Carte Identité</td>
-                                        <td>610.000 Fcfa</td>
-                                    </tr>
-                                    <tr>
-                                        <td> <img class="img-fluid table-avtar" src="{{ asset('assets/images/user/2.jpg') }}"
-                                                alt="">Votre Prenom </td>
-                                        <td>Adresse</td>
-                                        <td>Carte Identité</td>
-                                        <td>610.000 Fcfa</td>
-                                    </tr>
-                                    <tr>
-                                        <td> <img class="img-fluid table-avtar" src="{{ asset('assets/images/user/2.jpg') }}"
-                                                alt="">Votre Prenom </td>
-                                        <td>Adresse</td>
-                                        <td>Carte Identité</td>
-                                        <td>610.000 Fcfa</td>
-                                    </tr>
-                                    <tr>
-                                        <td> <img class="img-fluid table-avtar" src="{{ asset('assets/images/user/2.jpg') }}"
-                                                alt="">Votre Prenom </td>
-                                        <td>Adresse</td>
-                                        <td>Carte Identité</td>
-                                        <td>610.000 Fcfa</td>
-                                    </tr>
-                                    <tr>
-                                        <td> <img class="img-fluid table-avtar" src="{{ asset('assets/images/user/2.jpg') }}"
-                                                alt="">Votre Prenom </td>
-                                        <td>Adresse</td>
-                                        <td>Carte Identité</td>
-                                        <td>610.000 Fcfa</td>
-                                    </tr>
-                                    <tr>
-                                        <td> <img class="img-fluid table-avtar" src="{{ asset('assets/images/user/2.jpg') }}"
-                                                alt="">Votre Prenom </td>
-                                        <td>Adresse</td>
-                                        <td>Carte Identité</td>
-                                        <td>610.000 Fcfa</td>
-                                    </tr>
-                                    <tr>
-                                        <td> <img class="img-fluid table-avtar" src="{{ asset('assets/images/user/2.jpg') }}"
-                                                alt="">Votre Prenom </td>
-                                        <td>Adresse</td>
-                                        <td>Carte Identité</td>
-                                        <td>610.000 Fcfa</td>
-                                    </tr>
-                                    <tr>
-                                        <td> <img class="img-fluid table-avtar" src="{{ asset('assets/images/user/2.jpg') }}"
-                                                alt="">Votre Prenom </td>
-                                        <td>Adresse</td>
-                                        <td>Carte Identité</td>
-                                        <td>610.000 Fcfa</td>
-                                    </tr>
-                                    <tr>
-                                        <td> <img class="img-fluid table-avtar" src="{{ asset('assets/images/user/2.jpg') }}"
-                                                alt="">Votre Prenom </td>
-                                        <td>Adresse</td>
-                                        <td>Carte Identité</td>
-                                        <td>610.000 Fcfa</td>
-                                    </tr>
-                                    <tr>
-                                        <td> <img class="img-fluid table-avtar" src="{{ asset('assets/images/user/2.jpg') }}"
-                                                alt="">Votre Prenom </td>
-                                        <td>Adresse</td>
-                                        <td>Carte Identité</td>
-                                        <td>610.000 Fcfa</td>
-                                    </tr>
-                                    <tr>
-                                        <td> <img class="img-fluid table-avtar" src="{{ asset('assets/images/user/2.jpg') }}"
-                                                alt="">Votre Prenom </td>
-                                        <td>Adresse</td>
-                                        <td>Carte Identité</td>
-                                        <td>610.000 Fcfa</td>
-                                    </tr>
+                                  
+                                    
+                                   
+                                   
+                                  
+                                   
+                                    
+                                   
                                 </tbody>
                             </table>
                         </div>

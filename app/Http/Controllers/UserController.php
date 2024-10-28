@@ -7,6 +7,7 @@ use App\Http\Requests\User\UpdateUserRequest;
 use App\Http\Resources\UserResource;
 use App\Http\Resources\UserCollection;
 use App\Models\User;
+use App\Enums\UserRole; // Importation de l'énumération
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
@@ -132,12 +133,57 @@ class UserController extends Controller
         return new UserResource($user);
     }
 
+    /**
+     * Récupère le nombre d'utilisateurs par rôle.
+     */
+    public function CalculUser()
+    {
+        // Sélectionner tous les utilisateurs avec leurs rôles
+        $users = User::with('role')->get();
+    
+        // Compte des utilisateurs par rôle
+        $nombreClients = $users->filter(function ($user) {
+            return $user->role && $user->role->id === UserRole::CLIENT; // Assurez-vous d'utiliser la bonne clé pour vérifier le rôle
+        })->count();
+    
+        $nombreDistributeurs = $users->filter(function ($user) {
+            return $user->role && $user->role->id === UserRole::DISTRIBUTEUR; // Idem pour le distributeur
+        })->count();
+    
+        $nombreAgents = $users->filter(function ($user) {
+            return $user->role && $user->role->id === UserRole::AGENT; // Idem pour l'agent
+        })->count();
+    
+        // Retourne les comptes au format JSON
+        return response()->json([
+            'nombreClients' => $nombreClients,
+            'nombreDistributeurs' => $nombreDistributeurs,
+            'nombreAgents' => $nombreAgents,
+        ]);
+    }
+    
+    
     public function afficherUsers()
     {
         // Sélectionner tous les utilisateurs et leurs comptes
         $users = User::with('comptes')->get();
 
         return view('dashboard.dashboard-utilisateurs', compact('users'));
+        
     }
-    
+
+    public function afficherTransactions()
+{
+    try {
+        // Récupérer toutes les transactions
+        $transactions = User::with('distributeur')->get(); // Assurez-vous que la relation distributeur est définie dans votre modèle Transaction
+
+        return view('dashboard.dashboard-transactions', compact('transactions'));
+    } catch (\Exception $e) {
+        return response()->json(['message' => 'Erreur lors de la récupération des transactions'], 500);
+    }
 }
+
+    
+ }
+   

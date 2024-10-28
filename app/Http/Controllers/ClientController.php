@@ -26,15 +26,26 @@ class ClientController extends Controller
     /**
      * Voir le solde total du client.
      */
-    public function voirSolde(Client $client)
+    public function voirSolde(Request $request)
     {
         try {
+            // Récupérer l'utilisateur authentifié
+            $client = $request->user();
+    
+            // Vérifiez que l'utilisateur a le rôle 'client'
+            if ($client->role !== 'client') {
+                return response()->json(['message' => 'L\'utilisateur n\'est pas un client valide'], 403);
+            }
+    
+            // Calculer le solde total de tous les comptes de l'utilisateur
             $soldeTotal = $client->comptes()->sum('solde');
+    
             return response()->json(['solde_total' => $soldeTotal]);
         } catch (\Exception $e) {
             return response()->json(['message' => 'Erreur lors de la récupération du solde'], 500);
         }
     }
+    
 
     /**
  * Transfert entre deux clients effectué par un client
@@ -64,12 +75,12 @@ public function transfertEntreClients(Request $request)
 
         // Vérifier que le compte source appartient à un client
         if (!$userSource->isClient()) {
-            return redirect()->route('dashbord.dashboard-client')->with('message', 'Le compte source doit appartenir à un client valide');
+            return redirect()->route('dashboard-client')->with('message', 'Le compte source doit appartenir à un client valide');
         }
 
         // Vérifier que le compte source a un solde suffisant
         if ($compteSource->solde < $request->montant) {
-            return redirect()->route('dashbord.dashboard-client')->with('message', 'Solde insuffisant dans le compte source');
+            return redirect()->route('dashboard-client')->with('message', 'Solde insuffisant dans le compte source');
         }
 
         // Calculer la commission (2 % du montant transféré)
@@ -110,13 +121,13 @@ public function transfertEntreClients(Request $request)
         DB::commit();
 
         // Redirection avec message de succès
-        return redirect()->route('dashboard.dashboard-client')->with('message', 'Transfert effectué avec succès. Votre commission pour cette transaction : ' . number_format($commission, 2, ',', ' ') . ' Fcfa');
+        return redirect()->route('dashboard-client')->with('message', 'Transfert effectué avec succès. Votre commission pour cette transaction : ' . number_format($commission, 2, ',', ' ') . ' Fcfa');
     } catch (ModelNotFoundException $e) {
         DB::rollBack();
-        return redirect()->route('dashboard.dashboard-client')->with('error', 'Compte non trouvé');
+        return redirect()->route('dashboard-client')->with('error', 'Compte non trouvé');
     } catch (\Exception $e) {
         DB::rollBack();
-        return redirect()->route('dashboard.dashboard-client')->with('error', 'Erreur lors du transfert');
+        return redirect()->route('dashboard-client')->with('error', 'Erreur lors du transfert');
     }
 }
 

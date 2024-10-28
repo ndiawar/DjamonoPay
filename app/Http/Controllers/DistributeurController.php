@@ -338,17 +338,50 @@ public function effectuerRetrait(Request $request)
      * Historique transaction
      *
      */
-    public function afficherHistorique()
+    public function CalculUser()
     {
-        // Récupérer les transactions avec les informations des clients et comptes associés
-        $transactions = Transaction::join('comptes', 'transactions.compte_id', '=', 'comptes.id')
-            ->join('users', 'comptes.user_id', '=', 'users.id')
-            ->where('users.role', 'client') // Assurez-vous que le champ 'role' est défini pour filtrer par rôle client
-            ->select('transactions.*', 'users.nom', 'users.prenom', 'users.photo', 'comptes.numero_compte')
-            ->orderBy('transactions.date', 'desc')
-            ->get();
-            dd($transactions); // Cela affichera le contenu de $transactions
+        $nombreClients = User::where('role', 'client')->count();
+        $nombreDistributeurs = User::where('role', 'distributeur')->count();
+        $nombreAgents = User::where('role', 'agent')->count();
     
-        return view('dashboard-distributeur', compact('transactions'));
+        // Test si les variables sont bien récupérées
+        dd($nombreClients, $nombreDistributeurs, $nombreAgents);
+    
+        return view('dashboard.dashboard-utilisateurs', compact('nombreClients', 'nombreDistributeurs', 'nombreAgents'));
     }
+
+    /**
+ * Historique des transactions d'un utilisateur.
+ */
+public function historiqueTransactions(Request $request, $clientId)
+{
+    try {
+        // Rechercher le client par ID
+        $client = User::findOrFail($clientId);
+
+        // Vérifiez que l'utilisateur a le rôle 'client'
+        if ($client->role !== 'client') {
+            return response()->json(['message' => 'L\'utilisateur n\'est pas un client valide'], 403);
+        }
+
+        // Récupérer les transactions associées à ce client
+        $transactions = Transaction::where('user_id', $client->id)->paginate(10);
+
+        // Retourner les transactions avec des métadonnées
+        return response()->json([
+            'data' => new TransactionCollection($transactions),
+            'meta' => [
+                'current_page' => $transactions->currentPage(),
+                'last_page' => $transactions->lastPage(),
+                'total' => $transactions->total(),
+            ]
+        ]);
+    } catch (ModelNotFoundException $e) {
+        return response()->json(['message' => 'Client non trouvé'], 404);
+    } catch (\Exception $e) {
+        return response()->json(['message' => 'Erreur lors de la récupération des transactions'], 500);
+    }
+}
+
+    
 }
