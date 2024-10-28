@@ -129,13 +129,13 @@ class DistributeurController extends Controller
         DB::commit();
 
         // Si vous utilisez AJAX, renvoyez un JSON
-        return redirect()->route('dashboard-distributeur')->with('message', 'Dépôt effectué avec succès. Votre commission pour cette transaction : ' . number_format($commission, 2, ',', ' ') . ' Fcfa');
+        return redirect()->route('distributeurs.afficher_Historique')->with('message', 'Dépôt effectué avec succès. Votre commission pour cette transaction : ' . number_format($commission, 2, ',', ' ') . ' Fcfa');
     } catch (ModelNotFoundException $e) {
         DB::rollBack();
-        return redirect()->route('dashboard-distributeur')->with('error', 'Compte non trouvé');
+        return redirect()->route('distributeurs.afficher_Historique')->with('error', 'Compte non trouvé');
     } catch (\Exception $e) {
         DB::rollBack();
-        return redirect()->route('dashboard-distributeur')->with('error', 'Error lors du Depôt ');
+        return redirect()->route('distributeurs.afficher_Historique')->with('error', 'Error lors du Depôt ');
     }
 }
 
@@ -162,12 +162,12 @@ public function effectuerRetrait(Request $request)
 
         // Vérifier si l'utilisateur est bien un client
         if (!$user || !$user->isClient()) {
-            return redirect()->route('dashboard-distributeur')->with('error', 'Le compte ne correspond pas à un client valide');
+            return redirect()->route('distributeurs.afficher_Historique')->with('error', 'Le compte ne correspond pas à un client valide');
         }
 
         // Vérifier si le solde est suffisant
         if ($compte->solde < $request->montant) {
-            return redirect()->route('dashboard-distributeur')->with('error', 'Solde insuffisant pour effectuer ce retrait');
+            return redirect()->route('distributeurs.afficher_Historique')->with('error', 'Solde insuffisant pour effectuer ce retrait');
         }
 
         // Logique pour effectuer le retrait
@@ -189,13 +189,13 @@ public function effectuerRetrait(Request $request)
         DB::commit();
 
         // Redirection avec un message de succès
-        return redirect()->route('dashboard-distributeur')->with('message', 'Retrait effectué avec succès');
+        return redirect()->route('distributeurs.afficher_Historique')->with('message', 'Retrait effectué avec succès');
     } catch (ModelNotFoundException $e) {
         DB::rollBack();
-        return redirect()->route('dashboard-distributeur')->with('error', 'Compte non trouvé');
+        return redirect()->route('distributeurs.afficher_Historique')->with('error', 'Compte non trouvé');
     } catch (\Exception $e) {
         DB::rollBack();
-        return redirect()->route('dashboard-distributeur')->with('error', 'Erreur lors du retrait');
+        return redirect()->route('distributeurs.afficher_Historique')->with('error', 'Erreur lors du retrait');
     }
 }
 
@@ -223,12 +223,14 @@ public function effectuerRetrait(Request $request)
     public function annulerTransaction(Request $request, Transaction $transaction)
     {
         try {
-            $transaction->etat = 'annulé';
+            $transaction->etat = 'annulee';
             $transaction->save();
-            return response()->json(['message' => 'Transaction annulée avec succès'], 200);
+
+            return redirect()->back()->with('success', 'Transaction annulée avec succès');
         } catch (\Exception $e) {
-            return response()->json(['message' => 'Erreur lors de l\'annulation de la transaction'], 500);
+            return redirect()->back()->with('error', 'Erreur lors de l\'annulation de la transaction : ' . $e->getMessage());
         }
+        
     }
 
     public function afficherDistributeurs()
@@ -279,12 +281,12 @@ public function effectuerRetrait(Request $request)
 
         // Vérifier que les deux utilisateurs sont des clients
         if (!$userSource->isClient() || !$userDestination->isClient()) {
-            return redirect()->route('dashboard-distributeur')->with('message', 'Les deux comptes doivent appartenir à des clients valides');
+            return redirect()->route('distributeurs.afficher_Historique')->with('message', 'Les deux comptes doivent appartenir à des clients valides');
         }
 
         // Vérifier que le compte source a un solde suffisant
         if ($compteSource->solde < $request->montant) {
-           return redirect()->route('dashboard-distributeur')->with('message','Solde insuffisant dans le compte source');
+           return redirect()->route('distributeurs.afficher_Historique')->with('message','Solde insuffisant dans le compte source');
         }
 
         // Calculer la commission (1 % du montant transféré)
@@ -325,30 +327,46 @@ public function effectuerRetrait(Request $request)
         DB::commit();
 
         // Redirection avec message de succès
-        return redirect()->route('dashboard-distributeur')->with('message', 'Transfert effectué avec succès. Votre commission pour cette transaction : ' . number_format($commission, 2, ',', ' ') . ' Fcfa');
+        return redirect()->route('distributeurs.afficher_Historique')->with('message', 'Transfert effectué avec succès. Votre commission pour cette transaction : ' . number_format($commission, 2, ',', ' ') . ' Fcfa');
     } catch (ModelNotFoundException $e) {
         DB::rollBack();
-        return redirect()->route('dashboard-distributeur')->with('error', 'Compte non trouvé');
+        return redirect()->route('distributeurs.afficher_Historique')->with('error', 'Compte non trouvé');
     } catch (\Exception $e) {
         DB::rollBack();
-        return redirect()->route('dashboard-distributeur')->with('error', 'Erreur lors du transfert');
+        return redirect()->route('distributeurs.afficher_Historique')->with('error', 'Erreur lors du transfert');
     }
 }
 /**
-     * Historique transaction
-     *
-     */
-    public function afficherHistorique()
-    {
-        // Récupérer les transactions avec les informations des clients et comptes associés
-        $transactions = Transaction::join('comptes', 'transactions.compte_id', '=', 'comptes.id')
-            ->join('users', 'comptes.user_id', '=', 'users.id')
-            ->where('users.role', 'client') // Assurez-vous que le champ 'role' est défini pour filtrer par rôle client
-            ->select('transactions.*', 'users.nom', 'users.prenom', 'users.photo', 'comptes.numero_compte')
-            ->orderBy('transactions.date', 'desc')
+ * Historique transaction
+ */
+public function afficherHistorique() 
+{
+    try {
+        // Récupérer les transactions avec les utilisateurs et les comptes
+        $transactions = Transaction::join('users', 'transactions.user_id', '=', 'users.id')
+            ->join('comptes', 'users.id', '=', 'comptes.user_id')
+            ->select([
+                'transactions.id', // Ajout de l'ID pour les modales
+                'transactions.type as type_transaction',
+                'transactions.montant',
+                'transactions.created_at',
+                'users.nom',
+                'users.prenom',
+                'users.photo',
+                'comptes.numero_compte'
+            ])
+            ->where('users.role', 'distributeur')
+            ->orderBy('transactions.created_at', 'desc')
             ->get();
-            dd($transactions); // Cela affichera le contenu de $transactions
-    
-        return view('dashboard-distributeur', compact('transactions'));
+
+        // Debug pour voir les données récupérées
+        // \Log::info('Transactions récupérées:', ['count' => $transactions->count()]);
+        //dd($transactions);
+        return view('dashboard.dashboard-distributeur', ['transactions' => $transactions]);
+
+    } catch (\Exception $e) {
+        // \Log::error('Erreur dans afficherHistorique: ' . $e->getMessage());
+        return view('dashboard.dashboard-distributeur')->with('error', 'Une erreur est survenue lors du chargement des transactions.');
     }
+}
 }

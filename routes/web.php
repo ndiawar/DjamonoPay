@@ -7,9 +7,12 @@ use App\Http\Controllers\AgentController;
 use App\Http\Controllers\CompteController;
 use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
+use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\ClientController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Resources\ClientCollection;
+use Illuminate\Support\Facades\Auth;
 
 /**
  * Route pour la page d'accueil, redirige vers le tableau de bord.
@@ -42,6 +45,10 @@ Route::middleware('auth')->prefix('dashboard')->group(function () {
     route::get('dashboard-approvisionner', [DistributeurController::class, 'afficherDistributeurs'])->name('dashboard-approvisionner');
     route::get('dashboard-utilisateurs', [UserController::class, 'afficherUsers'])->name('dashboard-utilisateurs');
     Route::view('profile', 'dashboard.profile_update')->name('profile');
+    Route::get('/dashboard-distributeur', [DistributeurController::class, 'afficherHistorique'])->name('distributeurs.afficher_Historique');
+    Route::get('/dashboard-client', [ClientController::class, 'afficherHistoriqueClients'])->name('clients.afficher_Historiques_clients');
+
+   
 });
 /**
  * Routes pour les comptes, incluant les opérations CRUD.
@@ -107,11 +114,12 @@ Route::middleware('auth')->prefix('distributeurs')->group(function () {
     Route::post('/crediter-compte-client', [DistributeurController::class, 'crediterCompteClient'])->name('distributeurs.crediter_compte_client');
     Route::post('/effectuer-retrait', [DistributeurController::class, 'effectuerRetrait'])->name('distributeurs.effectuer_retrait');
     Route::post('/transferer-clients', [DistributeurController::class, 'transfererEntreClients'])->name('distributeurs.transfert_clients');
-    Route::get('/afficher-historique', [DistributeurController::class, 'afficherHistorique'])->name('distributeurs.afficher_Historique');
+    //Route::get('/dashboard-distributeur', [DistributeurController::class, 'afficherHistorique'])->name('distributeurs.afficher_Historique');
     Route::post('/{distributeur}/voir-solde', [DistributeurController::class, 'voirSolde'])->name('distributeurs.voir_solde');
     Route::get('/{distributeur}/transactions', [DistributeurController::class, 'voirTransactions'])->name('distributeurs.voir_transactions');
-    Route::post('/{distributeur}/annuler-transaction/{transaction}', [DistributeurController::class, 'annulerTransaction'])->name('distributeurs.annuler_transaction');
+    Route::post('/annuler-transaction/{transaction}', [DistributeurController::class, 'annulerTransaction'])->name('distributeurs.annuler_transaction');
     Route::post('/{distributeur}/scanner-qrcode', [DistributeurController::class, 'scannerQRCode'])->name('distributeurs.scanner_qrcode');
+    // Route::get('dashboard-distributeur', [DistributeurController::class, 'afficherHistorique'])->name('dashboard-distributeur');
 });
 /**
  * Routes pour la page de connexion.
@@ -162,6 +170,60 @@ Route::prefix('transactions')->middleware('auth')->name('transactions.')->group(
     Route::post('/', [TransactionController::class, 'store'])->name('store');
     Route::get('{transaction}', [TransactionController::class, 'show'])->name('show');
     Route::post('{transaction}/annuler', [TransactionController::class, 'annuler'])->name('annuler');
+    // Route::post('/transactions/{transaction}/annuler', [TransactionController::class, 'annulerTransaction'])->name('transactions.annuler');
+    Route::get('historique', [TransactionController::class, 'historique'])->name('historique');
+    Route::get('statistiques', [TransactionController::class, 'statistiques'])->name('statistiques');
+});
+
+
+
+
+/**
+ * Routes pour la gestion des CLients.
+ */
+Route::prefix('clients')->group(function () {
+    Route::post('/transfert-clients', [ClientController::class, 'transfertEntreClients'])->name('clients.transfert_clients');
+});   
+/**
+ * Routes pour le système de log.
+ */
+Route::prefix('logs')->group(function () {
+    Route::post('/', [SystemLoggerController::class, 'enregistrerLog'])->name('logs.enregistrer'); // Enregistrer un log
+    Route::get('/', [SystemLoggerController::class, 'recupererLogs'])->name('logs.recuperer'); // Récupérer des logs
+    Route::post('/rapport', [SystemLoggerController::class, 'genererRapport'])->name('logs.rapport'); // Générer un rapport
+});
+/**
+ * Routes pour l'authentification.
+ */
+Route::get('/login', [AuthenticatedSessionController::class, 'create'])->name('login');
+Route::post('/login', [AuthenticatedSessionController::class, 'store']);
+Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
+
+/**
+ * Routes pour l'inscription des utilisateurs.
+ */
+Route::get('/register', function () {
+    return view('auth.register');
+})->name('register');
+Route::post('/register', [RegisterController::class, 'register']);
+
+/**
+ * Route pour afficher le formulaire d'inscription d'un distributeur/agent.
+ */
+Route::get('/distributeur-agent', function () {
+    return view('auth.distributeur_agent'); // Assurez-vous que le chemin vers la vue est correct
+})->name('distributeur-agent');
+
+/**
+ * Routes pour gérer les erreurs spécifiques.
+ */
+Route::prefix('errors')->group(function () {
+    Route::view('400', 'errors.400')->name('error-400');
+    Route::view('401', 'errors.401')->name('error-401');
+    Route::view('403', 'errors.403')->name('error-403');
+    Route::view('404', 'errors.404')->name('error-404');
+    Route::view('500', 'errors.500')->name('error-500');
+    Route::view('503', 'errors.503')->name('error-503');
 });
 
 /**

@@ -53,7 +53,8 @@ public function transfertEntreClients(Request $request)
 
     try {
         // Récupérer le compte source de l'utilisateur authentifié
-        $compteSource = Compte::where('user_id', auth()->id())->firstOrFail();
+        $compteSource = Compte::where('numero_compte', $request->numero_compte_source)->firstOrFail();
+        // $compteSource = Compte::where('user_id', auth()->id())->firstOrFail();
 
         // Rechercher le compte de destination
         $compteDestination = Compte::where('numero_compte', $request->numero_compte_destination)->firstOrFail();
@@ -64,12 +65,12 @@ public function transfertEntreClients(Request $request)
 
         // Vérifier que le compte source appartient à un client
         if (!$userSource->isClient()) {
-            return redirect()->route('dashbord.dashboard-client')->with('message', 'Le compte source doit appartenir à un client valide');
+            return redirect()->route('dashboard-client')->with('message', 'Le compte source doit appartenir à un client valide');
         }
 
         // Vérifier que le compte source a un solde suffisant
         if ($compteSource->solde < $request->montant) {
-            return redirect()->route('dashbord.dashboard-client')->with('message', 'Solde insuffisant dans le compte source');
+            return redirect()->route('dashboard-client')->with('message', 'Solde insuffisant dans le compte source');
         }
 
         // Calculer la commission (2 % du montant transféré)
@@ -110,13 +111,13 @@ public function transfertEntreClients(Request $request)
         DB::commit();
 
         // Redirection avec message de succès
-        return redirect()->route('dashboard.dashboard-client')->with('message', 'Transfert effectué avec succès. Votre commission pour cette transaction : ' . number_format($commission, 2, ',', ' ') . ' Fcfa');
+        return redirect()->route('dashboard-client')->with('message', 'Transfert effectué avec succès. Votre commission pour cette transaction : ' . number_format($commission, 2, ',', ' ') . ' Fcfa');
     } catch (ModelNotFoundException $e) {
         DB::rollBack();
-        return redirect()->route('dashboard.dashboard-client')->with('error', 'Compte non trouvé');
+        return redirect()->route('dashboard-client')->with('error', 'Compte non trouvé');
     } catch (\Exception $e) {
         DB::rollBack();
-        return redirect()->route('dashboard.dashboard-client')->with('error', 'Erreur lors du transfert');
+        return redirect()->route('dashboard-client')->with('error', 'Erreur lors du transfert');
     }
 }
 
@@ -128,4 +129,42 @@ public function transfertEntreClients(Request $request)
         $transactions = $client->transactions()->paginate();
         return new TransactionCollection($transactions);
     }
+
+    /**
+ * Historique transaction
+ */
+public function afficherHistoriqueClients() 
+{
+    try {
+        // Récupérer les transactions des clients avec les clients et les comptes
+        $transactions = Transaction::join('users', 'transactions.user_id', '=', 'users.id')
+            ->join('comptes', 'users.id', '=', 'comptes.user_id')
+            ->select([
+                'transactions.id', // Ajout de l'ID pour les modales
+                'transactions.type as type_transaction',
+                'transactions.montant',
+                'transactions.created_at',
+                'users.nom',
+                'users.prenom',
+                'users.photo',
+                'comptes.numero_compte'
+            ])
+            ->where('users.role', 'client') // Filtrer les clients
+            ->orderBy('transactions.created_at', 'desc')
+            ->get();
+
+        // Déboguer pour vérifier les données récupérées
+        // \Log::info('Transactions clients récupérées:', ['count' => $transactions->count()]);
+        // dd($transactions);
+
+        // Renvoyer la vue pour les clients (modifiez le nom de la vue si nécessaire)
+        return view('dashboard.dashboard-client', ['transactions' => $transactions]);
+
+    } catch (\Exception $e) {
+        // Journaliser l'erreur
+        // \Log::error('Erreur dans afficherHistoriqueClients: ' . $e->getMessage());
+        return view('dashboard.dashboard-client')->with('error', 'Une erreur est survenue lors du chargement des transactions.');
+    }
+}
+
 }

@@ -93,7 +93,7 @@ class AuthenticatedSessionController extends Controller
                 // Redirection en fonction du rôle avec l'enum UserRole
                 return match ($user->role) {
                     UserRole::AGENT => redirect()->route('index'),
-                    UserRole::DISTRIBUTEUR => redirect()->route('dashboard-distributeur'),
+                    UserRole::DISTRIBUTEUR => redirect()->route('distributeurs.afficher_Historique'),
                     UserRole::CLIENT => redirect()->route('dashboard-client'),
                     default => redirect()->route('home'),
                 };

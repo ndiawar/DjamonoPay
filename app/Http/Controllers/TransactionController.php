@@ -48,30 +48,28 @@ class TransactionController extends Controller
         try {
             $transaction->etat = 'annulé';
             $transaction->save();
-
-            return response()->json(['message' => 'Transaction annulée avec succès'], 200);
-        } catch (QueryException $e) {
-            return response()->json(['message' => 'Erreur lors de l\'annulation de la transaction : ' . $e->getMessage()], 400);
-        } catch (Exception $e) {
-            return response()->json(['message' => 'Erreur inattendue : ' . $e->getMessage()], 500);
+    
+            return redirect()->back()->with('success', 'Transaction annulée avec succès');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Erreur lors de l\'annulation de la transaction : ' . $e->getMessage());
         }
     }
 
     /**
      * Consulte l'historique des transactions d'un utilisateur.
      */
-    public function consulterHistorique(Request $request)
-    {
-        try {
-            $userId = $request->query('user_id'); // Obtenez l'ID de l'utilisateur depuis la requête
+    // public function consulterHistorique(Request $request)
+    // {
+    //     try {
+    //         $userId = $request->query('user_id'); // Obtenez l'ID de l'utilisateur depuis la requête
 
-            $transactions = Transaction::where('client_id', $userId)->with(['user', 'distributeur'])->get();
+    //         $transactions = Transaction::where('client_id', $userId)->with(['user', 'distributeur'])->get();
 
-            return TransactionResource::collection($transactions);
-        } catch (Exception $e) {
-            return response()->json(['message' => 'Erreur lors de la récupération de l\'historique des transactions : ' . $e->getMessage()], 500);
-        }
-    }
+    //         return TransactionResource::collection($transactions);
+    //     } catch (Exception $e) {
+    //         return response()->json(['message' => 'Erreur lors de la récupération de l\'historique des transactions : ' . $e->getMessage()], 500);
+    //     }
+    // }
 
     /**
      * Calcule les frais d'une transaction.
@@ -100,4 +98,5 @@ class TransactionController extends Controller
 
         return 0; // Aucun commission par défaut
     }
+
 }

@@ -57,26 +57,31 @@
 
                     <!-- Lien visible uniquement pour le distributeur -->
                     @if(Auth::check() && Auth::user()->role === 'distributeur')
-                        <li class="sidebar-list">
-                            <a class="sidebar-link sidebar-title link-nav" href="{{ route('dashboard-distributeur') }}">
-                                <svg class="stroke-icon"><use href="{{ asset('assets/svg/icon-sprite.svg#stroke-user') }}"></use></svg>
-                                <svg class="fill-icon"><use href="{{ asset('assets/svg/icon-sprite.svg#fill-user') }}"></use></svg>
-                                <span>Distributeur</span>
-                            </a>
+                        <li class="sidebar-list"><i class="fa fa-thumb-tack"></i><a
+                                class="sidebar-link sidebar-title link-nav" href="{{ route('distributeurs.afficher_Historique') }}">
+                                <svg class="stroke-icon">
+                                    <use href="{{ asset('assets/svg/icon-sprite.svg#stroke-user') }}"></use>
+                                </svg>
+                                <svg class="fill-icon">
+                                    <use href="{{ asset('assets/svg/icon-sprite.svg#fill-user') }}"></use>
+                                </svg><span> Distributeur</span></a>
                         </li>
                     @endif
 
                     <!-- Lien visible uniquement pour le client -->
                     @if(Auth::check() && Auth::user()->role === 'client')
-                        <li class="sidebar-list">
-                            <a class="sidebar-link sidebar-title link-nav" href="{{ route('dashboard-client') }}">
-                                <svg class="stroke-icon"><use href="{{ asset('assets/svg/icon-sprite.svg#user-visitor') }}"></use></svg>
-                                <svg class="fill-icon"><use href="{{ asset('assets/svg/icon-sprite.svg#user-visitor') }}"></use></svg>
-                                <span>Client</span>
-                            </a>
-                        </li>
+                        <li class="sidebar-list"><i class="fa fa-thumb-tack"></i><a
+                                class="sidebar-link sidebar-title link-nav" href="{{ route('clients.afficher_Historiques_clients') }}">
+                                <svg class="stroke-icon">
+                                    <use href="{{ asset('assets/svg/icon-sprite.svg#user-visitor') }}"></use>
+                                </svg>
+                                <svg class="fill-icon">
+                                    <use href="{{ asset('assets/svg/icon-sprite.svg#user-visitor') }}"></use>
+                                </svg><span> Client</span></a>
+                        </li> 
                     @endif
-
+                    
+                    
                 </ul>
             </div>
             <div class="right-arrow" id="right-arrow"><i data-feather="arrow-right"></i></div>
