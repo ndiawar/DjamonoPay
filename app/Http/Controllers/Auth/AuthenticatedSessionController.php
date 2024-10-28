@@ -94,7 +94,7 @@ class AuthenticatedSessionController extends Controller
                 return match ($user->role) {
                     UserRole::AGENT => redirect()->route('index'),
                     UserRole::DISTRIBUTEUR => redirect()->route('distributeurs.afficher_Historique'),
-                    UserRole::CLIENT => redirect()->route('dashboard-client'),
+                    UserRole::CLIENT => redirect()->route('clients.afficher_Historiques_clients'),
                     default => redirect()->route('home'),
                 };
             } else {

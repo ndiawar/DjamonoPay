@@ -12,7 +12,7 @@
         </div>
         <div class="nav-right col-xxl-7 col-xl-6 col-md-7 col-8 pull-right right-header p-0 ms-auto">
             <ul class="nav-menus">
-                <li class="onhover-dropdown">
+                <!-- <li class="onhover-dropdown">
                     <div class="notification-box">
                         <svg>
                             <use href="{{ asset('assets/svg/icon-sprite.svg#notification') }}"></use>
@@ -37,7 +37,7 @@
                             <li><a class="f-w-700" href="#">Check all</a></li>
                         </ul>
                     </div>
-                </li>
+                </li> -->
                 <li class="profile-nav onhover-dropdown pe-0 py-0">
                     
                 <div class="media profile-media">

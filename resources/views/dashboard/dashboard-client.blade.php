@@ -30,9 +30,10 @@
                 <div class="card p-3" style="width: 35rem; margin: auto;">
                     <!-- Solde masqué/affiché -->
                     <h3 id="balance" class="text-center">
-                        <span id="balanceValue">1542789 F</span>
-                        <i class="text-dark bi bi-eye-slash" id="toggleBalance" onclick="toggleBalance()" style="cursor:pointer;"></i>
+                    <span id="balanceValue">{{ number_format(Auth::user()->solde, 0, ',', ' ') }} F</span>
+                    <i class="text-dark bi bi-eye-slash" id="toggleBalance" onclick="toggleBalance()" style="cursor:pointer;"></i>
                     </h3>
+
 
                     <!-- QR Code -->
                     <div class="d-flex justify-content-center mb-3">
@@ -55,43 +56,52 @@
                         <span class="d-block mt-1 text-muted">Envoyer</span>
                     </div>
                 </div>
-              <!-- Modal pour le transfert -->
-              <div class="modal fade" id="transferModal" tabindex="-1" aria-labelledby="transferModalLabel" aria-hidden="true">
-                <div class="modal-dialog">
-                  <div class="modal-content">
-                    <div class="modal-header">
-                      <h5 class="modal-title" id="transferModalLabel">Effectuer un transfert</h5>
-                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <!-- Modal pour le transfert -->
+                <div class="modal fade" id="transferModal" tabindex="-1" aria-labelledby="transferModalLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="transferModalLabel">Effectuer un transfert</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <form action="{{ route('clients.transfert_clients') }}" method="POST" id="transferForm">
+                                    @csrf
+                                    <div class="mb-3">
+                                        <label for="numero_compte_source" class="form-label">Source</label>
+                                        <input type="text" class="form-control" id="numero_compte_source" name="numero_compte_source" required>
+                                        <div class="invalid-feedback" id="numero_compte_source-error"></div>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label for="numero_compte_destination" class="form-label">Destinataire</label>
+                                        <input type="text" class="form-control" id="numero_compte_destination" name="numero_compte_destination" required>
+                                        <div class="invalid-feedback" id="numero_compte_destination-error"></div>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label for="montant_envoye" class="form-label">Montant à envoyer (incluant les frais de 2%)</label>
+                                        <input type="number" class="form-control" id="montant_envoye" name="montant" required step="0.01" min="0">
+                                        <div class="invalid-feedback" id="mmontant_envoye-error"></div>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label for="montant_recu" class="form-label">Montant à recevoir (hors frais)</label>
+                                        <input type="number" class="form-control" id="montant_recu" step="0.01" min="0">
+                                    </div>
+
+                                    <div class="alert alert-info mt-2" id="frais-info" style="display: none;">
+                                        Frais de transfert (2%): <span id="frais-montant">0</span> FCFA
+                                    </div>
+
+                                    <button type="submit" class="btn btn-secondary btn-custom me-2" id="submitTransfer">Envoyer</button>
+                                </form>
+                            </div>
+                        </div>
                     </div>
-                    <div class="modal-body">
-                      <form action="{{ route('clients.transfert_clients') }}" method="POST">
-                          @csrf
-                          <div class="mb-3">
-                              <label for="recipient" class="form-label">Source</label>
-                              <input type="text" class="form-control" id="recipient" name="numero_compte_source" required>
-                          </div>
-                          <div class="mb-3">
-                              <label for="recipient" class="form-label">Destinataire</label>
-                              <input type="text" class="form-control" id="recipient" name="numero_compte_destination" required>
-                          </div>
-                          <div class="mb-3">
-                              <label for="amount" class="form-label">Montant Envoyé</label>
-                              <input type="number" class="form-control" id="amount" name="montant" required>
-                          </div>
-                          <div class="mb-3">
-                              <label for="amount" class="form-label">Montant Reçu</label>
-                              <input type="number" class="form-control" d="amountReceived" name="montant_recu" required>
-                          </div>
-                          <div class="mb-3">
-                                <label for="commission" class="form-label">Commission (2%)</label>
-                                <input type="text" class="form-control" id="commission" name="commission" readonly>
-                          </div>
-                          <button type="submit" class="btn btn-secondary btn-custom me-2">Envoyer</button>
-                      </form>
-                    </div>
-                  </div>
                 </div>
-              </div>
+
+                
             </div>
             <div class="card-body">
                 <div class="table-responsive user-datatable">
@@ -231,8 +241,149 @@ function toggleBalance() {
             balance.insertAdjacentHTML('afterend', '<span id="hiddenBalance" style="color: #003f6b;">••••••</span>'); // Ajouter les points
         }
     }
+
 }
+
+//controle de saisies transfert client client
+
+document.addEventListener('DOMContentLoaded', function() {
+    const COMMISSION_RATE = 0.02; // 2%
+    let isCalculatingFromReceived = false;
+
+    // Fonction pour calculer le montant reçu après déduction des frais
+    function calculateReceivedAmount(sentAmount) {
+        if (!sentAmount) return '';
+        return (parseFloat(sentAmount) * (1 - COMMISSION_RATE)).toFixed(2);
+    }
+
+    // Fonction pour calculer le montant à envoyer en fonction du montant reçu souhaité
+    function calculateSentAmount(receivedAmount) {
+        if (!receivedAmount) return '';
+        return (parseFloat(receivedAmount) / (1 - COMMISSION_RATE)).toFixed(2);
+    }
+
+    // Fonction pour mettre à jour l'affichage des frais
+    function updateFraisDisplay(montant) {
+        const fraisElement = document.getElementById('frais-montant');
+        const fraisInfoElement = document.getElementById('frais-info');
+        
+        if (fraisElement && fraisInfoElement) {
+            const frais = (parseFloat(montant || 0) * COMMISSION_RATE).toFixed(2);
+            fraisElement.textContent = frais;
+            fraisInfoElement.style.display = montant ? 'block' : 'none';
+        }
+    }
+
+    // Fonction de validation des champs de formulaire
+    function validateField(field) {
+        const value = field.value;
+        const errorDiv = document.getElementById(`${field.id}-error`);
+        let isValid = true;
+
+        if (errorDiv) {
+            switch (field.id) {
+                case 'numero_compte_source':
+                case 'numero_compte_destination':
+                    if (!value) {
+                        errorDiv.textContent = 'Ce champ est requis';
+                        isValid = false;
+                    } else if (value.length < 5) {
+                        errorDiv.textContent = 'Le numéro de compte doit contenir au moins 5 caractères';
+                        isValid = false;
+                    } else {
+                        errorDiv.textContent = '';
+                    }
+                    break;
+
+                case 'montant_envoye':
+                    if (!value) {
+                        errorDiv.textContent = 'Le montant est requis';
+                        isValid = false;
+                    } else if (parseFloat(value) <= 0) {
+                        errorDiv.textContent = 'Le montant doit être supérieur à 0';
+                        isValid = false;
+                    } else {
+                        errorDiv.textContent = '';
+                    }
+                    break;
+            }
+        }
+
+        field.classList.toggle('is-invalid', !isValid);
+        return isValid;
+    }
+
+    // Écouteur pour le champ montant envoyé
+    const montantEnvoyeElement = document.getElementById('montant_envoye');
+    if (montantEnvoyeElement) {
+        montantEnvoyeElement.addEventListener('input', function(e) {
+            if (isCalculatingFromReceived) return;
+            const montant = e.target.value;
+            
+            if (validateField(this)) {
+                const montantRecuElement = document.getElementById('montant_recu');
+                if (montantRecuElement) {
+                    montantRecuElement.value = calculateReceivedAmount(montant);
+                }
+                updateFraisDisplay(montant);
+            }
+        });
+    }
+
+    // Écouteur pour le champ montant reçu
+    const montantRecuElement = document.getElementById('montant_recu');
+    if (montantRecuElement) {
+        montantRecuElement.addEventListener('input', function(e) {
+            isCalculatingFromReceived = true;
+            const montantRecu = e.target.value;
+            const montantEnvoye = calculateSentAmount(montantRecu);
+            
+            if (montantEnvoyeElement) {
+                montantEnvoyeElement.value = montantEnvoye;
+                updateFraisDisplay(montantEnvoye);
+                validateField(montantEnvoyeElement);
+            }
+            
+            isCalculatingFromReceived = false;
+        });
+    }
+
+    // Validation des numéros de compte source et destination
+    ['numero_compte_source', 'numero_compte_destination'].forEach(id => {
+        const element = document.getElementById(id);
+        if (element) {
+            element.addEventListener('input', function() {
+                validateField(this);
+            });
+        }
+    });
+
+    // Validation du formulaire avant soumission
+    const transferForm = document.getElementById('transferForm');
+    if (transferForm) {
+        transferForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const fields = ['numero_compte_source', 'numero_compte_destination', 'montant_envoye'];
+            let isValid = true;
+
+            fields.forEach(fieldId => {
+                const field = document.getElementById(fieldId);
+                if (field && !validateField(field)) {
+                    isValid = false;
+                }
+            });
+
+            if (isValid) {
+                this.submit();
+            }
+        });
+    }
+});
+
+
 </script>
 
 
 @endsection
+

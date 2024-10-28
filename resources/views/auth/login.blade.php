@@ -51,9 +51,9 @@
                     <input type="password" name="password" placeholder="Mot de passe" required>
                     <i class="bi bi-eye toggle-password" onclick="togglePasswordVisibility()"></i>
                 </div>
-                <div class="forgot-password">
+                <!-- <div class="forgot-password">
                     <a href="#">Mot de passe oublié ?</a>
-                </div>
+                </div> -->
                 <button type="submit" class="btn-connect">Se connecter</button>
             </form>
         </div>

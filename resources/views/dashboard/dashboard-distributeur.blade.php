@@ -174,36 +174,7 @@
                     </div>
                     <!-- Fin Modal Depot -->
                     <!-- Envoie et Retrait summary section -->
-                    <div class="row justify-content-center mt-3">
-                        <div class="col-md-3 mb-3">
-                            <div class="border-start border-5 border-info card p-2 shadow-sm card-hover bg-ligth text-dark"> <!-- Background sombre et hover -->
-                                <div class="d-flex justify-content-between align-items-center text-center">
-                                    <div>
-                                        <span>Envoie</span>
-                                        <h4>$128,320</h4>
-                                    </div>
-                                    <div class="text-success">
-                                        <i class="bi bi-arrow-up-right-circle-fill"></i> <!-- Icône de montée -->
-                                        <span>11.09%</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-3 mb-3">
-                            <div class="border-start border-5 border-info card p-2 shadow-sm card-hover bg-ligth text-dark"> <!-- Background sombre et hover -->
-                                <div class="d-flex justify-content-between align-items-center text-center">
-                                    <div>
-                                        <span>Retrait</span>
-                                        <h4>$128,320</h4>
-                                    </div>
-                                    <div class="text-success">
-                                        <i class="bi bi-arrow-up-right-circle-fill"></i>
-                                        <span>11.09%</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                    
                     </div>
                     <div class="card-body">
                         <div class="table-responsive user-datatable">

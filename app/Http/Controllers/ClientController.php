@@ -65,12 +65,12 @@ public function transfertEntreClients(Request $request)
 
         // Vérifier que le compte source appartient à un client
         if (!$userSource->isClient()) {
-            return redirect()->route('dashboard-client')->with('message', 'Le compte source doit appartenir à un client valide');
+            return redirect()->route('clients.afficher_Historiques_clients')->with('message', 'Le compte source doit appartenir à un client valide');
         }
 
         // Vérifier que le compte source a un solde suffisant
         if ($compteSource->solde < $request->montant) {
-            return redirect()->route('dashboard-client')->with('message', 'Solde insuffisant dans le compte source');
+            return redirect()->route('clients.afficher_Historiques_clients')->with('message', 'Solde insuffisant dans le compte source');
         }
 
         // Calculer la commission (2 % du montant transféré)
@@ -111,13 +111,13 @@ public function transfertEntreClients(Request $request)
         DB::commit();
 
         // Redirection avec message de succès
-        return redirect()->route('dashboard-client')->with('message', 'Transfert effectué avec succès. Votre commission pour cette transaction : ' . number_format($commission, 2, ',', ' ') . ' Fcfa');
+        return redirect()->route('clients.afficher_Historiques_clients')->with('message', 'Transfert effectué avec succès. Votre commission pour cette transaction : ' . number_format($commission, 2, ',', ' ') . ' Fcfa');
     } catch (ModelNotFoundException $e) {
         DB::rollBack();
-        return redirect()->route('dashboard-client')->with('error', 'Compte non trouvé');
+        return redirect()->route('clients.afficher_Historiques_clients')->with('error', 'Compte non trouvé');
     } catch (\Exception $e) {
         DB::rollBack();
-        return redirect()->route('dashboard-client')->with('error', 'Erreur lors du transfert');
+        return redirect()->route('clients.afficher_Historiques_clients')->with('error', 'Erreur lors du transfert');
     }
 }
 
