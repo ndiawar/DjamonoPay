@@ -75,8 +75,16 @@
                               <input type="text" class="form-control" id="recipient" name="numero_compte_destination" required>
                           </div>
                           <div class="mb-3">
-                              <label for="amount" class="form-label">Montant</label>
+                              <label for="amount" class="form-label">Montant Envoyé</label>
                               <input type="number" class="form-control" id="amount" name="montant" required>
+                          </div>
+                          <div class="mb-3">
+                              <label for="amount" class="form-label">Montant Reçu</label>
+                              <input type="number" class="form-control" d="amountReceived" name="montant_recu" required>
+                          </div>
+                          <div class="mb-3">
+                                <label for="commission" class="form-label">Commission (2%)</label>
+                                <input type="text" class="form-control" id="commission" name="commission" readonly>
                           </div>
                           <button type="submit" class="btn btn-secondary btn-custom me-2">Envoyer</button>
                       </form>
@@ -87,141 +95,103 @@
             </div>
             <div class="card-body">
                 <div class="table-responsive user-datatable">
-                    <table class="display" id="datatable-range">
-                        <thead>
-                            <tr>
-                                <th>Client</th>
-                                <th>Adresse</th>
-                                <th>Numéro Compte</th>
-                                <th>Transaction</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td> <img class="img-fluid table-avtar" src="{{ asset('assets/images/user/2.jpg') }}"
-                                        alt="">Nom Client</td>
-                                <td>Dakar</td>
-                                <td>6145 7854 7485 9654 0012</td>
-                                <td class="d-flex rounded" style="background-color: #d4edda;">
-                                    <p class="me-2">325.452 Fcfa</p> 
-                                    <p class="">Retrait</p>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td> <img class="img-fluid table-avtar" src="{{ asset('assets/images/user/2.jpg') }}"
-                                        alt="">Nom Client</td>
-                                <td>Dakar</td>
-                                <td>6145 7854 7485 9654 0012</td>
-                                <td class="d-flex rounded" style="background-color: #d4edda;">
-                                    <p class="me-2">325.452 Fcfa</p> 
-                                    <p class="">Retrait</p>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td> <img class="img-fluid table-avtar" src="{{ asset('assets/images/user/2.jpg') }}"
-                                        alt="">Nom Client</td>
-                                <td>Dakar</td>
-                                <td>6145 7854 7485 9654 0012</td>
-                                <td class="d-flex rounded" style="background-color: #d4edda;">
-                                    <p class="me-2">325.452 Fcfa</p> 
-                                    <p class="">Retrait</p>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td> <img class="img-fluid table-avtar" src="{{ asset('assets/images/user/2.jpg') }}"
-                                        alt="">Nom Client</td>
-                                <td>Dakar</td>
-                                <td>6145 7854 7485 9654 0012</td>
-                                <td class="d-flex rounded" style="background-color: #d4edda;">
-                                    <p class="me-2">325.452 Fcfa</p> 
-                                    <p class="">Retrait</p>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td> <img class="img-fluid table-avtar" src="{{ asset('assets/images/user/2.jpg') }}"
-                                        alt="">Nom Client</td>
-                                <td>Dakar</td>
-                                <td>6145 7854 7485 9654 0012</td>
-                                <td class="d-flex rounded" style="background-color: #d4edda;">
-                                    <p class="me-2">325.452 Fcfa</p> 
-                                    <p class="">Retrait</p>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td> <img class="img-fluid table-avtar" src="{{ asset('assets/images/user/2.jpg') }}"
-                                        alt="">Nom Client</td>
-                                <td>Dakar</td>
-                                <td>6145 7854 7485 9654 0012</td>
-                                <td class="d-flex rounded" style="background-color: #cce5ff;">
-                                <p class="me-2">325.452 Fcfa</p> 
-                                <p class="">transfert</p>
-                            </td>
+                <table class="table">
+                                    
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th class="align-middle">Photo</th>
+                                            <th class="align-middle">Clients</th>
+                                            <th class="align-middle">Numéro Compte</th>
+                                            <th class="align-middle">Montant</th>
+                                            <th class="align-middle">Type_Transaction</th>
+                                            <th class="align-middle">Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @if(isset($transactions) && count($transactions) > 0)
+                                            @foreach($transactions as $transaction)
+                                                <tr>
+                                                    <td class="align-middle">
+                                                        @if($transaction->photo)
+                                                            <img src="{{ asset('storage/' . $transaction->photo) }}" 
+                                                                alt="Photo" 
+                                                                class="rounded-circle"
+                                                                style="width: 50px; height: 50px; object-fit: cover;">
+                                                        @else
+                                                            <img src="{{ asset('assets/images/user.jpg') }}" 
+                                                                alt="Default" 
+                                                                class="rounded-circle"
+                                                                style="width: 50px; height: 50px; object-fit: cover;">
+                                                        @endif
+                                                    </td>
+                                                    <td class="align-middle">
+                                                        <div class="d-flex flex-column">
+                                                            <span class="fw-bold">{{ $transaction->nom }} {{ $transaction->prenom }}</span>
+                                                            <!-- <span class="text-muted small">{{ $transaction->prenom }}</span> -->
+                                                        </div>
+                                                    </td>
+                                                    <td class="align-middle">
+                                                        <span class="d-none d-md-inline">{{ $transaction->numero_compte }}</span>
+                                                    </td>
+                                                    <td class="align-middle">
+                                                        <span class="fw-bold {{ $transaction->type_transaction == 'depot' ? 'text-success' : 'text-primary' }}">
+                                                            {{ number_format($transaction->montant, 0, ',', ' ') }} FCFA
+                                                        </span>
+                                                    </td>
+                                                    <td class="align-middle">
+                                                        <span class="badge {{ $transaction->type_transaction == 'depot' ? 'bg-success' : 'bg-primary' }}">
+                                                            {{ ucfirst($transaction->type_transaction) }}
+                                                        </span>
+                                                    </td>
+                                                    <td class="align-middle">
+                                                    <div class="d-flex gap-2">
+    <!-- Bouton détails -->
+    <button type="button" 
+            class="btn btn-info btn-sm"
+            data-bs-toggle="modal" 
+            data-bs-target="#detailsModal{{ $transaction->id }}"
+            title="Voir détails">
+        <i class="bi bi-eye"></i> <!-- Icône de l'œil pour voir les détails -->
+    </button>
 
-                            </tr>
-                            <tr>
-                                <td> <img class="img-fluid table-avtar" src="{{ asset('assets/images/user/2.jpg') }}"
-                                        alt="">Nom Client</td>
-                                <td>Dakar</td>
-                                <td>6145 7854 7485 9654 0012</td>
-                                <td class="d-flex rounded" style="background-color: #cce5ff;">
-                                <p class="me-2">325.452 Fcfa</p> 
-                                <p class="">transfert</p>
-                            </td>
+    
 
-                            </tr>
-                            <tr>
-                                <td> <img class="img-fluid table-avtar" src="{{ asset('assets/images/user/2.jpg') }}"
-                                        alt="">Nom Client</td>
-                                <td>Dakar</td>
-                                <td>6145 7854 7485 9654 0012</td>
-                                <td class="d-flex rounded" style="background-color: #cce5ff;">
-                                <p class="me-2">325.452 Fcfa</p> 
-                                <p class="">transfert</p>
-                            </td>
 
-                            </tr>
-                            <tr>
-                                <td> <img class="img-fluid table-avtar" src="{{ asset('assets/images/user/2.jpg') }}"
-                                        alt="">Nom Client</td>
-                                <td>Dakar</td>
-                                <td>6145 7854 7485 9654 0012</td>
-                                <td class="d-flex rounded" style="background-color: #f8d7da;">
-                                    <p class="me-5">325.452 Fcfa</p> 
-                                    <p class="">annulé</p>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td> <img class="img-fluid table-avtar" src="{{ asset('assets/images/user/2.jpg') }}"
-                                        alt="">Nom Client</td>
-                                <td>Dakar</td>
-                                <td>6145 7854 7485 9654 0012</td>
-                                <td class="d-flex rounded" style="background-color: #f8d7da;">
-                                    <p class="me-5">325.452 Fcfa</p> 
-                                    <p class="">annulé</p>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td> <img class="img-fluid table-avtar" src="{{ asset('assets/images/user/2.jpg') }}"
-                                        alt="">Nom Client</td>
-                                <td>Dakar</td>
-                                <td>6145 7854 7485 9654 0012</td>
-                                <td class="d-flex rounded" style="background-color: #f8d7da;">
-                                    <p class="me-5">325.452 Fcfa</p> 
-                                    <p class="">annulé</p>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td> <img class="img-fluid table-avtar" src="{{ asset('assets/images/user/2.jpg') }}"
-                                        alt="">Nom Client</td>
-                                <td>Dakar</td>
-                                <td>6145 7854 7485 9654 0012</td>
-                                <td class="d-flex rounded" style="background-color: #f8d7da;">
-                                    <p class="me-5">325.452 Fcfa</p> 
-                                    <p class="">annulé</p>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
+                                                        <!-- Modal Détails -->
+                                                        <div class="modal fade" id="detailsModal{{ $transaction->id }}" tabindex="-1">
+                                                            <div class="modal-dialog modal-dialog-centered">
+                                                                <div class="modal-content">
+                                                                    <div class="modal-header">
+                                                                        <h5 class="modal-title">Détails de la transaction</h5>
+                                                                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                                                    </div>
+                                                                    <div class="modal-body">
+                                                                        <p><strong>Distributeur :</strong> {{ $transaction->nom }} {{ $transaction->prenom }}</p>
+                                                                        <p><strong>Numéro de compte :</strong> {{ $transaction->numero_compte }}</p>
+                                                                        <p><strong>Type :</strong> {{ ucfirst($transaction->type_transaction) }}</p>
+                                                                        <p><strong>Montant :</strong> {{ number_format($transaction->montant, 0, ',', ' ') }} FCFA</p>
+                                                                    </div>
+                                                                    <div class="modal-footer">
+                                                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                      
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            @endforeach
+                                        @else
+                                            <tr>
+                                                <td colspan="6" class="text-center">Aucune transaction trouvée</td>
+                                            </tr>
+                                        @endif
+                                    </tbody>
+                                </table>
                 </div>
             </div>
           </div>

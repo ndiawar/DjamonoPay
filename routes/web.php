@@ -13,6 +13,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\SystemLoggerController;
 use App\Enums\UserRole;
 use App\Http\Controllers\ClientController;
+use App\Http\Resources\ClientCollection;
 use Illuminate\Support\Facades\Auth;
 
 /**
@@ -36,6 +37,9 @@ Route::prefix('dashboard')->group(function () {
     Route::view('dashboard-approvisionner', 'dashboard.dashboard-approvisionner')->name('dashboard-approvisionner');
     route::get('dashboard-approvisionner', [DistributeurController::class, 'afficherDistributeurs'])->name('dashboard-approvisionner');
     route::get('dashboard-utilisateurs', [UserController::class, 'afficherUsers'])->name('dashboard-utilisateurs');
+    Route::get('/dashboard-distributeur', [DistributeurController::class, 'afficherHistorique'])->name('distributeurs.afficher_Historique');
+    Route::get('/dashboard-client', [ClientController::class, 'afficherHistoriqueClients'])->name('clients.afficher_Historiques_clients');
+
    
 });
 
@@ -79,11 +83,12 @@ Route::prefix('distributeurs')->group(function () {
     Route::post('/crediter-compte-client', [DistributeurController::class, 'crediterCompteClient'])->name('distributeurs.crediter_compte_client');
     Route::post('/effectuer-retrait', [DistributeurController::class, 'effectuerRetrait'])->name('distributeurs.effectuer_retrait');
     Route::post('/transferer-clients', [DistributeurController::class, 'transfererEntreClients'])->name('distributeurs.transfert_clients');
-    Route::get('/afficher-historique', [DistributeurController::class, 'afficherHistorique'])->name('distributeurs.afficher_Historique');
+    //Route::get('/dashboard-distributeur', [DistributeurController::class, 'afficherHistorique'])->name('distributeurs.afficher_Historique');
     Route::post('/{distributeur}/voir-solde', [DistributeurController::class, 'voirSolde'])->name('distributeurs.voir_solde');
     Route::get('/{distributeur}/transactions', [DistributeurController::class, 'voirTransactions'])->name('distributeurs.voir_transactions');
-    Route::post('/{distributeur}/annuler-transaction/{transaction}', [DistributeurController::class, 'annulerTransaction'])->name('distributeurs.annuler_transaction');
+    Route::post('/annuler-transaction/{transaction}', [DistributeurController::class, 'annulerTransaction'])->name('distributeurs.annuler_transaction');
     Route::post('/{distributeur}/scanner-qrcode', [DistributeurController::class, 'scannerQRCode'])->name('distributeurs.scanner_qrcode');
+    // Route::get('dashboard-distributeur', [DistributeurController::class, 'afficherHistorique'])->name('dashboard-distributeur');
 });
 
 /**
@@ -115,7 +120,7 @@ Route::prefix('transactions')->name('transactions.')->group(function () {
     Route::get('/', [TransactionController::class, 'index'])->name('index');
     Route::post('/', [TransactionController::class, 'store'])->name('store');
     Route::get('{transaction}', [TransactionController::class, 'show'])->name('show');
-    Route::post('{transaction}/annuler', [TransactionController::class, 'annuler'])->name('annuler');
+    // Route::post('/transactions/{transaction}/annuler', [TransactionController::class, 'annulerTransaction'])->name('transactions.annuler');
     Route::get('historique', [TransactionController::class, 'historique'])->name('historique');
     Route::get('statistiques', [TransactionController::class, 'statistiques'])->name('statistiques');
 });

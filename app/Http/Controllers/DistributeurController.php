@@ -223,12 +223,14 @@ public function effectuerRetrait(Request $request)
     public function annulerTransaction(Request $request, Transaction $transaction)
     {
         try {
-            $transaction->etat = 'annulé';
+            $transaction->etat = 'annulee';
             $transaction->save();
-            return response()->json(['message' => 'Transaction annulée avec succès'], 200);
+
+            return redirect()->back()->with('success', 'Transaction annulée avec succès');
         } catch (\Exception $e) {
-            return response()->json(['message' => 'Erreur lors de l\'annulation de la transaction'], 500);
+            return redirect()->back()->with('error', 'Erreur lors de l\'annulation de la transaction : ' . $e->getMessage());
         }
+        
     }
 
     public function afficherDistributeurs()
@@ -335,20 +337,36 @@ public function effectuerRetrait(Request $request)
     }
 }
 /**
-     * Historique transaction
-     *
-     */
-    public function afficherHistorique()
-    {
-        // Récupérer les transactions avec les informations des clients et comptes associés
-        $transactions = Transaction::join('comptes', 'transactions.compte_id', '=', 'comptes.id')
-            ->join('users', 'comptes.user_id', '=', 'users.id')
-            ->where('users.role', 'client') // Assurez-vous que le champ 'role' est défini pour filtrer par rôle client
-            ->select('transactions.*', 'users.nom', 'users.prenom', 'users.photo', 'comptes.numero_compte')
-            ->orderBy('transactions.date', 'desc')
+ * Historique transaction
+ */
+public function afficherHistorique() 
+{
+    try {
+        // Récupérer les transactions avec les utilisateurs et les comptes
+        $transactions = Transaction::join('users', 'transactions.user_id', '=', 'users.id')
+            ->join('comptes', 'users.id', '=', 'comptes.user_id')
+            ->select([
+                'transactions.id', // Ajout de l'ID pour les modales
+                'transactions.type as type_transaction',
+                'transactions.montant',
+                'transactions.created_at',
+                'users.nom',
+                'users.prenom',
+                'users.photo',
+                'comptes.numero_compte'
+            ])
+            ->where('users.role', 'distributeur')
+            ->orderBy('transactions.created_at', 'desc')
             ->get();
-            dd($transactions); // Cela affichera le contenu de $transactions
-    
-        return view('dashboard-distributeur', compact('transactions'));
+
+        // Debug pour voir les données récupérées
+        // \Log::info('Transactions récupérées:', ['count' => $transactions->count()]);
+        //dd($transactions);
+        return view('dashboard.dashboard-distributeur', ['transactions' => $transactions]);
+
+    } catch (\Exception $e) {
+        // \Log::error('Erreur dans afficherHistorique: ' . $e->getMessage());
+        return view('dashboard.dashboard-distributeur')->with('error', 'Une erreur est survenue lors du chargement des transactions.');
     }
+}
 }

@@ -6,7 +6,6 @@
 <link rel="stylesheet" type="text/css" href="{{ asset('assets/css/vendors/datatables.css') }}">
 <!-- Bootstrap Icons -->
 <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
-<!-- Custom CSS -->
 <style>
     .icon-circle {
         background-color: #003f6b; /* Couleur de fond des icônes */
@@ -209,35 +208,160 @@
                     <div class="card-body">
                         <div class="table-responsive user-datatable">
                             <table class="display" id="datatable-range">
-                                <thead>
-                                    <tr>
-                                        <th>Photo</th>
-                                        <th>Clients</th>
-                                        <th>Numéro Compte</th>
-                                        <th>Montant</th>
-                                        <th>Type_Transaction</th>
-                                        <th>Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                <tbody>
+                            <div class="table-responsive">
+                                <table class="table">
+                                    
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th class="align-middle">Photo</th>
+                                            <th class="align-middle">Clients</th>
+                                            <th class="align-middle">Numéro Compte</th>
+                                            <th class="align-middle">Montant</th>
+                                            <th class="align-middle">Type_Transaction</th>
+                                            <th class="align-middle">Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @if(isset($transactions) && count($transactions) > 0)
+                                            @foreach($transactions as $transaction)
+                                                <tr>
+                                                    <td class="align-middle">
+                                                        @if($transaction->photo)
+                                                            <img src="{{ asset('storage/' . $transaction->photo) }}" 
+                                                                alt="Photo" 
+                                                                class="rounded-circle"
+                                                                style="width: 50px; height: 50px; object-fit: cover;">
+                                                        @else
+                                                            <img src="{{ asset('assets/images/user.jpg') }}" 
+                                                                alt="Default" 
+                                                                class="rounded-circle"
+                                                                style="width: 50px; height: 50px; object-fit: cover;">
+                                                        @endif
+                                                    </td>
+                                                    <td class="align-middle">
+                                                        <div class="d-flex flex-column">
+                                                            <span class="fw-bold">{{ $transaction->nom }} {{ $transaction->prenom }}</span>
+                                                            <!-- <span class="text-muted small">{{ $transaction->prenom }}</span> -->
+                                                        </div>
+                                                    </td>
+                                                    <td class="align-middle">
+                                                        <span class="d-none d-md-inline">{{ $transaction->numero_compte }}</span>
+                                                    </td>
+                                                    <td class="align-middle">
+                                                        <span class="fw-bold {{ 
+                                                            $transaction->type_transaction == 'depot' ? 'text-success' : 
+                                                            ($transaction->type_transaction == 'annulee' ? 'text-warning' : 'text-danger') 
+                                                        }}">
+                                                            {{ number_format($transaction->montant, 0, ',', ' ') }} FCFA
+                                                        </span>
+                                                    </td>
+                                                    <td class="align-middle">
+                                                        <span class="badge {{ 
+                                                            $transaction->type_transaction == 'depot' ? 'bg-success' : 
+                                                            ($transaction->type_transaction == 'annulee' ? 'bg-warning' : 'bg-danger') 
+                                                        }}">
+                                                            {{ ucfirst($transaction->type_transaction) }}
+                                                        </span>
+                                                    </td>
+                                                    
+                                                    <td class="align-middle">
+                                                    <div class="d-flex gap-2">
+    <!-- Bouton détails -->
+    <button type="button" 
+            class="btn btn-info btn-sm"
+            data-bs-toggle="modal" 
+            data-bs-target="#detailsModal{{ $transaction->id }}"
+            title="Voir détails">
+        <i class="bi bi-eye"></i> <!-- Icône de l'œil pour voir les détails -->
+    </button>
 
-                                </tbody>
-                               </table>
-                                </tbody>
-                            </table>
+    <!-- Bouton annuler -->
+    <button type="button text-white" 
+            class="btn btn-danger btn-sm"
+            data-bs-toggle="modal" 
+            data-bs-target="#annulerModal{{ $transaction->id }}"
+            title="Annuler">
+        <i class="bi bi-x-lg"></i> <!-- Icône X pour annuler -->
+    </button>
+</div>
+
+
+                                                        <!-- Modal Détails -->
+                                                        <div class="modal fade" id="detailsModal{{ $transaction->id }}" tabindex="-1">
+                                                            <div class="modal-dialog modal-dialog-centered">
+                                                                <div class="modal-content">
+                                                                    <div class="modal-header">
+                                                                        <h5 class="modal-title">Détails de la transaction</h5>
+                                                                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                                                    </div>
+                                                                    <div class="modal-body">
+                                                                        <p><strong>Distributeur :</strong> {{ $transaction->nom }} {{ $transaction->prenom }}</p>
+                                                                        <p><strong>Numéro de compte :</strong> {{ $transaction->numero_compte }}</p>
+                                                                        <p><strong>Type :</strong> {{ ucfirst($transaction->type_transaction) }}</p>
+                                                                        <p><strong>Montant :</strong> {{ number_format($transaction->montant, 0, ',', ' ') }} FCFA</p>
+                                                                    </div>
+                                                                    <div class="modal-footer">
+                                                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                        <!-- Modal Annulation -->
+                                                        <div class="modal fade" id="annulerModal{{ $transaction->id }}" tabindex="-1">
+                                                            <div class="modal-dialog modal-dialog-centered">
+                                                                <div class="modal-content">
+                                                                    <div class="modal-header">
+                                                                        <h5 class="modal-title">Confirmation d'annulation</h5>
+                                                                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                                                    </div>
+                                                                    <div class="modal-body">
+                                                                        <div class="alert alert-warning">
+                                                                            <p><strong>Êtes-vous sûr de vouloir annuler cette transaction ?</strong></p>
+                                                                            <p><strong>Distributeur :</strong> {{ $transaction->nom }} {{ $transaction->prenom }}</p>
+                                                                            <p><strong>Montant :</strong> {{ number_format($transaction->montant, 0, ',', ' ') }} FCFA</p>
+                                                                            <p><strong>Type :</strong> {{ ucfirst($transaction->type_transaction) }}</p>
+                                                                            <p><strong>Date :</strong> {{ \Carbon\Carbon::parse($transaction->created_at)->format('d/m/Y H:i') }}</p>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="modal-footer">
+                                                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                                                                        <form action="{{ route('distributeurs.annuler_transaction', $transaction->id) }}" method="POST" class="d-inline">
+                                                                            @csrf
+                                                                            @method('POST')
+                                                                            <button type="submit" class="btn btn-danger">Confirmer</button>
+                                                                        </form>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            @endforeach
+                                        @else
+                                            <tr>
+                                                <td colspan="6" class="text-center">Aucune transaction trouvée</td>
+                                            </tr>
+                                        @endif
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-            <!-- Tale Distributeurs-->
-        </div>        
-    @endsection
+        </div>
+    </div>
+@endsection
+
+ 
+
+         
 
 
 @section('script')
 <script src="{{ asset('assets/js/datatable/datatables/jquery.dataTables.min.js') }}"></script>
 <script src="{{ asset('assets/js/datatable/datatables/datatable.custom.js') }}"></script>
 <script src="{{ asset('assets/js/dashboard/dashboard_5.js') }}"></script>
-
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 @endsection
