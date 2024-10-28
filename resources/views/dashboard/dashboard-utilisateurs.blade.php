@@ -121,7 +121,7 @@
                                                 @endif
                                             </td>
                                             <td>{{ $user->nom }} {{ $user->prenom }}</td>
-                                            <td>{{ $compte->numero_compte }}</td> <!-- Utilise le numéro de compte du compte associé -->
+                                            <td>{{ $compte->numero }}</td> <!-- Utilise le numéro de compte du compte associé -->
                                             <td>{{ $user->role }}</td>
                                             <td>{{ number_format($compte->solde ?? 0, 0, ',', ' ') }} FCFA</td>
                                             <td>

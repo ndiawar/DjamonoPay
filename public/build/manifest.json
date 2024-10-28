@@ -1104,24 +1104,24 @@
     "src": "public/assets/images/details_open.png"
   },
   "public/assets/scss/app.scss": {
-    "file": "assets/app-c89f1bca.css",
+    "file": "assets/app-6fa99e80.css",
     "isEntry": true,
     "src": "public/assets/scss/app.scss"
   },
   "resources/css/app.css": {
-    "file": "assets/app-74aa6698.css",
+    "file": "assets/app-134aabff.css",
     "isEntry": true,
     "src": "resources/css/app.css"
   },
+  "resources/css/login.css": {
+    "file": "assets/login-961062c9.css",
+    "isEntry": true,
+    "src": "resources/css/login.css"
+  },
   "resources/css/register.css": {
-    "file": "assets/register-1206f7ff.css",
+    "file": "assets/register-e80318ab.css",
     "isEntry": true,
     "src": "resources/css/register.css"
-  },
-  "resources/css/style.css": {
-    "file": "assets/style-097e0ee8.css",
-    "isEntry": true,
-    "src": "resources/css/style.css"
   },
   "resources/js/app.js": {
     "file": "assets/app-662c600f.js",
@@ -1129,7 +1129,7 @@
     "src": "resources/js/app.js"
   },
   "resources/js/login.js": {
-    "file": "assets/login-1523c887.js",
+    "file": "assets/login-610f0cd3.js",
     "imports": [
       "resources/js/app.js"
     ],
@@ -1137,7 +1137,7 @@
     "src": "resources/js/login.js"
   },
   "resources/js/register.js": {
-    "file": "assets/register-c5f5cc3e.js",
+    "file": "assets/register-d011c938.js",
     "isEntry": true,
     "src": "resources/js/register.js"
   }

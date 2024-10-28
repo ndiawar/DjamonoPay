@@ -1,17 +1,18 @@
 import './bootstrap';
 
 // Toggle pour afficher/masquer le mot de passe
-const togglePassword = document.getElementById('togglePassword');
-const passwordInput = document.getElementById('password');
-
-if (togglePassword) {
-    togglePassword.addEventListener('click', function () {
-        const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
-        passwordInput.setAttribute('type', type);
-
-        // Changer l'icône en fonction de l'état
-        this.classList.toggle('fa-eye-slash');
-    });
+function togglePasswordVisibility() {
+    const passwordInput = document.querySelector('input[name="password"]');
+    const passwordIcon = document.querySelector('.toggle-password');
+    if (passwordInput.type === "password") {
+        passwordInput.type = "text";
+        passwordIcon.classList.remove('bi-eye');
+        passwordIcon.classList.add('bi-eye-slash');
+    } else {
+        passwordInput.type = "password";
+        passwordIcon.classList.remove('bi-eye-slash');
+        passwordIcon.classList.add('bi-eye');
+    }
 }
 
 // Validation en temps réel
