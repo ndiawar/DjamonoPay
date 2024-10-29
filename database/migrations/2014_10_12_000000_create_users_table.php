@@ -12,15 +12,38 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('users', function (Blueprint $table) {
-            $table->id();
-            $table->string('name');
+            $table->id();  // ID unique auto-incrémenté
+            
+            // Informations personnelles de base
+            $table->string('nom');
+            $table->string('prenom');
             $table->string('email')->unique();
-            $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
+            
+            // Rôle et état du compte
+            $table->enum('role', ['client', 'distributeur', 'agent'])->default('client');
+            $table->enum('etat_compte', ['actif', 'inactif', 'suspendu'])->default('actif');
+            
+            // Informations personnelles détaillées
+            $table->string('telephone')->unique();
+            $table->text('adresse')->nullable();
+            $table->date('date_naissance')->nullable();
+            $table->string('numero_identite')->unique();
+            
+            // Gestion des photos
+            $table->string('photo')->nullable();
+            $table->string('profile_photo_path')->nullable(); // Si vous n'avez pas besoin de la longueur, pas besoin de spécifier
+            
+            // Gestion d'équipe et vérification
+            $table->timestamp('email_verified_at')->nullable();
             $table->rememberToken();
-            $table->foreignId('current_team_id')->nullable();
-            $table->string('profile_photo_path', 2048)->nullable();
             $table->timestamps();
+            
+            // Index pour optimiser les performances
+            $table->index('role');
+            $table->index('etat_compte');
+            $table->index(['nom', 'prenom']);
+            $table->index('telephone');
         });
     }
 
