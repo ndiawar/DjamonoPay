@@ -50,6 +50,7 @@ Route::middleware('auth')->prefix('dashboard')->group(function () {
 
    
 });
+
 /**
  * Routes pour les comptes, incluant les opérations CRUD.
  */
@@ -99,6 +100,7 @@ Route::middleware('auth')->prefix('agent')->group(function () {
     Route::post('/crediter-rapide-distributeur/', [AgentController::class, 'crediterRapideDistributeur'])->name('agents.crediter_rapide_distributeur');
     Route::post('/bloquer-utilisateur/{userId}', [AgentController::class, 'bloquerOuDebloquerCompte'])->name('agents.bloquer_utilisateur');
 });
+
 /**
  * Routes pour les distributeurs, incluant les opérations CRUD.
  */
@@ -121,6 +123,7 @@ Route::middleware('auth')->prefix('distributeurs')->group(function () {
     Route::post('/{distributeur}/scanner-qrcode', [DistributeurController::class, 'scannerQRCode'])->name('distributeurs.scanner_qrcode');
     // Route::get('dashboard-distributeur', [DistributeurController::class, 'afficherHistorique'])->name('dashboard-distributeur');
 });
+
 /**
  * Routes pour la page de connexion.
  */
@@ -134,11 +137,6 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::put('/profile/{id}', [ProfileController::class, 'updateUser'])->name('profile.update');
 });
-
-
-/**
- * Routes pour la gestion des utilisateurs.
- */
 
 /**
  * Routes pour la gestion des distributeurs.
@@ -174,9 +172,6 @@ Route::prefix('transactions')->middleware('auth')->name('transactions.')->group(
     Route::get('historique', [TransactionController::class, 'historique'])->name('historique');
     Route::get('statistiques', [TransactionController::class, 'statistiques'])->name('statistiques');
 });
-
-
-
 
 /**
  * Routes pour la gestion des CLients.

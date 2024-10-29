@@ -69,10 +69,9 @@
                                     @csrf
                                     <div class="mb-3">
                                         <label for="numero_compte_source" class="form-label">Source</label>
-                                        <input type="text" class="form-control" id="numero_compte_source" name="numero_compte_source" required>
+                                        <input type="text" class="form-control" id="numero_compte_source" name="numero_compte_source" value="{{ Auth::user()->numero_compte ?? '' }}" required>
                                         <div class="invalid-feedback" id="numero_compte_source-error"></div>
                                     </div>
-
                                     <div class="mb-3">
                                         <label for="numero_compte_destination" class="form-label">Destinataire</label>
                                         <input type="text" class="form-control" id="numero_compte_destination" name="numero_compte_destination" required>

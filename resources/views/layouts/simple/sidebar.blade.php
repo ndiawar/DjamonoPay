@@ -15,23 +15,29 @@
 
                     <!-- Lien visible uniquement pour l'agent -->
                     @if(Auth::check() && Auth::user()->role === 'agent')
-                     <!-- Lien visible pour tous les utilisateurs -->
-                     <li class="sidebar-list">
-                        <a class="sidebar-link sidebar-title" href="{{ route('index') }}">
-                            <svg class="stroke-icon"><use href="{{ asset('assets/svg/icon-sprite.svg#stroke-home') }}"></use></svg>
-                            <svg class="fill-icon"><use href="{{ asset('assets/svg/icon-sprite.svg#fill-home') }}"></use></svg>
-                            <span>Dashboard</span>
-                        </a>
-                    </li>
+                            <li class="sidebar-list">
+                                <a class="sidebar-link sidebar-title" href="#">
+                                    <span> </span>
+                                </a>
+                            </li>
 
-                    <!-- Lien Transactions visible pour tous -->
-                    <li class="sidebar-list">
-                        <a class="sidebar-link sidebar-title link-nav" href="{{ route('dashboard-transactions') }}">
-                            <svg class="stroke-icon"><use href="{{ asset('assets/svg/icon-sprite.svg#stroke-starter-kit') }}"></use></svg>
-                            <svg class="fill-icon"><use href="{{ asset('assets/svg/icon-sprite.svg#fill-starter-kit') }}"></use></svg>
-                            <span>Transactions</span>
-                        </a>
-                    </li>
+                        <!-- Lien visible pour tous les utilisateurs -->
+                        <li class="sidebar-list">
+                            <a class="sidebar-link sidebar-title" href="{{ route('index') }}">
+                                <svg class="stroke-icon"><use href="{{ asset('assets/svg/icon-sprite.svg#stroke-home') }}"></use></svg>
+                                <svg class="fill-icon"><use href="{{ asset('assets/svg/icon-sprite.svg#fill-home') }}"></use></svg>
+                                <span>Dashboard</span>
+                            </a>
+                        </li>
+
+                        <!-- Lien Transactions visible pour tous -->
+                        <li class="sidebar-list">
+                            <a class="sidebar-link sidebar-title link-nav" href="{{ route('dashboard-transactions') }}">
+                                <svg class="stroke-icon"><use href="{{ asset('assets/svg/icon-sprite.svg#stroke-starter-kit') }}"></use></svg>
+                                <svg class="fill-icon"><use href="{{ asset('assets/svg/icon-sprite.svg#fill-starter-kit') }}"></use></svg>
+                                <span>Transactions</span>
+                            </a>
+                        </li>
                         <li class="sidebar-list">
                             <a class="sidebar-link sidebar-title link-nav" href="{{ route('dashboard-approvisionner') }}">
                                 <svg class="stroke-icon"><use href="{{ asset('assets/svg/icon-sprite.svg#stroke-charts') }}"></use></svg>
@@ -57,6 +63,11 @@
 
                     <!-- Lien visible uniquement pour le distributeur -->
                     @if(Auth::check() && Auth::user()->role === 'distributeur')
+                        <li class="sidebar-list">
+                            <a class="sidebar-link sidebar-title" href="#">
+                                <span> </span>
+                            </a>
+                        </li>
                         <li class="sidebar-list"><i class="fa fa-thumb-tack"></i><a
                                 class="sidebar-link sidebar-title link-nav" href="{{ route('distributeurs.afficher_Historique') }}">
                                 <svg class="stroke-icon">
@@ -70,6 +81,11 @@
 
                     <!-- Lien visible uniquement pour le client -->
                     @if(Auth::check() && Auth::user()->role === 'client')
+                        <li class="sidebar-list">
+                            <a class="sidebar-link sidebar-title" href="#">
+                                <span> </span>
+                            </a>
+                        </li>
                         <li class="sidebar-list"><i class="fa fa-thumb-tack"></i><a
                                 class="sidebar-link sidebar-title link-nav" href="{{ route('clients.afficher_Historiques_clients') }}">
                                 <svg class="stroke-icon">

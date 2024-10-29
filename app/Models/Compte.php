@@ -11,7 +11,7 @@ class Compte extends Model
 
     protected $fillable = [
         'user_id',
-        'numero',
+        'numero_compte',
         'solde',
         'qr_code',
         'est_bloque',

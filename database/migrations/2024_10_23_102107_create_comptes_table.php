@@ -13,7 +13,7 @@ class CreateComptesTable extends Migration
     {
         Schema::create('comptes', function (Blueprint $table) {
             $table->id(); 
-            $table->string('numero'); 
+            $table->string('numero_compte'); 
             $table->foreignId('user_id')
                   ->constrained('users')
                   ->onDelete('restrict') // Empêche la suppression de l'utilisateur si des comptes existent

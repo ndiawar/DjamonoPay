@@ -80,8 +80,8 @@ class RegisterController extends Controller
         ]);
 
        
-        // // Connexion automatique de l'utilisateur après inscription
-        // auth()->login($user);
+        // Connexion automatique de l'utilisateur après inscription
+        auth()->login($user);
 
         // Redirection en fonction du rôle
         if ($role === UserRole::CLIENT) {
