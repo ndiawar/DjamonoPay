@@ -72,7 +72,7 @@ class RegisterController extends Controller
         // Création du compte bancaire
         Compte::create([
             'user_id' => $user->id,
-            'numero_compte' => $numeroCompte,
+            'numero' => $numeroCompte,
             'solde' => $soldeInitial,
             'qr_code' => Str::random(10),
             'est_bloque' => false,
