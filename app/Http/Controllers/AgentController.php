@@ -259,15 +259,7 @@ public function crediterRapideDistributeur(Request $request)
                 return redirect()->back()->with('error', 'Erreur lors du crédit'); // Redirection vers la même page avec message d'erreur
             }
     }
-    //CalculUser pour les nombres d'agent, de distributeurs et de Client qu'il y a 
-    // public function CalculUser()
-    // {
-    //     $nombreClients = Client::count(); // Compte le nombre de clients
-    //     $nombreDistributeurs = Distributeur::count(); // Compte le nombre de distributeurs
-    //     $nombreAgents = Agent::count(); // Compte le nombre de distributeurs
     
-    //     return view('dashboard.index', compact('nombreClients', 'nombreDistributeurs','nombreAgents'));
-    // }
     
 
 

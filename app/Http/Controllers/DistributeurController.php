@@ -150,52 +150,68 @@ public function effectuerRetrait(Request $request)
         'montant' => 'required|numeric|min:0.01',
     ]);
 
-    // Démarrer une transaction
+    // Démarrer une transaction SQL
     DB::beginTransaction();
 
     try {
-        // Rechercher le compte par numéro de compte
-        $compte = Compte::where('numero_compte', $request->numero_compte)->firstOrFail();
+        // 1. Rechercher le compte du client par numéro de compte
+        $compteClient = Compte::where('numero_compte', $request->numero_compte)->firstOrFail();
 
-        // Trouver l'utilisateur associé au compte
-        $user = User::find($compte->user_id);
+        // 2. Trouver l'utilisateur associé au compte
+        $client = User::find($compteClient->user_id);
 
-        // Vérifier si l'utilisateur est bien un client
-        if (!$user || !$user->isClient()) {
-            return redirect()->route('distributeurs.afficher_Historique')->with('error', 'Le compte ne correspond pas à un client valide');
+        // 3. Vérifier si l'utilisateur est bien un client
+        if (!$client || !$client->isClient()) {
+            return redirect()->route('distributeurs.afficher_Historique')->with('error', 'Compte invalide ou utilisateur non client.');
         }
 
-        // Vérifier si le solde est suffisant
-        if ($compte->solde < $request->montant) {
-            return redirect()->route('distributeurs.afficher_Historique')->with('error', 'Solde insuffisant pour effectuer ce retrait');
+        // 4. Vérifier si le solde du client est suffisant
+        if ($compteClient->solde < $request->montant) {
+            return redirect()->route('distributeurs.afficher_Historique')->with('error', 'Solde insuffisant sur le compte du client.');
         }
 
-        // Logique pour effectuer le retrait
-        $compte->solde -= $request->montant;
-        $compte->save(); // Enregistrer les modifications
+        // 5. Récupérer le compte du distributeur connecté
+        $distributeur = auth()->user();
+        $compteDistributeur = Compte::where('user_id', $distributeur->id)->first();
 
-        // Enregistrer la transaction
+        // 6. Vérifier si le distributeur a un solde suffisant pour effectuer l'opération
+        if ($compteDistributeur->solde < $request->montant) {
+            return redirect()->route('distributeurs.afficher_Historique')->with('error', 'Solde insuffisant du distributeur.');
+        }
+
+        // 7. Effectuer le retrait sur le compte du client
+        $compteClient->solde -= $request->montant;
+        $compteClient->save();
+
+        // 8. Déduire également le montant du solde du distributeur
+        $compteDistributeur->solde -= $request->montant;
+        $compteDistributeur->save();
+
+        // 9. Enregistrer la transaction dans la base de données
         Transaction::create([
-            'user_id' => $user->id, // ID du client
+            'user_id' => $client->id,  // ID du client
             'type' => 'retrait',
             'montant' => $request->montant,
             'frais' => 0, // Ajoutez la logique pour les frais si nécessaire
             'commission' => 0, // Ajoutez la logique pour la commission si nécessaire
             'etat' => 'terminee',
-            'motif' => 'Retrait effectué',
+            'motif' => 'Retrait effectué par distributeur',
             'date' => now(),
         ]);
 
+        // 10. Valider la transaction SQL
         DB::commit();
 
-        // Redirection avec un message de succès
-        return redirect()->route('distributeurs.afficher_Historique')->with('message', 'Retrait effectué avec succès');
+        // 11. Redirection avec un message de succès
+        return redirect()->route('distributeurs.afficher_Historique')->with('message', 'Retrait effectué avec succès.');
+
     } catch (ModelNotFoundException $e) {
         DB::rollBack();
-        return redirect()->route('distributeurs.afficher_Historique')->with('error', 'Compte non trouvé');
+        return redirect()->route('distributeurs.afficher_Historique')->with('error', 'Compte non trouvé.');
     } catch (\Exception $e) {
         DB::rollBack();
-        return redirect()->route('distributeurs.afficher_Historique')->with('error', 'Erreur lors du retrait');
+        // \Log::error('Erreur lors du retrait: ' . $e->getMessage());
+        return redirect()->route('distributeurs.afficher_Historique')->with('error', 'Erreur lors du retrait.');
     }
 }
 
@@ -342,11 +358,30 @@ public function effectuerRetrait(Request $request)
 public function afficherHistorique() 
 {
     try {
-        // Récupérer les transactions avec les utilisateurs et les comptes
+        // Récupérer l'utilisateur connecté (distributeur)
+        $distributeur = auth()->user();
+
+        // Vérifier que l'utilisateur est bien connecté et a le rôle distributeur
+        if (!$distributeur || $distributeur->role !== 'distributeur') {
+            return redirect()->back()->with('error', 'Accès non autorisé.');
+        }
+
+        // Récupérer le compte associé au distributeur connecté
+        $compte = Compte::where('user_id', $distributeur->id)->first();
+
+        // Vérifier si le compte existe
+        if (!$compte) {
+            return redirect()->back()->with('error', 'Aucun compte associé trouvé.');
+        }
+
+        // Récupérer le solde du compte
+        $solde = $compte->solde;
+
+        // Récupérer les transactions effectuées par le distributeur connecté
         $transactions = Transaction::join('users', 'transactions.user_id', '=', 'users.id')
             ->join('comptes', 'users.id', '=', 'comptes.user_id')
             ->select([
-                'transactions.id', // Ajout de l'ID pour les modales
+                'transactions.id', 
                 'transactions.type as type_transaction',
                 'transactions.montant',
                 'transactions.created_at',
@@ -355,18 +390,24 @@ public function afficherHistorique()
                 'users.photo',
                 'comptes.numero_compte'
             ])
-            ->where('users.role', 'distributeur')
+            // Filtrer par l'ID du distributeur dans les transactions
+            ->where('transactions.user_id', $distributeur->id) // Changez ceci pour filtrer par le user_id des transactions
             ->orderBy('transactions.created_at', 'desc')
             ->get();
 
-        // Debug pour voir les données récupérées
-        // \Log::info('Transactions récupérées:', ['count' => $transactions->count()]);
-        //dd($transactions);
-        return view('dashboard.dashboard-distributeur', ['transactions' => $transactions]);
+        // Passer les transactions et le solde à la vue
+        return view('dashboard.dashboard-distributeur', [
+            'transactions' => $transactions,
+            'solde' => $solde
+        ]);
 
     } catch (\Exception $e) {
-        // \Log::error('Erreur dans afficherHistorique: ' . $e->getMessage());
-        return view('dashboard.dashboard-distributeur')->with('error', 'Une erreur est survenue lors du chargement des transactions.');
+        // Gestion des erreurs
+       // \Log::error('Erreur dans afficherHistorique: ' . $e->getMessage());
+        return view('dashboard.dashboard-distributeur')
+            ->with('error', 'Une erreur est survenue lors du chargement des transactions.');
     }
 }
+
+
 }

@@ -12,6 +12,8 @@ use App\Models\User;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
+
 
 class ClientController extends Controller
 {
@@ -42,84 +44,86 @@ class ClientController extends Controller
  */
 public function transfertEntreClients(Request $request)
 {
+
+    // Récupérer le type de transaction à filtrer (s'il existe)
+    $typeTransaction = $request->query('type_transaction');
+
+    // Récupérer les transactions avec un filtre optionnel
+    $transactions = Transaction::when($typeTransaction, function ($query, $typeTransaction) {
+        return $query->where('type_transaction', $typeTransaction);
+    })->get();
+
+    // Retourner la vue avec les transactions filtrées
+    return view('clients.historiques', compact('transactions'));
     // Valider les données d'entrée
     $request->validate([
-        'numero_compte_source' => 'required|string',
-        'numero_compte_destination' => 'required|string',
+        'numero_compte_destination' => 'required|string|exists:comptes,numero_compte',
         'montant' => 'required|numeric|min:0.01',
     ]);
 
     DB::beginTransaction();
 
     try {
-        // Récupérer le compte source de l'utilisateur authentifié
-        $compteSource = Compte::where('numero_compte', $request->numero_compte_source)->firstOrFail();
-        // $compteSource = Compte::where('user_id', auth()->id())->firstOrFail();
+        // Récupérer le compte source (de l'utilisateur connecté)
+        $compteSource = Compte::where('user_id', auth()->id())->firstOrFail();
 
-        // Rechercher le compte de destination
+        // Récupérer le compte destinataire
         $compteDestination = Compte::where('numero_compte', $request->numero_compte_destination)->firstOrFail();
 
-        // Récupérer les utilisateurs associés aux comptes
-        $userSource = User::findOrFail($compteSource->user_id);
-        $userDestination = User::findOrFail($compteDestination->user_id);
-
-        // Vérifier que le compte source appartient à un client
-        if (!$userSource->isClient()) {
-            return redirect()->route('clients.afficher_Historiques_clients')->with('message', 'Le compte source doit appartenir à un client valide');
-        }
-
-        // Vérifier que le compte source a un solde suffisant
-        if ($compteSource->solde < $request->montant) {
-            return redirect()->route('clients.afficher_Historiques_clients')->with('message', 'Solde insuffisant dans le compte source');
-        }
-
-        // Calculer la commission (2 % du montant transféré)
+        // Calcul des frais (2%) et du montant net à transférer
         $commission = $request->montant * 0.02;
-
-        // Effectuer le transfert en déduisant le montant du compte source
         $montantNet = $request->montant - $commission;
+
+        // Vérifier le solde du compte source
+        if ($compteSource->solde < $request->montant) {
+            return back()->with('message', 'Solde insuffisant dans le compte source.');
+        }
+
+        // Mettre à jour les soldes
         $compteSource->solde -= $request->montant;
         $compteSource->save();
 
-        // Créditez le montant net au compte de destination
         $compteDestination->solde += $montantNet;
         $compteDestination->save();
 
         // Enregistrer les transactions
         Transaction::create([
-            'user_id' => $userSource->id,
+            'user_id' => $compteSource->user_id,
             'type' => 'retrait',
             'montant' => $request->montant,
-            'frais' => $commission, // Ajoutez la logique pour les frais si nécessaire
-            'commission' => $commission,
+            'frais' => $commission,
             'etat' => 'terminee',
-            'motif' => 'Transfert vers le compte ' . $compteDestination->numero_compte,
+            'motif' => 'Transfert vers ' . $compteDestination->numero_compte,
             'date' => now(),
         ]);
 
         Transaction::create([
-            'user_id' => $userDestination->id,
+            'user_id' => $compteDestination->user_id,
             'type' => 'depot',
-            'montant' => $request->montant,
-            'frais' => 0,
-            'commission' => 0,
+            'montant' => $montantNet,
             'etat' => 'terminee',
-            'motif' => 'Transfert depuis le compte ' . $compteSource->numero_compte,
+            'motif' => 'Transfert depuis ' . $compteSource->numero_compte,
             'date' => now(),
         ]);
 
         DB::commit();
 
-        // Redirection avec message de succès
-        return redirect()->route('clients.afficher_Historiques_clients')->with('message', 'Transfert effectué avec succès. Votre commission pour cette transaction : ' . number_format($commission, 2, ',', ' ') . ' Fcfa');
+        // Redirection avec un message de succès
+        return redirect()->route('clients.afficher_Historiques_clients')
+                         ->with('message', 'Transfert effectué avec succès.');
+
     } catch (ModelNotFoundException $e) {
         DB::rollBack();
-        return redirect()->route('clients.afficher_Historiques_clients')->with('error', 'Compte non trouvé');
+        return back()->with('error', 'Compte non trouvé: ' . $e->getMessage());
     } catch (\Exception $e) {
         DB::rollBack();
-        return redirect()->route('clients.afficher_Historiques_clients')->with('error', 'Erreur lors du transfert');
+        return back()->with('error', 'Erreur lors du transfert: ' . $e->getMessage());
     }
 }
+
+
+
+
 
     /**
      * Voir les transactions du client.
@@ -153,12 +157,22 @@ public function afficherHistoriqueClients()
             ->orderBy('transactions.created_at', 'desc')
             ->get();
 
+        // Récupérer le client connecté
+        $client = Auth::user();
+
+        // Vérifier si le client a un compte et récupérer le solde
+        $compte = Compte::where('user_id', $client->id)->first();
+        $solde = $compte ? $compte->solde : 0; // Assurez-vous que le compte existe
+
         // Déboguer pour vérifier les données récupérées
         // \Log::info('Transactions clients récupérées:', ['count' => $transactions->count()]);
         // dd($transactions);
 
         // Renvoyer la vue pour les clients (modifiez le nom de la vue si nécessaire)
-        return view('dashboard.dashboard-client', ['transactions' => $transactions]);
+        return view('dashboard.dashboard-client', [
+            'transactions' => $transactions,
+            'solde' => $solde // Passer le solde à la vue
+        ]);
 
     } catch (\Exception $e) {
         // Journaliser l'erreur
@@ -166,5 +180,6 @@ public function afficherHistoriqueClients()
         return view('dashboard.dashboard-client')->with('error', 'Une erreur est survenue lors du chargement des transactions.');
     }
 }
+
 
 }
