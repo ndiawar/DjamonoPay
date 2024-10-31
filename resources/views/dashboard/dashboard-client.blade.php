@@ -50,7 +50,13 @@
                     </div>
 
                     <!-- Bouton pour transférer (ouvre le modal) -->
-                   
+                    <!-- Bouton pour transférer (ouvre le modal) -->
+                    <div class="mb-2 text-center">
+                        <div class="icon-circle d-flex justify-content-center align-items-center mx-auto" data-bs-toggle="modal" data-bs-target="#transferModal" style="width: 40px; height: 40px; border-radius: 50%; background-color: #003f6b;">
+                            <i class="fs-5 bi bi-send-fill text-white"></i>
+                        </div>
+                        <span class="d-block mt-1 text-muted">Envoyer</span>
+                    </div>
                 </div>
                 <!-- Modal pour le transfert -->
                <div class="modal fade" id="transferModal" tabindex="-1" aria-labelledby="transferModalLabel" aria-hidden="true">
