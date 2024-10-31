@@ -205,7 +205,7 @@ class TransactionController extends Controller
                 'totalTransfert' => $totalTransfert,
             ]);
     
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return view('dashboard.dashboard-transactions')
                 ->with('error', 'Une erreur est survenue lors du chargement des transactions.');
         }

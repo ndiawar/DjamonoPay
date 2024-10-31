@@ -42,88 +42,90 @@ class ClientController extends Controller
  * Transfert entre deux clients effectué par un client
  *
  */
-public function transfertEntreClients(Request $request)
-{
 
-    // Récupérer le type de transaction à filtrer (s'il existe)
-    $typeTransaction = $request->query('type_transaction');
+    /**
+     * Transfert entre deux clients effectué par un client
+     */
+    public function transfertEntreClients(Request $request)
+    {
+        // Valider les données d'entrée
+        $request->validate([
+            'numero_compte_destination' => 'required|string|exists:comptes,numero_compte',
+            'montant' => 'required|numeric|min:0.01',
+        ]);
 
-    // Récupérer les transactions avec un filtre optionnel
-    $transactions = Transaction::when($typeTransaction, function ($query, $typeTransaction) {
-        return $query->where('type_transaction', $typeTransaction);
-    })->get();
+        DB::beginTransaction();
 
-    // Retourner la vue avec les transactions filtrées
-    return view('clients.historiques', compact('transactions'));
-    // Valider les données d'entrée
-    $request->validate([
-        'numero_compte_destination' => 'required|string|exists:comptes,numero_compte',
-        'montant' => 'required|numeric|min:0.01',
-    ]);
+        try {
+            // Récupérer le compte source (de l'utilisateur connecté)
+            $compteSource = Compte::where('user_id', auth()->id())->firstOrFail();
 
-    DB::beginTransaction();
+            // Récupérer le compte destinataire
+            $compteDestination = Compte::where('numero_compte', $request->numero_compte_destination)->firstOrFail();
 
-    try {
-        // Récupérer le compte source (de l'utilisateur connecté)
-        $compteSource = Compte::where('user_id', auth()->id())->firstOrFail();
+            // Vérifier si le compte source et le compte destinataire sont identiques
+            if ($compteSource->user_id === $compteDestination->user_id) {
+                return back()->with('warning', 'Vous ne pouvez pas transférer de l\'argent vers votre propre compte.');
+            }
 
-        // Récupérer le compte destinataire
-        $compteDestination = Compte::where('numero_compte', $request->numero_compte_destination)->firstOrFail();
+            // Vérifier le solde du compte source
+            if ($compteSource->solde < $request->montant) {
+                return back()->with('message', 'Solde insuffisant dans le compte source.');
+            }
 
-        // Calcul des frais (2%) et du montant net à transférer
-        $commission = $request->montant * 0.02;
-        $montantNet = $request->montant - $commission;
+            // Calcul des frais (2%) et du montant net à transférer
+            $commission = $request->montant * 0.02;
+            $montantNet = $request->montant - $commission;
 
-        // Vérifier le solde du compte source
-        if ($compteSource->solde < $request->montant) {
-            return back()->with('message', 'Solde insuffisant dans le compte source.');
+            // Mettre à jour les soldes
+            $compteSource->solde -= $request->montant;
+            $compteSource->save();
+
+            $compteDestination->solde += $montantNet;
+            $compteDestination->save();
+
+            // Enregistrer les transactions
+            Transaction::create([
+                'user_id' => $compteSource->user_id,
+                'type' => 'retrait',
+                'montant' => $request->montant,
+                'frais' => $commission,
+                'etat' => 'terminee',
+                'motif' => 'Transfert vers ' . $compteDestination->numero_compte,
+                'date' => now(),
+            ]);
+
+            Transaction::create([
+                'user_id' => $compteDestination->user_id,
+                'type' => 'depot',
+                'montant' => $montantNet,
+                'etat' => 'terminee',
+                'motif' => 'Transfert depuis ' . $compteSource->numero_compte,
+                'date' => now(),
+            ]);
+
+            DB::commit();
+
+            // Récupérer le type de transaction à filtrer (s'il existe)
+            $typeTransaction = $request->query('type_transaction');
+
+            // Récupérer les transactions avec un filtre optionnel
+            $transactions = Transaction::when($typeTransaction, function ($query, $typeTransaction) {
+                return $query->where('type_transaction', $typeTransaction);
+            })->get();
+
+            // Retourner la vue avec les transactions filtrées
+            return view('dashboard.dashboard-client', compact('transactions'))
+                ->with('message', 'Transfert effectué avec succès.');
+
+        } catch (ModelNotFoundException $e) {
+            DB::rollBack();
+            return back()->with('error', 'Compte non trouvé: ' . $e->getMessage());
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return back()->with('error', 'Erreur lors du transfert: ' . $e->getMessage());
         }
-
-        // Mettre à jour les soldes
-        $compteSource->solde -= $request->montant;
-        $compteSource->save();
-
-        $compteDestination->solde += $montantNet;
-        $compteDestination->save();
-
-        // Enregistrer les transactions
-        Transaction::create([
-            'user_id' => $compteSource->user_id,
-            'type' => 'retrait',
-            'montant' => $request->montant,
-            'frais' => $commission,
-            'etat' => 'terminee',
-            'motif' => 'Transfert vers ' . $compteDestination->numero_compte,
-            'date' => now(),
-        ]);
-
-        Transaction::create([
-            'user_id' => $compteDestination->user_id,
-            'type' => 'depot',
-            'montant' => $montantNet,
-            'etat' => 'terminee',
-            'motif' => 'Transfert depuis ' . $compteSource->numero_compte,
-            'date' => now(),
-        ]);
-
-        DB::commit();
-
-        // Redirection avec un message de succès
-        return redirect()->route('clients.afficher_Historiques_clients')
-                         ->with('message', 'Transfert effectué avec succès.');
-
-    } catch (ModelNotFoundException $e) {
-        DB::rollBack();
-        return back()->with('error', 'Compte non trouvé: ' . $e->getMessage());
-    } catch (\Exception $e) {
-        DB::rollBack();
-        return back()->with('error', 'Erreur lors du transfert: ' . $e->getMessage());
     }
-}
-
-
-
-
 
     /**
      * Voir les transactions du client.

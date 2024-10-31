@@ -65,7 +65,7 @@
                     <div class="mb-3">
                         <form method="GET" action="{{ route('dashboard-transactions') }}">
                             <label for="type_transaction">Filtrer par type de transaction :</label>
-                            <select name="type_transaction" id="type_transaction" class="form-select" onchange="this.form.submit()">
+                            <select name="type_transaction" id="type_transaction" class="form-select w-25" onchange="this.form.submit()">
                                 <option value="">Tous</option>
                                 <option value="depot" {{ request('type_transaction') == 'depot' ? 'selected' : '' }}>Dépôt</option>
                                 <option value="retrait" {{ request('type_transaction') == 'retrait' ? 'selected' : '' }}>Retrait</option>

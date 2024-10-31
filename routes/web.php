@@ -181,9 +181,9 @@ Route::prefix('transactions')->middleware('auth')->name('transactions.')->group(
 /**
  * Routes pour la gestion des CLients.
  */
-Route::prefix('clients')->group(function () {
-    Route::post('/transfert-clients', [ClientController::class, 'transfertEntreClients'])->name('clients.transfert_clients');
-});   
+// Route::prefix('clients')->group(function () {
+//     Route::post('/transfert-clients', [ClientController::class, 'transfertEntreClients'])->name('clients.transfert_clients');
+// });   
 /**
  * Routes pour le système de log.
  */
