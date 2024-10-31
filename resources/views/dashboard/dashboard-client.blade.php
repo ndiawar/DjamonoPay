@@ -30,7 +30,8 @@
                 <div class="card p-3" style="width: 35rem; margin: auto;">
                     <!-- Solde masqué/affiché -->
                     <h3 id="balance" class="text-center">
-                    <span id="balanceValue">{{ number_format(Auth::user()->solde, 0, ',', ' ') }} F</span>
+                        <span id="balanceValue">{{ number_format($solde, 0, ',', ' ') }} F</span>
+
                     <i class="text-dark bi bi-eye-slash" id="toggleBalance" onclick="toggleBalance()" style="cursor:pointer;"></i>
                     </h3>
 
@@ -49,158 +50,134 @@
                     </div>
 
                     <!-- Bouton pour transférer (ouvre le modal) -->
-                    <div class="mb-2 text-center">
-                        <div class="icon-circle d-flex justify-content-center align-items-center mx-auto" data-bs-toggle="modal" data-bs-target="#transferModal" style="width: 40px; height: 40px; border-radius: 50%; background-color: #003f6b;">
-                            <i class="fs-5 bi bi-send-fill text-white"></i>
-                        </div>
-                        <span class="d-block mt-1 text-muted">Envoyer</span>
-                    </div>
+                   
                 </div>
                 <!-- Modal pour le transfert -->
-                <div class="modal fade" id="transferModal" tabindex="-1" aria-labelledby="transferModalLabel" aria-hidden="true">
-                    <div class="modal-dialog">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title" id="transferModalLabel">Effectuer un transfert</h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+               <div class="modal fade" id="transferModal" tabindex="-1" aria-labelledby="transferModalLabel" aria-hidden="true">
+             <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="transferModalLabel">Effectuer un transfert</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form action="{{ route('clients.transfert_clients') }}" method="POST" id="transferForm">
+                            @csrf
+
+                            <div class="mb-3">
+                                <label for="numero_compte_destination" class="form-label">Numéro du client destinataire</label>
+                                <input type="text" class="form-control" id="numero_compte_destination" name="numero_compte_destination" required>
+                                <div class="invalid-feedback" id="numero_compte_destination-error"></div>
                             </div>
-                            <div class="modal-body">
-                                <form action="{{ route('clients.transfert_clients') }}" method="POST" id="transferForm">
-                                    @csrf
-                                    <div class="mb-3">
-                                        <label for="numero_compte_source" class="form-label">Source</label>
-                                        <input type="text" class="form-control" id="numero_compte_source" name="numero_compte_source" value="{{ Auth::user()->numero_compte ?? '' }}" required>
-                                        <div class="invalid-feedback" id="numero_compte_source-error"></div>
-                                    </div>
-                                    <div class="mb-3">
-                                        <label for="numero_compte_destination" class="form-label">Destinataire</label>
-                                        <input type="text" class="form-control" id="numero_compte_destination" name="numero_compte_destination" required>
-                                        <div class="invalid-feedback" id="numero_compte_destination-error"></div>
-                                    </div>
 
-                                    <div class="mb-3">
-                                        <label for="montant_envoye" class="form-label">Montant à envoyer (incluant les frais de 2%)</label>
-                                        <input type="number" class="form-control" id="montant_envoye" name="montant" required step="0.01" min="0">
-                                        <div class="invalid-feedback" id="mmontant_envoye-error"></div>
-                                    </div>
-
-                                    <div class="mb-3">
-                                        <label for="montant_recu" class="form-label">Montant à recevoir (hors frais)</label>
-                                        <input type="number" class="form-control" id="montant_recu" step="0.01" min="0">
-                                    </div>
-
-                                    <div class="alert alert-info mt-2" id="frais-info" style="display: none;">
-                                        Frais de transfert (2%): <span id="frais-montant">0</span> FCFA
-                                    </div>
-
-                                    <button type="submit" class="btn btn-secondary btn-custom me-2" id="submitTransfer">Envoyer</button>
-                                </form>
+                            <div class="mb-3">
+                                <label for="montant_envoye" class="form-label">Montant à envoyer (incluant les frais de 2%)</label>
+                                <input type="number" class="form-control" id="montant_envoye" name="montant" required step="0.01" min="0">
+                                <div class="invalid-feedback" id="montant_envoye-error"></div>
                             </div>
-                        </div>
+
+                            <div class="mb-3">
+                                <label for="montant_recu" class="form-label">Montant à recevoir (hors frais)</label>
+                                <input type="number" class="form-control" id="montant_recu" required step="0.01" min="0">
+                            </div>
+
+                            <div class="alert alert-info mt-2" id="frais-info" style="display: none;">
+                                Frais de transfert (2%): <span id="frais-montant">0</span> FCFA
+                            </div>
+
+                            <button type="submit" class="btn btn-secondary btn-custom me-2" id="submitTransfer">Envoyer</button>
+                        </form>
                     </div>
                 </div>
+    </div>
+</div>
+
+                
+                
 
                 
             </div>
             <div class="card-body">
                 <div class="table-responsive user-datatable">
-                <table class="table">
-                                    
-                                    <thead class="table-light">
-                                        <tr>
-                                            <th class="align-middle">Photo</th>
-                                            <th class="align-middle">Clients</th>
-                                            <th class="align-middle">Numéro Compte</th>
-                                            <th class="align-middle">Montant</th>
-                                            <th class="align-middle">Type_Transaction</th>
-                                            <th class="align-middle">Action</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @if(isset($transactions) && count($transactions) > 0)
-                                            @foreach($transactions as $transaction)
-                                                <tr>
-                                                    <td class="align-middle">
-                                                        @if($transaction->photo)
-                                                            <img src="{{ asset('storage/' . $transaction->photo) }}" 
-                                                                alt="Photo" 
-                                                                class="rounded-circle"
-                                                                style="width: 50px; height: 50px; object-fit: cover;">
-                                                        @else
-                                                            <img src="{{ asset('assets/images/user.jpg') }}" 
-                                                                alt="Default" 
-                                                                class="rounded-circle"
-                                                                style="width: 50px; height: 50px; object-fit: cover;">
-                                                        @endif
-                                                    </td>
-                                                    <td class="align-middle">
-                                                        <div class="d-flex flex-column">
-                                                            <span class="fw-bold">{{ $transaction->nom }} {{ $transaction->prenom }}</span>
-                                                            <!-- <span class="text-muted small">{{ $transaction->prenom }}</span> -->
+                    <table class="table">
+                        <thead class="table-light">
+                            <tr>
+                                <th class="align-middle">Photo</th>
+                                <th class="align-middle">Clients</th>
+                                <th class="align-middle">Numéro Compte</th>
+                                <th class="align-middle">Montant</th>
+                                <th class="align-middle">Type_Transaction</th>
+                                <th class="align-middle">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if(isset($transactions) && count($transactions) > 0)
+                                @foreach($transactions as $transaction)
+                                    <tr>
+                                        <td class="align-middle">
+                                            @if($transaction->photo)
+                                                <img src="{{ asset('storage/' . $transaction->photo) }}" 
+                                                    alt="Photo" 
+                                                    class="rounded-circle"
+                                                    style="width: 50px; height: 50px; object-fit: cover;">
+                                            @else
+                                                <img src="{{ asset('assets/images/user.jpg') }}" 
+                                                    alt="Default" 
+                                                    class="rounded-circle"
+                                                    style="width: 50px; height: 50px; object-fit: cover;">
+                                            @endif
+                                        </td>
+                                        <td class="align-middle">{{ $transaction->nom }} {{ $transaction->prenom }}</td>
+                                        <td class="align-middle">{{ $transaction->numero_compte }}</td>
+                                        <td class="align-middle">
+                                            <span class="fw-bold {{ $transaction->type_transaction == 'depot' ? 'text-success' : 'text-primary' }}">
+                                                {{ number_format($transaction->montant, 0, ',', ' ') }} FCFA
+                                            </span>
+                                        </td>
+                                        <td class="align-middle">
+                                            <span class="badge {{ $transaction->type_transaction == 'depot' ? 'bg-success' : 'bg-primary' }}">
+                                                {{ ucfirst($transaction->type_transaction) }}
+                                            </span>
+                                        </td>
+                                        <td class="align-middle">
+                                            <button type="button" 
+                                                    class="btn btn-info btn-sm"
+                                                    data-bs-toggle="modal" 
+                                                    data-bs-target="#detailsModal{{ $transaction->id }}"
+                                                    title="Voir détails">
+                                                <i class="bi bi-eye"></i>
+                                            </button>
+                    
+                                            <div class="modal fade" id="detailsModal{{ $transaction->id }}" tabindex="-1">
+                                                <div class="modal-dialog modal-dialog-centered">
+                                                    <div class="modal-content">
+                                                        <div class="modal-header">
+                                                            <h5 class="modal-title">Détails de la transaction</h5>
+                                                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                                                         </div>
-                                                    </td>
-                                                    <td class="align-middle">
-                                                        <span class="d-none d-md-inline">{{ $transaction->numero_compte }}</span>
-                                                    </td>
-                                                    <td class="align-middle">
-                                                        <span class="fw-bold {{ $transaction->type_transaction == 'depot' ? 'text-success' : 'text-primary' }}">
-                                                            {{ number_format($transaction->montant, 0, ',', ' ') }} FCFA
-                                                        </span>
-                                                    </td>
-                                                    <td class="align-middle">
-                                                        <span class="badge {{ $transaction->type_transaction == 'depot' ? 'bg-success' : 'bg-primary' }}">
-                                                            {{ ucfirst($transaction->type_transaction) }}
-                                                        </span>
-                                                    </td>
-                                                    <td class="align-middle">
-                                                    <div class="d-flex gap-2">
-    <!-- Bouton détails -->
-    <button type="button" 
-            class="btn btn-info btn-sm"
-            data-bs-toggle="modal" 
-            data-bs-target="#detailsModal{{ $transaction->id }}"
-            title="Voir détails">
-        <i class="bi bi-eye"></i> <!-- Icône de l'œil pour voir les détails -->
-    </button>
-
-    
-
-
-                                                        <!-- Modal Détails -->
-                                                        <div class="modal fade" id="detailsModal{{ $transaction->id }}" tabindex="-1">
-                                                            <div class="modal-dialog modal-dialog-centered">
-                                                                <div class="modal-content">
-                                                                    <div class="modal-header">
-                                                                        <h5 class="modal-title">Détails de la transaction</h5>
-                                                                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                                                                    </div>
-                                                                    <div class="modal-body">
-                                                                        <p><strong>Distributeur :</strong> {{ $transaction->nom }} {{ $transaction->prenom }}</p>
-                                                                        <p><strong>Numéro de compte :</strong> {{ $transaction->numero_compte }}</p>
-                                                                        <p><strong>Type :</strong> {{ ucfirst($transaction->type_transaction) }}</p>
-                                                                        <p><strong>Montant :</strong> {{ number_format($transaction->montant, 0, ',', ' ') }} FCFA</p>
-                                                                    </div>
-                                                                    <div class="modal-footer">
-                                                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
+                                                        <div class="modal-body">
+                                                            <p><strong>Distributeur :</strong> {{ $transaction->nom }} {{ $transaction->prenom }}</p>
+                                                            <p><strong>Numéro de compte :</strong> {{ $transaction->numero_compte }}</p>
+                                                            <p><strong>Type :</strong> {{ ucfirst($transaction->type_transaction) }}</p>
+                                                            <p><strong>Montant :</strong> {{ number_format($transaction->montant, 0, ',', ' ') }} FCFA</p>
                                                         </div>
-
-                                                      
-                                                                </div>
-                                                            </div>
+                                                        <div class="modal-footer">
+                                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
                                                         </div>
-                                                    </td>
-                                                </tr>
-                                            @endforeach
-                                        @else
-                                            <tr>
-                                                <td colspan="6" class="text-center">Aucune transaction trouvée</td>
-                                            </tr>
-                                        @endif
-                                    </tbody>
-                                </table>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            @else
+                                <tr>
+                                    <td colspan="6" class="text-center">Aucune transaction trouvée</td>
+                                </tr>
+                            @endif
+                        </tbody>
+                    </table>
+                    
                 </div>
             </div>
           </div>
@@ -217,13 +194,18 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
+// Supposons que vous ayez une variable pour le solde dynamique
+const soldeDynamique = '{{ number_format($solde, 0, ',', ' ') }} F'; // Valeur récupérée du backend
+
 function toggleBalance() {
     const balance = document.getElementById('balanceValue');
     const icon = document.getElementById('toggleBalance');
 
+    // Vérifier si le solde est actuellement affiché ou non
     if (balance.style.display === 'none') {
-        balance.style.display = 'inline';
-        balance.textContent = '1542789 F'; // Rétablir la valeur
+        // Afficher le solde
+        balance.style.display = 'inline'; 
+        balance.textContent = soldeDynamique; // Remplacez par la valeur dynamique
         icon.className = 'text-dark bi bi-eye-slash'; // Icône œil fermé
 
         // Supprimer les points si affichés
@@ -232,16 +214,41 @@ function toggleBalance() {
             hiddenBalance.remove();
         }
     } else {
-        balance.style.display = 'none';
+        // Masquer le solde
+        balance.style.display = 'none'; 
         icon.className = 'text-dark bi bi-eye'; // Icône œil ouvert
 
-        // Vérifier si les points sont déjà affichés
+        // Ajouter des points pour masquer le solde
         if (!document.getElementById('hiddenBalance')) {
-            balance.insertAdjacentHTML('afterend', '<span id="hiddenBalance" style="color: #003f6b;">••••••</span>'); // Ajouter les points
+            balance.insertAdjacentHTML('afterend', '<span id="hiddenBalance" style="color: #003f6b;">••••••</span>');
         }
     }
-
+    
 }
+
+
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const montantEnvoyeInput = document.getElementById('montant_envoye');
+        const montantRecuInput = document.getElementById('montant_recu');
+        const fraisInfo = document.getElementById('frais-info');
+        const fraisMontant = document.getElementById('frais-montant');
+
+        montantEnvoyeInput.addEventListener('input', function () {
+            const montantEnvoye = parseFloat(montantEnvoyeInput.value) || 0;
+            const frais = montantEnvoye * 0.02; // 2% de frais
+            const montantRecu = montantEnvoye - frais;
+
+            fraisMontant.textContent = frais.toFixed(2); // Mettre à jour le montant des frais
+            montantRecuInput.value = montantRecu.toFixed(2); // Mettre à jour le montant reçu
+
+            // Afficher la section des frais si le montant est supérieur à 0
+            fraisInfo.style.display = montantEnvoye > 0 ? 'block' : 'none';
+        });
+    });
+
+
+
 
 //controle de saisies transfert client client
 

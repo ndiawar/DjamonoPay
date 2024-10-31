@@ -28,7 +28,7 @@
                         <h3 class="mb-3">Listes des utilisateurs</h3>
                         <div class="row w-75 mt-5 justify-content-center">
                             <div class="col-md-4">
-                                <div class="w-75 border-start border-5  card small-widget">
+                                <div class="w-75 border-start border-5 card small-widget">
                                     <div class="bg-gradient">
                                         <svg class="stroke-icon svg-fill">
                                             <use href="{{ asset('assets/svg/icon-sprite.svg#pending-order') }}"></use>
@@ -41,14 +41,14 @@
                                     <div class="card-body primary">
                                         <span class="f-light pt-2 fs-6">Nombre de Clients</span>
                                         <div class="d-flex align-items-end gap-1 pt-4">
-                                            <h6 class="fs-2">1.258</h6>
+                                            <h6 class="fs-2">{{ $nombreClients }}</h6>
                                         </div>
-                                        
                                     </div>
                                 </div>
                             </div>
+                        
                             <div class="col-md-4">
-                                <div class="w-75 border-start border-5  card small-widget">
+                                <div class="w-75 border-start border-5 card small-widget">
                                     <div class="bg-gradient">
                                         <svg class="stroke-icon svg-fill">
                                             <use href="{{ asset('assets/svg/icon-sprite.svg#pending-order') }}"></use>
@@ -61,14 +61,14 @@
                                     <div class="card-body primary">
                                         <span class="f-light pt-2 fs-6">Nombre de Distributeurs</span>
                                         <div class="d-flex align-items-end gap-1 pt-4">
-                                            <h6 class="fs-2">1.258</h6>
+                                            <h6 class="fs-2">{{ $nombreDistributeurs }}</h6>
                                         </div>
-                                        
                                     </div>
                                 </div>
                             </div>
+                        
                             <div class="col-md-4">
-                                <div class="w-75 border-start border-5  card small-widget">
+                                <div class="w-75 border-start border-5 card small-widget">
                                     <div class="bg-gradient">
                                         <svg class="stroke-icon svg-fill">
                                             <use href="{{ asset('assets/svg/icon-sprite.svg#pending-order') }}"></use>
@@ -79,15 +79,15 @@
                                         </span>
                                     </div>
                                     <div class="card-body primary">
-                                        <span class="f-light pt-2 fs-6">Nombre de Agents</span>
+                                        <span class="f-light pt-2 fs-6">Nombre d'Agents</span>
                                         <div class="d-flex align-items-end gap-1 pt-4">
-                                            <h6 class="fs-2">1.258</h6>
+                                            <h6 class="fs-2">{{ $nombreAgents }}</h6>
                                         </div>
-                                        
                                     </div>
                                 </div>
                             </div>
                         </div>
+                        
                     </div>
                     <div class="card-body">
                         <div class="table-responsive user-datatable">
@@ -98,13 +98,12 @@
                                     <th>Nom</th>
                                     <th>Numero_Compte</th>
                                     <th>Role</th>
-                                    <th>Solde</th>
                                     <th>État compte</th>
                                     <th>Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                @foreach($users as $user)
+                                @foreach ($users as $user)
                                     @foreach($user->comptes as $compte) <!-- Itère sur les comptes de chaque utilisateur -->
                                         <tr>
                                             <td>
@@ -121,11 +120,11 @@
                                                 @endif
                                             </td>
                                             <td>{{ $user->nom }} {{ $user->prenom }}</td>
-                                            <td>{{ $compte->numero }}</td> <!-- Utilise le numéro de compte du compte associé -->
-                                            <td>{{ $user->nom }} {{ $user->prenom }}</td> 
                                             <td>{{ $compte->numero_compte }}</td> <!-- Utilise le numéro de compte du compte associé -->
-                                            <td>{{ $user->role }}</td>
-                                            <td>{{ number_format($compte->solde ?? 0, 0, ',', ' ') }} FCFA</td>
+                                            <td>{{ $user->role }}</td> 
+                                           
+                                            <td>{{ $user->etat_compte }}</td>
+                                           
                                             <td>
                                                 <span class="badge {{ $user->etat_compte == 'actif' ? 'bg-success' : 'bg-warning' }}">
                                                     {{ ucfirst($user->etat_compte) }}

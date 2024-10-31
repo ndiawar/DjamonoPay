@@ -48,8 +48,9 @@
                                 <div class="d-flex justify-content-between align-items-center text-center">
                                     <div>
                                         <h6 class="text-muted">Solde</h6>
-                                        <h2>$128,320</h2>
+                                        <h2>{{ number_format($solde, 0, ',', ' ') }} FCFA</h2>
                                     </div>
+                                    
                                     <div class="d-flex flex-column align-items-center">
                                         <div class="mb-2">
                                             <div class="icon-circle d-flex justify-content-center align-items-center" style="width: 40px; height: 40px; border-radius: 50%; background-color: #003f6b;"

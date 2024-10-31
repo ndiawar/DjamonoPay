@@ -44,11 +44,13 @@ Route::middleware('auth')->prefix('dashboard')->group(function () {
     Route::view('dashboard-approvisionner', 'dashboard.dashboard-approvisionner')->name('dashboard-approvisionner');
     route::get('dashboard-approvisionner', [DistributeurController::class, 'afficherDistributeurs'])->name('dashboard-approvisionner');
     route::get('dashboard-utilisateurs', [UserController::class, 'afficherUsers'])->name('dashboard-utilisateurs');
-    Route::view('profile', 'dashboard.profile_update')->name('profile');
+    Route::view('profile', 'dashboard.profile')->name('profile');
     Route::get('/dashboard-distributeur', [DistributeurController::class, 'afficherHistorique'])->name('distributeurs.afficher_Historique');
     Route::get('/dashboard-client', [ClientController::class, 'afficherHistoriqueClients'])->name('clients.afficher_Historiques_clients');
     Route::get('/bilan-global', [TransactionController::class, 'bilanGlobal'])->name('bilan.global');
     Route::get('index',  [TransactionController::class, 'index'])->name('index');
+    // Route pour afficher l'historique des transactions
+Route::get('/dashboard-transactions', [TransactionController::class, 'afficherHistorique'])->name('dashboard-transactions');
 
    
 });
@@ -101,6 +103,7 @@ Route::middleware('auth')->prefix('agent')->group(function () {
     Route::post('/crediter-compte-distributeur/', [AgentController::class, 'crediterCompteDistributeur'])->name('agents.crediter_compte_distributeur');
     Route::post('/crediter-rapide-distributeur/', [AgentController::class, 'crediterRapideDistributeur'])->name('agents.crediter_rapide_distributeur');
     Route::post('/bloquer-utilisateur/{userId}', [AgentController::class, 'bloquerOuDebloquerCompte'])->name('agents.bloquer_utilisateur');
+    Route::get('dashboard-transactions', [UserController::class, 'afficherTransactions'])->name('transactions.afficher');
 });
 
 /**
@@ -135,10 +138,9 @@ Route::post('/login', [AuthenticatedSessionController::class, 'store'])->name('l
 /**
  * Routes pour le profil utilisateur.
  */
-Route::middleware('auth')->group(function () {
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::put('/profile/{id}', [ProfileController::class, 'updateUser'])->name('profile.update');
-});
+
+ Route::put('profile/update/{id}', [RegisterController::class, 'update'])->name('profile.update');
+
 
 /**
  * Routes pour la gestion des distributeurs.
@@ -173,6 +175,7 @@ Route::prefix('transactions')->middleware('auth')->name('transactions.')->group(
     // Route::post('/transactions/{transaction}/annuler', [TransactionController::class, 'annulerTransaction'])->name('transactions.annuler');
     Route::get('historique', [TransactionController::class, 'historique'])->name('historique');
     Route::get('statistiques', [TransactionController::class, 'statistiques'])->name('statistiques');
+    
 });
 
 /**
@@ -240,3 +243,8 @@ Route::prefix('clients')->middleware('auth')->group(function () {
     Route::put('/{client}', [ClientController::class, 'update'])->name('clients.update');
     Route::delete('/{client}', [ClientController::class, 'destroy'])->name('clients.destroy');
 });
+
+
+
+
+

@@ -177,4 +177,12 @@ class User extends Authenticatable
     {
         return $this->role === UserRole::AGENT;
     }
+
+  
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
 }

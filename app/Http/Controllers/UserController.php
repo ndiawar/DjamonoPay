@@ -134,10 +134,22 @@ class UserController extends Controller
 
     public function afficherUsers()
     {
-        // Sélectionner tous les utilisateurs et leurs comptes
+        // Récupérer les nombres d'agents, distributeurs et clients
+        $nombreClients = User::where('role', 'client')->count();
+        $nombreDistributeurs = User::where('role', 'distributeur')->count();
+        $nombreAgents = User::where('role', 'agent')->count();
+    
+        // Récupérer tous les utilisateurs et leurs comptes
         $users = User::with('comptes')->get();
-
-        return view('dashboard.dashboard-utilisateurs', compact('users'));
+    
+        // Passer les données à la vue
+        return view('dashboard.dashboard-utilisateurs', compact(
+            'users', 
+            'nombreClients', 
+            'nombreDistributeurs', 
+            'nombreAgents'
+        ));
     }
+    
     
 }

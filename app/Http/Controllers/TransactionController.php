@@ -160,7 +160,59 @@ class TransactionController extends Controller
             return view('dashboard.index', compact('totalMontant', 'totalEnvois', 'totalRetraits', 'montantJournalier', 'montantHebdomadaire', 'montantMensuel'));
         }
     }
-        
+
+    public function afficherHistorique(Request $request)
+    {
+        try {
+            // Récupérer toutes les transactions avec leurs informations associées
+            $query = Transaction::join('users', 'transactions.user_id', '=', 'users.id')
+                ->join('comptes', 'users.id', '=', 'comptes.user_id')
+                ->select([
+                    'transactions.id',
+                    'transactions.type as type_transaction',
+                    'transactions.montant',
+                    'transactions.created_at',
+                    'users.nom',
+                    'users.adresse',
+                    'users.numero_identite',
+                    'users.prenom',
+                    'users.photo',
+                    'comptes.numero_compte'
+                ])
+                ->where('users.role', 'distributeur')
+                ->orderBy('transactions.created_at', 'desc');
     
+            // Appliquer un filtre de type de transaction si spécifié
+            if ($request->has('type_transaction') && $request->type_transaction != '') {
+                $query->where('transactions.type', $request->type_transaction);
+            }
+    
+            $transactions = $query->get();
+    
+            // Calcul des totaux par type de transaction
+            $totalDepot = $transactions->where('type_transaction', 'depot')->sum('montant');
+            $totalRetrait = $transactions->where('type_transaction', 'retrait')->sum('montant');
+            $totalTransfert = $transactions->where('type_transaction', 'transfert')->sum('montant');
+    
+            // Calcul du solde global (exemple : dépôts - retraits)
+            $solde = $totalDepot - $totalRetrait;
+    
+            return view('dashboard.dashboard-transactions', [
+                'transactions' => $transactions,
+                'solde' => $solde,
+                'totalDepot' => $totalDepot,
+                'totalRetrait' => $totalRetrait,
+                'totalTransfert' => $totalTransfert,
+            ]);
+    
+        } catch (\Exception $e) {
+            return view('dashboard.dashboard-transactions')
+                ->with('error', 'Une erreur est survenue lors du chargement des transactions.');
+        }
+    }
     
     }
+    
+
+
+
