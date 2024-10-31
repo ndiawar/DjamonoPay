@@ -34,7 +34,7 @@ Route::get('/distributeur-agent', function () {
  * Groupe de routes pour le tableau de bord.
  */
 Route::middleware('auth')->prefix('dashboard')->group(function () {
-    Route::view('index', 'dashboard.index')->name('index');
+    // Route::view('index', 'dashboard.index')->name('index');
     Route::view('dashboard-transactions', 'dashboard.dashboard-transactions')->name('dashboard-transactions');
     Route::view('dashboard-distributeur', 'dashboard.dashboard-distributeur')->name('dashboard-distributeur');
     Route::get('dashboard-distributeur', [DistributeurController::class, 'index'])->name('dashboard-distributeur');
@@ -47,6 +47,8 @@ Route::middleware('auth')->prefix('dashboard')->group(function () {
     Route::view('profile', 'dashboard.profile_update')->name('profile');
     Route::get('/dashboard-distributeur', [DistributeurController::class, 'afficherHistorique'])->name('distributeurs.afficher_Historique');
     Route::get('/dashboard-client', [ClientController::class, 'afficherHistoriqueClients'])->name('clients.afficher_Historiques_clients');
+    Route::get('/bilan-global', [TransactionController::class, 'bilanGlobal'])->name('bilan.global');
+    Route::get('index',  [TransactionController::class, 'index'])->name('index');
 
    
 });

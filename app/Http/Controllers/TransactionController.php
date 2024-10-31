@@ -6,10 +6,12 @@ use App\Http\Requests\Transaction\StoreTransactionRequest;
 use App\Http\Requests\Transaction\UpdateTransactionRequest;
 use App\Http\Resources\TransactionResource;
 use App\Models\Transaction;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Database\QueryException;
 use Exception;
+use Illuminate\Support\Facades\Auth;
 
 class TransactionController extends Controller
 {
@@ -50,27 +52,12 @@ class TransactionController extends Controller
             $transaction->save();
     
             return redirect()->back()->with('success', 'Transaction annulée avec succès');
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return redirect()->back()->with('error', 'Erreur lors de l\'annulation de la transaction : ' . $e->getMessage());
         }
     }
 
-    /**
-     * Consulte l'historique des transactions d'un utilisateur.
-     */
-    // public function consulterHistorique(Request $request)
-    // {
-    //     try {
-    //         $userId = $request->query('user_id'); // Obtenez l'ID de l'utilisateur depuis la requête
-
-    //         $transactions = Transaction::where('client_id', $userId)->with(['user', 'distributeur'])->get();
-
-    //         return TransactionResource::collection($transactions);
-    //     } catch (Exception $e) {
-    //         return response()->json(['message' => 'Erreur lors de la récupération de l\'historique des transactions : ' . $e->getMessage()], 500);
-    //     }
-    // }
-
+    
     /**
      * Calcule les frais d'une transaction.
      */
@@ -97,6 +84,83 @@ class TransactionController extends Controller
         }
 
         return 0; // Aucun commission par défaut
+    }public function index()
+    {
+        return $this->bilanGlobal();
     }
-
-}
+    public function bilanGlobal()
+    {
+        try {
+            // Récupérer toutes les transactions
+            $transactions = Transaction::all();
+        
+            // Vérification de la récupération des transactions
+            if ($transactions->isEmpty()) {
+                throw new Exception('Aucune transaction trouvée.');
+            }
+        
+            // Calculer le montant total
+            $totalMontant = $transactions->sum('montant');
+        
+            // Calculer les transactions terminées et annulées
+            $totalTerminees = $transactions->where('etat', 'terminee')->sum('montant');
+            $totalAnnulees = $transactions->where('etat', 'annulee')->sum('montant');
+        
+            // Calculer le total des envois et des retraits
+            $totalEnvois = $transactions->where('type', 'depot')->sum('montant');
+            $totalRetraits = $transactions->where('type', 'retrait')->sum('montant');
+        
+            // Calculer les montants journaliers, hebdomadaires et mensuels
+            $montantJournalier = Transaction::whereDate('created_at', now())->sum('montant');
+            $montantHebdomadaire = Transaction::whereBetween('created_at', [now()->startOfWeek(), now()->endOfWeek()])->sum('montant');
+            $montantMensuel = Transaction::whereMonth('created_at', now()->month)->sum('montant');
+        
+            // Récupérer les 5 transactions les plus récentes
+            $transactionsRecentes = Transaction::orderBy('created_at', 'desc')->take(5)->get();
+        
+            // Calculer les pourcentages
+            $pourcentageTerminees = $totalMontant > 0 ? ($totalTerminees / $totalMontant) * 100 : 0;
+            $pourcentageAnnulees = $totalMontant > 0 ? ($totalAnnulees / $totalMontant) * 100 : 0;
+    
+            // Récupérer les transactions par mois
+            $transactionsParMois = Transaction::selectRaw('MONTH(date) as month, YEAR(date) as year, SUM(montant) as total')
+                ->groupBy('month', 'year')
+                ->orderBy('year')
+                ->orderBy('month')
+                ->get();
+    
+            // Préparer les données pour le graphique
+            $months = [];
+            $totals = [];
+            
+            foreach ($transactionsParMois as $transaction) {
+                $months[] = Carbon::createFromFormat('m', $transaction->month)->format('F Y'); // Nom du mois et année
+                $totals[] = $transaction->total;
+            }
+    
+            // Passer les données à la vue
+            return view('dashboard.index', compact(
+                'totalMontant', 
+                'pourcentageTerminees', 
+                'pourcentageAnnulees', 
+                'totalEnvois', 
+                'totalRetraits', 
+                'montantJournalier', 
+                'montantHebdomadaire', 
+                'montantMensuel',
+                'transactionsRecentes', // Ajouter ici
+                'months', // Ajouter ici pour le graphique
+                'totals' // Ajouter ici pour le graphique
+            ));
+        } catch (QueryException $e) {
+            logger('Erreur de requête: ' . $e->getMessage());
+            return view('dashboard.index', compact('totalMontant', 'totalEnvois', 'totalRetraits', 'montantJournalier', 'montantHebdomadaire', 'montantMensuel'));
+        } catch (Exception $e) {
+            logger('Erreur générale: ' . $e->getMessage());
+            return view('dashboard.index', compact('totalMontant', 'totalEnvois', 'totalRetraits', 'montantJournalier', 'montantHebdomadaire', 'montantMensuel'));
+        }
+    }
+        
+    
+    
+    }
