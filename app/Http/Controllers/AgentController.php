@@ -121,51 +121,63 @@ class AgentController extends Controller
      * Crediter Distributeur
      */
 
-    public function crediterCompteDistributeur(Request $request)
-    {
-        $request->validate([
-            'numero_compte' => 'required|string',
-            'montant' => 'required|numeric|min:0.01'
-        ]);
-        //dd($request->all());
-        
-        DB::beginTransaction();
-
-        try {
-            // Rechercher le compte par numéro de compte
-            $compte = Compte::where('numero_compte', $request->numero_compte)->firstOrFail();
-           
-
-            // Logique pour créditer le compte
-            // Ajouter le montant au solde existant
-            $compte->solde += $request->montant;
-            $compte->save();
-
-            // Enregistrer la transaction
-            Transaction::create([
-                'user_id' => $compte->user_id, // ID du distributeur (ou agent)
-                'type' => 'depot', // Type de la transaction
-                'montant' => $request->montant,
-                'frais' => 0, // Vous pouvez ajouter votre logique pour les frais
-                'commission' => 0, // Vous pouvez ajouter votre logique pour la commission
-                'etat' => 'terminee', // État de la transaction
-                'motif' => 'Créditation effectuée', // Motif de la transaction
-                'date' => now(), // Date de la transaction
-        ]);
-
-            DB::commit();
-            // Redirection vers la page dashboard-approvisionner avec un message de succès
-            return redirect()->route('dashboard-approvisionner')->with('message', 'Créditation effectué avec succès');
-            return response()->json(['message' => 'Crédit effectué avec succès']);
-        } catch (ModelNotFoundException $e) {
-            DB::rollBack();
-            return redirect()->route('dashboard-approvisionner')->with('error', 'Compte non trouvé');
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return redirect()->route('dashboard-approvisionner')->with('error', 'Erreur lors de créditation');
-        }
-    }
-
+     public function crediterCompteDistributeur(Request $request)
+     {
+         // Validation de base des champs requis
+         $request->validate([
+             'numero_compte' => 'required|string|regex:/^[A-Z]{2}\d{3}$/', // Format de compte (2 lettres, 3 chiffres)
+             'montant' => 'required|numeric|min:0.01'
+         ]);
+     
+         DB::beginTransaction();
+     
+         try {
+             // Recherche du compte et vérification du rôle de l'utilisateur
+             $compte = DB::table('comptes')
+                 ->join('users', 'comptes.user_id', '=', 'users.id')
+                 ->where('comptes.numero_compte', $request->numero_compte)
+                 ->where('users.role', 'distributeur')
+                 ->select('comptes.*') // Sélectionner uniquement les colonnes du compte
+                 ->first();
+     
+             // Si le compte est introuvable ou non valide pour un distributeur
+             if (!$compte) {
+                 DB::rollBack();
+                 return redirect()->route('dashboard-approvisionner')
+                                  ->with('error', 'Numéro de compte non valide ou non associé à un distributeur');
+             }
+     
+             // Créditer le compte
+             $compte = Compte::findOrFail($compte->id);
+             $compte->solde += $request->montant;
+             $compte->save();
+     
+             // Enregistrer la transaction
+             Transaction::create([
+                 'user_id' => $compte->user_id,
+                 'type' => 'depot',
+                 'montant' => $request->montant,
+                 'frais' => 0,
+                 'commission' => 0,
+                 'etat' => 'terminee',
+                 'motif' => 'Créditation effectuée',
+                 'date' => now(),
+             ]);
+     
+             DB::commit();
+             
+             // Redirection avec un message de succès
+             return redirect()->route('dashboard-approvisionner')->with('message', 'Créditation effectuée avec succès');
+     
+         } catch (ModelNotFoundException $e) {
+             DB::rollBack();
+             return redirect()->route('dashboard-approvisionner')->with('error', 'Compte non trouvé');
+         } catch (\Exception $e) {
+             DB::rollBack();
+             return redirect()->route('dashboard-approvisionner')->with('error', 'Erreur lors de la créditation');
+         }
+     }
+     
    /**
  * Bloque un compte utilisateur.
  */
@@ -260,7 +272,7 @@ public function crediterRapideDistributeur(Request $request)
             }
     }
     
-    
+   
 
 
 }

@@ -19,17 +19,17 @@
     <li class="breadcrumb-item active">Client</li>
 @endsection
 
-    @section('content')
-        <div class="container-fluid ">
-            @if($errors->any())
-                <div class="alert alert-danger">
-                    <ul>
-                        @foreach($errors->all() as $error)
-                            <li>{{ $error }}</li>
-                        @endforeach
-                    </ul>
-                </div>
-            @endif
+@section('content')
+    <div class="container-fluid">
+        @if($errors->any())
+            <div class="alert alert-danger">
+                <ul>
+                    @foreach($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
 
         <!-- Table Clients-->
         <div class="col-sm-12">
@@ -63,147 +63,144 @@
                         <div class="mb-2 text-center">
                             <div class="icon-circle d-flex justify-content-center align-items-center mx-auto" data-bs-toggle="modal" data-bs-target="#transferModal" style="width: 40px; height: 40px; border-radius: 50%; background-color: #003f6b;">
                                 <i class="fs-5 bi bi-send-fill text-white"></i>
-                            </div>
+                            </div> 
                             <span class="d-block mt-1 text-muted">Envoyer</span>
                         </div>
                     </div>
+                </div>
                 <!-- Modal pour le transfert -->
-                    <div class="modal fade" id="transferModal" tabindex="-1" aria-labelledby="transferModalLabel" aria-hidden="true">
-                        <div class="modal-dialog">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <h5 class="modal-title" id="transferModalLabel">Effectuer un transfert</h5>
-                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                </div>
-                                <div class="modal-body">
-                                    <form action="{{ route('clients.transfert_clients') }}" method="POST" id="transferForm">
-                                        @csrf
+                <div class="modal fade" id="transferModal" tabindex="-1" aria-labelledby="transferModalLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="transferModalLabel">Effectuer un transfert</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <form action="{{ route('clients.transfert_clients') }}" method="POST" id="transferForm">
+                                    @csrf
 
-                                        <div class="mb-3">
-                                            <label for="numero_compte_destination" class="form-label">Numéro du client destinataire</label>
-                                            <input type="text" class="form-control" id="numero_compte_destination" name="numero_compte_destination" required>
-                                            <!-- <div class="invalid-feedback" id="numero_compte_destination-error"></div> -->
+                                    <div class="mb-3">
+                                        <label for="numero_compte_destination" class="form-label">Numéro du client destinataire</label>
+                                        <input type="text" class="form-control" id="numero_compte_destination" name="numero_compte_destination" required>
+                                        <!-- <div class="invalid-feedback" id="numero_compte_destination-error"></div> -->
 
-                                            @error('numero_compte_destination')
-                                                <div class="invalid-feedback">{{ $message }}</div>
-                                            @enderror                                        
-                                        </div>
+                                        @error('numero_compte_destination')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror                                        
+                                    </div>
 
-                                        <div class="mb-3">
-                                            <label for="montant_envoye" class="form-label">Montant à envoyer (incluant les frais de 2%)</label>
-                                            <input type="number" class="form-control" id="montant_envoye" name="montant" required step="0.01" min="0">
-                                            <div class="invalid-feedback" id="montant_envoye-error"></div>
-                                            @error('montant')
-                                                <div class="invalid-feedback">{{ $message }}</div>
-                                            @enderror
-                                        </div>
+                                    <div class="mb-3">
+                                        <label for="montant_envoye" class="form-label">Montant à envoyer (incluant les frais de 2%)</label>
+                                        <input type="number" class="form-control" id="montant_envoye" name="montant" required step="0.01" min="0">
+                                        <div class="invalid-feedback" id="montant_envoye-error"></div>
+                                        @error('montant')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                    </div>
 
-                                        <div class="mb-3">
-                                            <label for="montant_recu" class="form-label">Montant à recevoir (hors frais)</label>
-                                            <input type="number" class="form-control" id="montant_recu" required step="0.01" min="0">
-                                            @error('montant')
-                                                <div class="invalid-feedback">{{ $message }}</div>
-                                            @enderror
-                                        </div>
+                                    <div class="mb-3">
+                                        <label for="montant_recu" class="form-label">Montant à recevoir (hors frais)</label>
+                                        <input type="number" class="form-control" id="montant_recu" required step="0.01" min="0">
+                                        @error('montant')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                    </div>
 
-                                        <div class="alert alert-info mt-2" id="frais-info" style="display: none;">
-                                            Frais de transfert (2%): <span id="frais-montant">0</span> FCFA
-                                        </div>
+                                    <div class="alert alert-info mt-2" id="frais-info" style="display: none;">
+                                        Frais de transfert (2%): <span id="frais-montant">0</span> FCFA
+                                    </div>
 
-                                        <button type="submit" class="btn btn-secondary btn-custom me-2" id="submitTransfer">Envoyer</button>
-                                    </form>
-                                </div>
+                                    <button type="submit" class="btn btn-secondary btn-custom me-2" id="submitTransfer">Envoyer</button>
+                                </form>
                             </div>
                         </div>
-                    </div>
-                </div>
-                <div class="card-body">
-                    <div class="table-responsive user-datatable">
-                        <table class="display" id="datatable-range">
-                            <thead class="table-light">
-                                <tr>
-                                    <th class="align-middle">Photo</th>
-                                    <th class="align-middle">Clients</th>
-                                    <th class="align-middle">Numéro Compte</th>
-                                    <th class="align-middle">Montant</th>
-                                    <th class="align-middle">Type_Transaction</th>
-                                    <th class="align-middle">Action</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @if(isset($transactions) && count($transactions) > 0)
-                                    @foreach($transactions as $transaction)
-                                        <tr>
-                                            <td class="align-middle">
-                                                @if($transaction->photo)
-                                                    <img src="{{ asset('storage/' . $transaction->photo) }}" 
-                                                        alt="Photo" 
-                                                        class="rounded-circle"
-                                                        style="width: 50px; height: 50px; object-fit: cover;">
-                                                @else
-                                                    <img src="{{ asset('assets/images/user.jpg') }}" 
-                                                        alt="Default" 
-                                                        class="rounded-circle"
-                                                        style="width: 50px; height: 50px; object-fit: cover;">
-                                                @endif
-                                            </td>
-                                            <td class="align-middle">{{ $transaction->nom }} {{ $transaction->prenom }}</td>
-                                            <td class="align-middle">{{ $transaction->numero_compte }}</td>
-                                            <td class="align-middle">
-                                                <span class="fw-bold {{ $transaction->type_transaction == 'depot' ? 'text-success' : 'text-primary' }}">
-                                                    {{ number_format($transaction->montant, 0, ',', ' ') }} FCFA
-                                                </span>
-                                            </td>
-                                            <td class="align-middle">
-                                                <span class="badge {{ $transaction->type_transaction == 'depot' ? 'bg-success' : 'bg-primary' }}">
-                                                    {{ ucfirst($transaction->type_transaction) }}
-                                                </span>
-                                            </td>
-                                            <td class="align-middle">
-                                                <button type="button" 
-                                                        class="btn btn-info btn-sm"
-                                                        data-bs-toggle="modal" 
-                                                        data-bs-target="#detailsModal{{ $transaction->id }}"
-                                                        title="Voir détails">
-                                                    <i class="bi bi-eye"></i>
-                                                </button>
-                        
-                                                <div class="modal fade" id="detailsModal{{ $transaction->id }}" tabindex="-1">
-                                                    <div class="modal-dialog modal-dialog-centered">
-                                                        <div class="modal-content">
-                                                            <div class="modal-header">
-                                                                <h5 class="modal-title">Détails de la transaction</h5>
-                                                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                                                            </div>
-                                                            <div class="modal-body">
-                                                                <p><strong>Distributeur :</strong> {{ $transaction->nom }} {{ $transaction->prenom }}</p>
-                                                                <p><strong>Numéro de compte :</strong> {{ $transaction->numero_compte }}</p>
-                                                                <p><strong>Type :</strong> {{ ucfirst($transaction->type_transaction) }}</p>
-                                                                <p><strong>Montant :</strong> {{ number_format($transaction->montant, 0, ',', ' ') }} FCFA</p>
-                                                            </div>
-                                                            <div class="modal-footer">
-                                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    @endforeach
-                                @else
-                                    <tr>
-                                        <td colspan="6" class="text-center">Aucune transaction trouvée</td>
-                                    </tr>
-                                @endif
-                            </tbody>
-                        </table>
-                        
                     </div>
                 </div>
             </div>
         </div>
-        <!-- Tale Clients-->
-    </div>        
+        <div class="card-body">
+            <div class="table-responsive user-datatable">
+                <table class="display" id="datatable-range">
+                    <thead>
+                        <tr>
+                            <th class="align-middle">Photo</th>
+                            <th class="align-middle">Clients</th>
+                            <th class="align-middle">Numéro Compte</th>
+                            <th class="align-middle">Montant</th>
+                            <th class="align-middle">Type_Transaction</th>
+                            <th class="align-middle">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if(isset($transactions) && count($transactions) > 0)
+                            @foreach($transactions as $transaction)
+                                <tr>
+                                    <td class="align-middle">
+                                        @if($transaction->photo)
+                                            <img src="{{ asset('storage/' . $transaction->photo) }}" 
+                                                alt="Photo" 
+                                                class="rounded-circle"
+                                                style="width: 50px; height: 50px; object-fit: cover;">
+                                        @else
+                                            <img src="{{ asset('assets/images/user.jpg') }}" 
+                                                alt="Default" 
+                                                class="rounded-circle"
+                                                style="width: 50px; height: 50px; object-fit: cover;">
+                                        @endif
+                                    </td>
+                                    <td class="align-middle">{{ $transaction->nom }} {{ $transaction->prenom }}</td>
+                                    <td class="align-middle">{{ $transaction->numero_compte }}</td>
+                                    <td class="align-middle">
+                                        <span class="fw-bold {{ $transaction->type_transaction == 'depot' ? 'text-success' : 'text-primary' }}">
+                                            {{ number_format($transaction->montant, 0, ',', ' ') }} FCFA
+                                        </span>
+                                    </td>
+                                    <td class="align-middle">
+                                        <span class="badge {{ $transaction->type_transaction == 'depot' ? 'bg-success' : 'bg-primary' }}">
+                                            {{ ucfirst($transaction->type_transaction) }}
+                                        </span>
+                                    </td>
+                                    <td class="align-middle">
+                                        <button type="button" 
+                                                class="btn btn-info btn-sm"
+                                                data-bs-toggle="modal" 
+                                                data-bs-target="#detailsModal{{ $transaction->id }}"
+                                                title="Voir détails">
+                                            <i class="bi bi-eye"></i>
+                                        </button>
+                
+                                        <div class="modal fade" id="detailsModal{{ $transaction->id }}" tabindex="-1">
+                                            <div class="modal-dialog modal-dialog-centered">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title">Détails de la transaction</h5>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        <p><strong>Distributeur :</strong> {{ $transaction->nom }} {{ $transaction->prenom }}</p>
+                                                        <p><strong>Numéro de compte :</strong> {{ $transaction->numero_compte }}</p>
+                                                        <p><strong>Type :</strong> {{ ucfirst($transaction->type_transaction) }}</p>
+                                                        <p><strong>Montant :</strong> {{ number_format($transaction->montant, 0, ',', ' ') }} FCFA</p>
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                </tr>
+                            @endforeach
+                        @else
+                            <tr>
+                                <td colspan="6" class="text-center">Aucune transaction trouvée</td>
+                            </tr>
+                        @endif
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>      
 @endsection
 
 
