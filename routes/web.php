@@ -102,6 +102,7 @@ Route::middleware('auth')->prefix('agent')->group(function () {
     Route::post('/crediter-rapide-distributeur/', [AgentController::class, 'crediterRapideDistributeur'])->name('agents.crediter_rapide_distributeur');
     Route::post('/bloquer-utilisateur/{userId}', [AgentController::class, 'bloquerOuDebloquerCompte'])->name('agents.bloquer_utilisateur');
     Route::get('dashboard-transactions', [UserController::class, 'afficherTransactions'])->name('transactions.afficher');
+   
 });
 
 /**

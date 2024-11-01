@@ -53,9 +53,7 @@ public function transfertEntreClients(Request $request)
         return $query->where('type_transaction', $typeTransaction);
     })->get();
 
-    // Retourner la vue avec les transactions filtrées
-    return view('clients.historiques', compact('transactions'));
-    // Valider les données d'entrée
+   
     $request->validate([
         'numero_compte_destination' => 'required|string|exists:comptes,numero_compte',
         'montant' => 'required|numeric|min:0.01',

@@ -85,59 +85,71 @@ class DistributeurController extends Controller
  */
     
 
-    public function crediterCompteClient(Request $request)
-{
-    // Validation des données d'entrée
-    $request->validate([
-        'numero_compte' => 'required|string',
-        'montant' => 'required|numeric|min:0.01',
-        
-    ]);
-
-    DB::beginTransaction();
-
-    try {
-        // Rechercher le compte par numéro de compte
-        $compte = Compte::where('numero_compte', $request->numero_compte)->firstOrFail();
-
-
-        // Vérifier si user_id est un client
-        $user = User::find($compte->user_id);
-        if (!$user || !$user->isClient()) {
-            return response()->json(['message' => 'Le compte ne correspond pas à un client valide'], 400);
-        }
-        // Logique pour créditer le compte
-        // Ajouter le montant au solde existant
-        $compte->solde += $request->montant;
-        $compte->save();
-
-        // Calculer la commission pour le distributeur (supposons un taux de 2%)
-        $commission = $request->montant * 0.01; // 1% de commission
-
-        // Enregistrer la transaction
-        Transaction::create([
-            'user_id' => $user->id, // ID du client
-            'type' => 'depot',
-            'montant' => $request->montant,
-            'frais' => 0, // Ajoutez la logique pour les frais si nécessaire
-            'commission' => $commission, // Ajoutez la logique pour la commission si nécessaire
-            'etat' => 'terminee',
-            'motif' => 'Dépôt effectué',
-            'date' => now(),
-        ]);
-
-        DB::commit();
-
-        // Si vous utilisez AJAX, renvoyez un JSON
-        return redirect()->route('distributeurs.afficher_Historique')->with('message', 'Dépôt effectué avec succès. Votre commission pour cette transaction : ' . number_format($commission, 2, ',', ' ') . ' Fcfa');
-    } catch (ModelNotFoundException $e) {
-        DB::rollBack();
-        return redirect()->route('distributeurs.afficher_Historique')->with('error', 'Compte non trouvé');
-    } catch (\Exception $e) {
-        DB::rollBack();
-        return redirect()->route('distributeurs.afficher_Historique')->with('error', 'Error lors du Depôt ');
-    }
-}
+ public function crediterCompteClient(Request $request)
+ {
+     // Validation des données d'entrée
+     $request->validate([
+         'numero_compte' => 'required|string',
+         'montant' => 'required|numeric|min:0.01',
+     ]);
+ 
+     DB::beginTransaction();
+ 
+     try {
+         // Rechercher le compte par numéro de compte
+         $compte = Compte::where('numero_compte', $request->numero_compte)->firstOrFail();
+ 
+         // Vérifier si l'utilisateur associé est un client
+         $user = User::find($compte->user_id);
+         if (!$user || !$user->isClient()) {
+             return response()->json(['message' => 'Le compte ne correspond pas à un client valide'], 400);
+         }
+ 
+         // Logique pour créditer le compte client
+         $compte->solde += $request->montant;
+         $compte->save();
+ 
+         // Calculer la commission du distributeur (1% par exemple)
+         $commission = $request->montant * 0.01;
+ 
+         // Déduire la commission du solde du distributeur connecté
+         $distributeur = auth()->user();
+         $compteDistributeur = Compte::where('user_id', $distributeur->id)->firstOrFail();
+ 
+         if ($compteDistributeur->solde < $commission) {
+             DB::rollBack();
+             return redirect()->route('distributeurs.afficher_Historique')->with('error', 'Solde insuffisant du distributeur pour couvrir la commission.');
+         }
+ 
+         $compteDistributeur->solde -= $commission;
+         $compteDistributeur->save();
+ 
+         // Enregistrer la transaction
+         Transaction::create([
+             'user_id' => $user->id,
+             'type' => 'depot',
+             'montant' => $request->montant,
+             'frais' => 0,
+             'commission' => $commission,
+             'etat' => 'terminee',
+             'motif' => 'Dépôt effectué',
+             'date' => now(),
+         ]);
+ 
+         DB::commit();
+ 
+         return redirect()->route('distributeurs.afficher_Historique')
+                          ->with('message', 'Dépôt effectué avec succès. Votre commission pour cette transaction : ' . number_format($commission, 2, ',', ' ') . ' Fcfa');
+ 
+     } catch (ModelNotFoundException $e) {
+         DB::rollBack();
+         return redirect()->route('distributeurs.afficher_Historique')->with('error', 'Compte non trouvé');
+     } catch (\Exception $e) {
+         DB::rollBack();
+         return redirect()->route('distributeurs.afficher_Historique')->with('error', 'Erreur lors du dépôt.');
+     }
+ }
+ 
 
 /**
  * Effectue un retrait sur le compte du client.
@@ -316,6 +328,8 @@ public function effectuerRetrait(Request $request)
         // Créditez le montant net au compte de destination
         $compteDestination->solde += $montantNet;
         $compteDestination->save();
+
+        
 
         // Enregistrer les transactions
         Transaction::create([

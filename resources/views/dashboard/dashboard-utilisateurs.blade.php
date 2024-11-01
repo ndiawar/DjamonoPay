@@ -90,16 +90,29 @@
                         
                     </div>
                     <div class="card-body">
+                        <!-- Formulaire de filtre -->
+                    <div class="mb-3">
+                        <form method="GET" action="{{ route('dashboard-utilisateurs') }}">
+                            <label for="type_transaction">Filtrer par type de transaction :</label>
+                            <select name="type_transaction" id="type_transaction" class="form-select" onchange="this.form.submit()">
+                                <option value="">Tous</option>
+                                <option value="depot" {{ request('type_transaction') == 'depot' ? 'selected' : '' }}>Dépôt</option>
+                                <option value="retrait" {{ request('type_transaction') == 'retrait' ? 'selected' : '' }}>Retrait</option>
+                                <option value="transfert" {{ request('type_transaction') == 'transfert' ? 'selected' : '' }}>Transfert</option>
+                            </select>
+                        </form>
+                    </div>
+
                         <div class="table-responsive user-datatable">
                             <table class="display" id="datatable-range">
                                 <thead>
                                     <tr>
-                                    <th>Photo</th>
-                                    <th>Nom</th>
-                                    <th>Numero_Compte</th>
-                                    <th>Role</th>
-                                    <th>État compte</th>
-                                    <th>Actions</th>
+                                        <th>Photo</th>
+                                        <th>Nom</th>
+                                        <th>Numero_Compte</th>
+                                        <th>Role</th>
+                                        <th>État compte</th>
+                                        <th>Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -109,22 +122,19 @@
                                             <td>
                                                 @if($user->photo)
                                                     <img class="img-fluid table-avtar rounded-circle" 
-                                                        src="{{ asset('storage/' . $user->photo) }}" 
-                                                        alt="Photo"
-                                                        style="width: 40px; height: 40px; object-fit: cover;">
+                                                         src="{{ asset('storage/' . $user->photo) }}" 
+                                                         alt="Photo"
+                                                         style="width: 40px; height: 40px; object-fit: cover;">
                                                 @else
                                                     <img class="img-fluid table-avtar rounded-circle" 
-                                                        src="{{ asset('assets/images/user.jpg') }}" 
-                                                        alt="Default"
-                                                        style="width: 40px; height: 40px; object-fit: cover;">
+                                                         src="{{ asset('assets/images/user.jpg') }}" 
+                                                         alt="Default"
+                                                         style="width: 40px; height: 40px; object-fit: cover;">
                                                 @endif
                                             </td>
                                             <td>{{ $user->nom }} {{ $user->prenom }}</td>
-                                            <td>{{ $compte->numero_compte }}</td> <!-- Utilise le numéro de compte du compte associé -->
+                                            <td>{{ $compte->numero_compte }}</td>
                                             <td>{{ $user->role }}</td> 
-                                           
-                                            <td>{{ $user->etat_compte }}</td>
-                                           
                                             <td>
                                                 <span class="badge {{ $user->etat_compte == 'actif' ? 'bg-success' : 'bg-warning' }}">
                                                     {{ ucfirst($user->etat_compte) }}
@@ -160,7 +170,12 @@
                                 </tbody>
                             </table>
                         </div>
+                        <!-- Pagination Bootstrap -->
+                        <div class="d-flex justify-content-center mt-4">
+                            
+                        </div>
                     </div>
+                    
                 </div>
             </div>
             <!-- Tale Utilisateurs-->

@@ -54,7 +54,7 @@
                     <div class="mb-2 text-center">
                         <div class="icon-circle d-flex justify-content-center align-items-center mx-auto" data-bs-toggle="modal" data-bs-target="#transferModal" style="width: 40px; height: 40px; border-radius: 50%; background-color: #003f6b;">
                             <i class="fs-5 bi bi-send-fill text-white"></i>
-                        </div>
+                        </div> 
                         <span class="d-block mt-1 text-muted">Envoyer</span>
                     </div>
                 </div>
@@ -104,18 +104,18 @@
                 
             </div>
             <div class="card-body">
-                <div class="table-responsive user-datatable">
-                    <table class="table">
-                        <thead class="table-light">
-                            <tr>
-                                <th class="align-middle">Photo</th>
-                                <th class="align-middle">Clients</th>
-                                <th class="align-middle">Numéro Compte</th>
-                                <th class="align-middle">Montant</th>
-                                <th class="align-middle">Type_Transaction</th>
-                                <th class="align-middle">Action</th>
-                            </tr>
-                        </thead>
+                      <div class="table-responsive user-datatable">
+                            <table class="display" id="datatable-range">
+                                <thead>
+                                    <tr>
+                                        <th class="align-middle">Photo</th>
+                                        <th class="align-middle">Clients</th>
+                                        <th class="align-middle">Numéro Compte</th>
+                                        <th class="align-middle">Montant</th>
+                                        <th class="align-middle">Type_Transaction</th>
+                                        <th class="align-middle">Action</th>
+                                    </tr>
+                                </thead>
                         <tbody>
                             @if(isset($transactions) && count($transactions) > 0)
                                 @foreach($transactions as $transaction)

@@ -178,21 +178,19 @@
                     
                     </div>
                     <div class="card-body">
-                        <div class="table-responsive user-datatable">
-                            <table class="display" id="datatable-range">
-                            <div class="table-responsive">
-                                <table class="table">
-                                    
-                                    <thead class="table-light">
+                        
+                         <div class="table-responsive user-datatable">
+                                        <table class="display" id="datatable-range">
+                                            <thead>
                                         <tr>
-                                            <th class="align-middle">Photo</th>
+                                             <th class="align-middle">Photo</th>
                                             <th class="align-middle">Clients</th>
                                             <th class="align-middle">Numéro Compte</th>
                                             <th class="align-middle">Montant</th>
                                             <th class="align-middle">Type_Transaction</th>
                                             <th class="align-middle">Action</th>
                                         </tr>
-                                    </thead>
+                                            </thead>
                                     <tbody>
                                         @if(isset($transactions) && count($transactions) > 0)
                                             @foreach($transactions as $transaction)
