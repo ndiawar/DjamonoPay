@@ -30,8 +30,8 @@
                                 <tr>
                                     <th>Utilisateur</th>
                                     <th>Date</th>
-                                    <th>Adresse Identité</th>
                                     <th>Action</th>
+                                    <th>Description</th>
                                 </tr>
                             </thead>
                             <tbody>
