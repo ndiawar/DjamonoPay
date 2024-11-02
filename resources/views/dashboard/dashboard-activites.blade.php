@@ -15,109 +15,60 @@
     <li class="breadcrumb-item active">Distributeur</li>
 @endsection
 
-    @section('content')
-        <div class="container-fluid ">
-                <!-- Multiple table control elements  Starts-->
-            <div class="col-sm-12">
-                <div class="card">
-                    <div class="card-header pb-0 card-no-border">
-                        <h3 class="mb-3">Historique des activitées</h3>
+@section('content')
+    <div class="container-fluid">
+        <!-- Multiple table control elements Starts-->
+        <div class="col-sm-12">
+            <div class="card">
+                <div class="card-header pb-0 card-no-border">
+                    <h3 class="mb-3">Historique des activités</h3>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive user-datatable">
+                        <table class="display" id="datatable-range">
+                            <thead>
+                                <tr>
+                                    <th>Utilisateur</th>
+                                    <th>Date</th>
+                                    <th>Adresse Identité</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if ($logs->isEmpty())
+                                    <tr>
+                                        <td colspan="4">Aucun enregistrement trouvé.</td>
+                                    </tr>
+                                @else
+                                    @foreach ($logs as $log)
+                                        <tr>
+                                            <td>{{ $log->user->prenom ?? 'Inconnu' }} {{ $log->user->nom ?? 'Inconnu' }}</td> <!-- Affiche le nom de l'utilisateur -->
+                                            <td>{{ $log->timestamp }}</td>
+                                            <td>{{ $log->description }}</td>
+                                            <td>{{ $log->action }}</td>
+                                        </tr>
+                                    @endforeach
+                                @endif
+                            </tbody>
 
-                    </div>
-                    <div class="card-body">
-                        <div class="table-responsive user-datatable">
-                            <table class="display" id="datatable-range">
-                                <thead>
-                                    <tr>
-                                        <th>Utilisateur</th>
-                                        <th>Date</th>
-                                        <th>Adresse Identité</th>
-                                        <th>Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td> Tiger Nixon</td>
-                                        <td>System Architect</td>
-                                        <td>Edinburgh</td>
-                                        <td>$320,800</td>
-                                    </tr>
-                                    <tr>
-                                        <td> Garrett Winters</td>
-                                        <td>Accountant</td>
-                                        <td>Tokyo</td>
-                                        <td>$170,750</td>
-                                    </tr>
-                                    <tr>
-                                        <td> <img class="img-fluid table-avtar" src="{{ asset('assets/images/user/11.png') }}"
-                                                alt="">Ashton Cox</td>
-                                        <td>Junior Technical Author</td>
-                                        <td>San Francisco</td>
-                                        <td>$86,000</td>
-                                    </tr>
-                                    <tr>
-                                        <td> <img class="img-fluid table-avtar" src="{{ asset('assets/images/user/11.png') }}
-                                                alt="">Cedric Kelly</td>
-                                        <td>Senior Javascript Developer</td>
-                                        <td>Edinburgh</td>
-                                        <td>$433,060</td>
-                                    </tr>
-                                    <tr>
-                                        <td><img class="img-fluid table-avtar" src="{{ asset('assets/images/user/7.jpg') }}"
-                                                alt="">Airi Satou</td>
-                                        <td>Accountant</td>
-                                        <td>Tokyo</td>
-                                        <td>$162,700</td>
-                                    </tr>
-                                    <tr>
-                                        <td><img class="img-fluid table-avtar" src="{{ asset('assets/images/user/7.jpg') }}"
-                                                alt="">Brielle Williamson</td>
-                                        <td>Integration Specialist</td>
-                                        <td>New York</td>
-                                        <td>$372,000</td>
-                                    </tr>
-                                    <tr>
-                                        <td><img class="img-fluid table-avtar" src="{{ asset('assets/images/user/7.jpg') }}"
-                                                alt="">Herrod Chandler</td>
-                                        <td>Sales Assistant</td>
-                                        <td>San Francisco</td>
-                                        <td>$137,500</td>
-                                    </tr>
-                                    <tr>
-                                        <td><img class="img-fluid table-avtar" src="{{ asset('assets/images/user/7.jpg') }}"
-                                                alt="">Rhona Davidson</td>
-                                        <td>Integration Specialist</td>
-                                        <td>Tokyo</td>
-                                        <td>$327,900</td>
-                                    </tr>
-                                    <tr>
-                                        <td><img class="img-fluid table-avtar" src="{{ asset('assets/images/user/7.jpg') }}"
-                                                alt="">Colleen Hurst</td>
-                                        <td>Javascript Developer</td>
-                                        <td>San Francisco</td>
-                                        <td>$205,500</td>
-                                    </tr>
-                                    <tr>
-                                        <td><img class="img-fluid table-avtar" src="{{ asset('assets/images/user/7.jpg') }}"
-                                                alt="">Sonya Frost</td>
-                                        <td>Software Engineer</td>
-                                        <td>Edinburgh</td>
-                                        <td>$103,600</td>
-                                    </tr>
-
-                                </tbody>
-                            </table>
-                        </div>
+                        </table>
                     </div>
                 </div>
             </div>
-            <!-- Multiple table control elements Ends-->
-            </div>
         </div>
-    @endsection
+        <!-- Multiple table control elements Ends-->
+    </div>
+@endsection
 
 @section('script')
 <script src="{{ asset('assets/js/datatable/datatables/jquery.dataTables.min.js') }}"></script>
 <script src="{{ asset('assets/js/datatable/datatables/datatable.custom.js') }}"></script>
 <script src="{{ asset('assets/js/dashboard/dashboard_5.js') }}"></script>
+<script>
+    $(document).ready(function() {
+        $('#datatable-range').DataTable({
+            // Configuration de DataTables si nécessaire
+        });
+    });
+</script>
 @endsection

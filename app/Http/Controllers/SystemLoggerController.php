@@ -1,84 +1,67 @@
 <?php
+// app/Http/Controllers/SystemLoggerController.php
 
 namespace App\Http\Controllers;
 
 use App\Models\SystemLogger;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Validation\ValidationException;
 
 class SystemLoggerController extends Controller
 {
-    /**
-     * Enregistrer un log.
-     */
-    public function enregistrerLog(Request $request)
+    public function index()
     {
-        try {
-            $validatedData = $request->validate([
-                'user_id' => 'required|exists:users,id',
-                'action' => 'required|string|max:255',
-                'description' => 'required|string|max:255',
-            ]);
-
-            $log = SystemLogger::create($validatedData);
-
-            return response()->json(['message' => 'Log enregistré avec succès', 'log' => $log], 201);
-        } catch (ValidationException $e) {
-            Log::error('Erreur de validation lors de l\'enregistrement du log: ' . $e->getMessage());
-            return response()->json(['error' => 'Données invalides'], 422);
-        } catch (\Exception $e) {
-            Log::error('Erreur lors de l\'enregistrement du log: ' . $e->getMessage());
-            return response()->json(['error' => 'Erreur lors de l\'enregistrement'], 500);
-        }
+        return $this->dashboard();
     }
 
-    /**
-     * Récupérer les logs en fonction des critères.
-     */
-    public function recupererLogs(Request $request)
+    public function store(Request $request)
     {
-        try {
-            $query = SystemLogger::query();
-
-            // Ajoutez des critères de filtrage ici
-            if ($request->has('user_id')) {
-                $query->where('user_id', $request->input('user_id'));
-            }
-
-            if ($request->has('action')) {
-                $query->where('action', 'LIKE', '%' . $request->input('action') . '%');
-            }
-
-            $logs = $query->get();
-
-            return response()->json(['logs' => $logs], 200);
-        } catch (\Exception $e) {
-            Log::error('Erreur lors de la récupération des logs: ' . $e->getMessage());
-            return response()->json(['error' => 'Erreur lors de la récupération des logs'], 500);
-        }
-    }
-
-    /**
-     * Générer un rapport des logs entre deux dates.
-     */
-    public function genererRapport(Request $request)
-    {
-        $request->validate([
-            'dateDebut' => 'required|date',
-            'dateFin' => 'required|date|after_or_equal:dateDebut',
+        $data = $request->validate([
+            'user_id' => 'required|exists:users,id',
+            'action' => 'required|string',
+            'description' => 'required|string',
         ]);
 
-        try {
-            $logs = SystemLogger::whereBetween('timestamp', [$request->dateDebut, $request->dateFin])->get();
+        $data['timestamp'] = $data['timestamp'] ?? now();
+        $log = SystemLogger::create($data);
 
-            // Génération du rapport ici (ex: export CSV, PDF, etc.)
-            // Pour l'instant, on retourne simplement les logs
-
-            return response()->json(['rapport' => $logs], 200);
-        } catch (\Exception $e) {
-            Log::error('Erreur lors de la génération du rapport: ' . $e->getMessage());
-            return response()->json(['error' => 'Erreur lors de la génération du rapport'], 500);
-        }
+        return response()->json(['log' => $log], 201);
     }
+
+    public function show($id)
+    {
+        $log = SystemLogger::findOrFail($id);
+        return response()->json(['log' => $log], 200);
+    }
+
+    public function destroy($id)
+    {
+        $log = SystemLogger::findOrFail($id);
+        $log->delete();
+        return response()->json(['message' => 'Log deleted successfully'], 200);
+    }
+
+    // Méthode pour afficher la vue du tableau de bord
+    public function dashboard()
+    {
+        // Récupère les logs avec les informations de l'utilisateur
+        $logs = SystemLogger::with('user:id,nom,prenom') // Assure-toi que le modèle SystemLogger a une relation définie avec User
+            ->select('id', 'user_id', 'action', 'timestamp', 'description')
+            ->orderBy('created_at', 'desc')
+            ->get();
+    
+        return view('dashboard.dashboard-activites', compact('logs'));
+    }
+    public function logAction($userId, $action, $description)
+    {
+        $data = [
+            'user_id' => $userId,
+            'action' => $action,
+            'description' => $description,
+            'timestamp' => now(),
+        ];
+        
+        SystemLogger::create($data);
+    }
+
+    
 }

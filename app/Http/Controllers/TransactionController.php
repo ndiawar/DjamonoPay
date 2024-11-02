@@ -18,7 +18,7 @@ class TransactionController extends Controller
     /**
      * Enregistre une nouvelle transaction.
      */
-    public function enregistrerTransaction(StoreTransactionRequest $request)
+    public function enregistrerTransaction(StoreTransactionRequest $request, Transaction $transaction)
     {
         try {
             $validated = $request->validated();
@@ -32,6 +32,9 @@ class TransactionController extends Controller
                 $validated['commission'] = $validated['montant'] * 0.02; // 2% de commission pour transfert
             }
 
+            // Loguer l'action
+            (new SystemLoggerController())->logAction(Auth::id(), 'Enregistrement d\'une transaction', 'Transaction ID: ' . $transaction->id);
+        
             $transaction = Transaction::create($validated);
 
             return new TransactionResource($transaction);
@@ -50,6 +53,10 @@ class TransactionController extends Controller
         try {
             $transaction->etat = 'annulé';
             $transaction->save();
+
+             // Loguer l'action
+            (new SystemLoggerController())->logAction(Auth::id(), 'Annulation d\'une transaction', 'Transaction ID: ' . $transaction->id);
+        
     
             return redirect()->back()->with('success', 'Transaction annulée avec succès');
         } catch (Exception $e) {
@@ -63,6 +70,9 @@ class TransactionController extends Controller
      */
     public function calculerFrais($montant, $type)
     {
+        // Loguer l'action
+    (new SystemLoggerController())->logAction(Auth::id(), 'Calcul des frais', 'Montant: ' . $montant . ', Type: ' . $type);
+    
         if ($type === 'transfert') {
             return $montant * 0.02; // 2% de frais pour transfert
         }
@@ -75,6 +85,10 @@ class TransactionController extends Controller
      */
     public function calculerCommission($montant, $type, $isDistributeur = false)
     {
+        // Loguer l'action
+    (new SystemLoggerController())->logAction(Auth::id(), 'Calcul de la commission', 'Montant: ' . $montant . ', Type: ' . $type);
+
+
         if ($isDistributeur) {
             if ($type === 'depot') {
                 return $montant * 0.01; // 1% de commission pour dépôt
@@ -84,13 +98,21 @@ class TransactionController extends Controller
         }
 
         return 0; // Aucun commission par défaut
-    }public function index()
+    }
+    public function index()
     {
+         // Loguer l'action d'accès à la méthode index
+    (new SystemLoggerController())->logAction(Auth::id(), 'Accès au bilan global', 'Accès à la méthode index');
+    
         return $this->bilanGlobal();
     }
     public function bilanGlobal()
     {
         try {
+
+        // Loguer le nombre de transactions récupérées
+        (new SystemLoggerController())->logAction(Auth::id(), 'Récupération des transactions', 'Nombre de transactions: ' );
+        
             // Récupérer toutes les transactions
             $transactions = Transaction::all();
         
@@ -137,7 +159,8 @@ class TransactionController extends Controller
                 $months[] = Carbon::createFromFormat('m', $transaction->month)->format('F Y'); // Nom du mois et année
                 $totals[] = $transaction->total;
             }
-    
+            
+            
             // Passer les données à la vue
             return view('dashboard.index', compact(
                 'totalMontant', 
@@ -164,6 +187,10 @@ class TransactionController extends Controller
     public function afficherHistorique(Request $request)
     {
         try {
+
+        // Loguer l'action
+        (new SystemLoggerController())->logAction(Auth::id(), 'Affichage de l\'historique des transactions', 'Nombre de transactions: ');
+        
             // Récupérer toutes les transactions avec leurs informations associées
             $query = Transaction::join('users', 'transactions.user_id', '=', 'users.id')
                 ->join('comptes', 'users.id', '=', 'comptes.user_id')

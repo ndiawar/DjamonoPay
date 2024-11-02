@@ -50,9 +50,12 @@ Route::middleware('auth')->prefix('dashboard')->group(function () {
     Route::get('/bilan-global', [TransactionController::class, 'bilanGlobal'])->name('bilan.global');
     Route::get('index',  [TransactionController::class, 'index'])->name('index');
     // Route pour afficher l'historique des transactions
-Route::get('/dashboard-transactions', [TransactionController::class, 'afficherHistorique'])->name('dashboard-transactions');
+    Route::get('/dashboard-transactions', [TransactionController::class, 'afficherHistorique'])->name('dashboard-transactions');
+    Route::view('client-documentation', 'dashboard.documentation')->name('client-documentation');
+    // Route::get('dashboard-client', [SystemLoggerController::class, 'dashboard'])->name('ddashboard-client');
 
-   
+// Change the route to point to the index method
+Route::get('dashboard-activites', [SystemLoggerController::class, 'index'])->name('dashboard-activites');
 });
 
 /**
