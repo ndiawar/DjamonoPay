@@ -90,6 +90,11 @@
     .submit-btn:hover {
         background-color: #0056b3;
     }
+	.card-gradient {
+    	background: linear-gradient(to bottom right, #006b9b, #00a1e4); /* Ajuste les couleurs comme tu le souhaites */
+    	color: white; /* Change la couleur du texte si nécessaire */
+	}
+
 </style>
 @endsection
 
@@ -105,9 +110,9 @@
 
 @section('content')
 	<div class="container-fluid">
-	<div class="row widget-grid">
+		<div class="row widget-grid">
 			<div class="col-md-3">
-				<div class="ms-3 card profile-box" >
+				<div class="ms-3 card profile-box card-gradient">
 					<div class="card-body">
 						<div class="media">
 							<div class="media-body"> 
@@ -117,7 +122,7 @@
 									</div>
 									<div class="card-info d-flex justify-content-end mt-5">
 										<div class="me-5 mt-5">NUMERO CARTE</div>
-										<div class="ms-5 mt-5">06/24</div>
+										<div class="mt-5">06/24</div>
 									</div>
 									<div class="card-number mb-4">1234 1234 1234 1234</div>
 								</div>
@@ -138,95 +143,80 @@
 				</div>
 			</div>
 			<div class="col-xxl-4 col-md-6 box-col-6 ms-3">
-				<div class="card bg-transparent shadow-sm p-3 borderborder-secondary rounded">
+				<div class="card bg-transparent shadow-sm p-3 border border-secondary rounded">
 					<div class="card-body">
-						<!-- Bilan Global -->
 						<h6 class="text-muted mt-2">Bilan Global</h6>
-						<h4 class="font-weight-bold">1.258.796 Fcfa</h4>
+						<h4 class="font-weight-bold">{{ number_format($totalMontant, 0, ',', ' ') }} Fcfa</h4>
 						<div class="d-flex justify-content-end align-items-center ms-5 mb-3 ps-5">
-							<!-- Augmentation -->
 							<span class="text-success d-flex align-items-center">
-							<i class="bi bi-arrow-up me-1"></i> 23.12%
-							</span>
-							<!-- Diminution -->
-							<span class="ps-5 text-danger d-flex align-items-center">
-							<i class="bi bi-arrow-down me-1"></i> 23.12%
+								<i class="bi bi-arrow-up me-1"></i> {{ number_format($pourcentageTerminees, 2) }}%
 							</span>
 						</div>
-
 						<hr class="my-3">
-
-						<!-- Monnaie -->
 						<div class="d-flex justify-content-between">
 							<div>
-							<h6 class="text-muted">Monnaie</h6>
-							<h5 class="font-weight-bold">FCFA/ XOF</h5>
+								<h6 class="text-muted">Monnaie</h6>
+								<h5 class="font-weight-bold">FCFA/ XOF</h5>
 							</div>
-							<!-- Statut -->
-							<div class="text-end">
-							<h6 class="text-muted">Statut</h6>
-							<h5 class="font-weight-bold text-dark">Active</h5>
-							</div>
+							<span class="ps-5 text-danger d-flex align-items-center">
+								<i class="bi bi-arrow-down me-1"></i> {{ number_format($pourcentageAnnulees, 2) }}%
+							</span>
 						</div>
 					</div>
 				</div>
 			</div>
 			<div class="col-md-4 mt-5">
 				<div class="row mt-5">
-					<div class="col-md-4 m-auto  ">
+					<div class="col-md-4 m-auto">
 						<div class="border-start border-5 border-info card small-widget">
 							<div class="card-body primary">
 								<span class="f-light pt-2">Solde</span>
 								<div class="d-flex align-items-end gap-1 pt-4">
-									<h6>1.258.000 Fcfa</h6>
-									
+									<h6>{{ number_format($totalMontant, 0, ',', ' ') }} Fcfa</h6>
 								</div>
 							</div>
 						</div>
 					</div>
-					<div class="col-md-4 m-auto ">
-						<div class="border-start border-5 border-success card small-widget">
-							<div class="card-body primary">
-								<span class="f-light pt-2">Envoie</span>
-								<div class="d-flex align-items-end gap-1 pt-4">
-								<h6>1.258.000 Fcfa</h6>
-									
-								</div>
-								<div class="bg-gradient">
-									<svg class="stroke-icon svg-fill">
-										<use href="{{ asset('assets/svg/icon-sprite.svg#pending-order') }}"></use>
-									</svg>
-									<span class="font-success">
-										<i class="icon-arrow-up"></i>
-										<span class="pe-3">+30%</span>
-									</span>
-								</div>
-
+					<div class="col-md-4 m-auto">
+					<div class="border-start border-5 border-success card small-widget">
+						<div class="card-body primary">
+							<span class="f-light pt-2">Envoie</span>
+							<div class="d-flex align-items-end gap-1 pt-4">
+								<h6>{{ number_format($totalEnvois, 0, ',', ' ') }} Fcfa</h6>
 							</div>
-						</div>
-					</div>
-					<div class="col-md-4 m-auto ">
-						<div class="border-start border-5 border-warning card small-widget">
-							<div class="card-body primary">
-								<span class="f-light pt-2">Retrait</span>
-								<div class="d-flex align-items-end gap-1 pt-4">
-								<h6>1.258.000 Fcfa</h6>
-									
-								</div>
-								<div class="bg-gradient">
-									<svg class="stroke-icon svg-fill">
-										<use href="{{ asset('assets/svg/icon-sprite.svg#pending-order') }}"></use>
-									</svg>
-									<span class="font-success">
-										<i class="icon-arrow-up"></i>
-										<span class="pe-3">+30%</span>
-									</span>
-								</div>
-
+							<div class="bg-gradient">
+								<svg class="stroke-icon svg-fill">
+									<use href="{{ asset('assets/svg/icon-sprite.svg#pending-order') }}"></use>
+								</svg>
+								<span class="font-success">
+									<i class="icon-arrow-up"></i>
+									<span class="pe-3">+30%</span>
+								</span>
 							</div>
 						</div>
 					</div>
 				</div>
+
+				<div class="col-md-4 m-auto">
+					<div class="border-start border-5 border-warning card small-widget">
+						<div class="card-body primary">
+							<span class="f-light pt-2">Retrait</span>
+							<div class="d-flex align-items-end gap-1 pt-4">
+								<h6>{{ number_format($totalRetraits, 0, ',', ' ') }} Fcfa</h6>
+							</div>
+							<div class="bg-gradient">
+								<svg class="stroke-icon svg-fill">
+									<use href="{{ asset('assets/svg/icon-sprite.svg#pending-order') }}"></use>
+								</svg>
+								<span class="font-success">
+									<i class="icon-arrow-up"></i>
+									<span class="pe-3">+30%</span>
+								</span>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
 			</div>
 		</div>
 	</div>
@@ -237,61 +227,34 @@
 					<div class="card">
 						<div class="card-header card-no-border">
 							<div class="header-top">
-								<h5 class="m-0">Transaction récentes</h5>
-								<div class="card-header-right-icon">
-									<div class="dropdown">
-										<button class="btn dropdown-toggle" id="recentButton" type="button" data-bs-toggle="dropdown" aria-expanded="false">Ajourd'hui</button>
-										<div class="dropdown-menu dropdown-menu-end" aria-labelledby="recentButton"><a class="dropdown-item" href="#">Ajourd'hui</a><a class="dropdown-item" href="#">Tomorrow</a><a class="dropdown-item" href="#">Yesterday</a></div>
-									</div>
-								</div>
+								<h5 class="m-0">Transactions récentes</h5>
 							</div>
 						</div>
 						<div class="card-body pt-0">
-						<div class="appointment-table table-responsive">
-							<table class="table table-bordernone">
-							<tbody>
-								<tr>
-								<td><img class="img-fluid img-40 rounded-circle" src="{{ asset('assets/images/dashboard/user/1.jpg') }}" alt="user"></td>
-								<td class="img-content-box"><a class="d-block f-w-500">Nom Prenom</a><span class="f-light">10 minutes ago</span></td>
-								<td class="text-end">
-									<p class="m-0 font-success">$200.00</p>
-								</td>
-								</tr>
-								<tr>
-								<td><img class="img-fluid img-40 rounded-circle" src="{{ asset('assets/images/dashboard/user/2.jpg') }}" alt="user"></td>
-								<td class="img-content-box"><a class="d-block f-w-500">Nom Prenom</a><span class="f-light">19 minutes ago</span></td>
-								<td class="text-end">
-									<p class="m-0 font-success">$970.00</p>
-								</td>
-								</tr>
-								<tr>
-								<td><img class="img-fluid img-40 rounded-circle" src="{{ asset('assets/images/dashboard/user/3.jpg') }}" alt="user"></td>
-								<td class="img-content-box"><a class="d-block f-w-500">Leslie Alexander</a><span class="f-light">2 hours ago</span></td>
-								<td class="text-end">
-									<p class="m-0 font-success">$300.00</p>
-								</td>
-								</tr>
-								<tr>
-								<td><img class="img-fluid img-40 rounded-circle" src="{{ asset('assets/images/dashboard/user/4.jpg') }}" alt="user"></td>
-								<td class="img-content-box"><a class="d-block f-w-500">Travis Wright</a><span class="f-light">8 hours ago</span></td>
-								<td class="text-end">
-									<p class="m-0 font-success">$450.00</p>
-								</td>
-								</tr>
-								<tr>
-								<td><img class="img-fluid img-40 rounded-circle" src="{{ asset('assets/images/dashboard/user/5.jpg') }}" alt="user"></td>
-								<td class="img-content-box"><a class="d-block f-w-500">Mark Green</a><span class="f-light">1 day ago</span></td>
-								<td class="text-end">
-									<p class="m-0 font-success">$768.00</p>
-								</td>
-								</tr>
-							</tbody>
-							</table>
-						</div>
+							<div class="appointment-table table-responsive">
+								<table class="table table-bordernone">
+									<tbody>
+										@foreach ($transactionsRecentes as $transaction)
+											<tr>
+												<td>
+													<!-- <img class="img-fluid img-40 rounded-circle" src="{{ asset('assets/images/dashboard/user/' . $transaction->user->photo) }}" alt="user"> -->
+												</td>
+												<td class="img-content-box">
+													<a class="d-block f-w-500">{{ $transaction->user->name }}</a>
+													<span class="f-light">{{ $transaction->created_at->diffForHumans() }}</span>
+												</td>
+												<td class="text-end">
+													<p class="m-0 font-success">{{ number_format($transaction->montant, 2, ',', ' ') }} Fcfa</p>
+												</td>
+											</tr>
+										@endforeach
+									</tbody>
+								</table>
+							</div>
 						</div>
 					</div>
 				</div>
-	  		</div>
+			</div>
 			<div class="col-xxl-6 col-md-6 box-col-6">
 				<div class="card transCard">
 					<div class="card-header card-no-border">
@@ -301,23 +264,24 @@
 						<div class="transaction-stats">
 							<div>
 								<p>Journalier</p>
-								<p class="amount">475.000 Fcfa</p>
+								<p class="amount">{{ number_format($montantJournalier ?? 0, 0, ',', ' ') }} Fcfa</p>
 							</div>
 							<div>
-								<p>hebdomadaire</p>
-								<p class="amount">7.000.000 Fcfa</p>
+								<p>Hebdomadaire</p>
+								<p class="amount">{{ number_format($montantHebdomadaire ?? 0, 0, ',', ' ') }} Fcfa</p>
 							</div>
 							<div>
-								<p>Mensuelle</p>
-								<p class="amount">22.542.356 Fcfa</p>
+								<p>Mensuel</p>
+								<p class="amount">{{ number_format($montantMensuel ?? 0, 0, ',', ' ') }} Fcfa</p>
 							</div>
 						</div>
-						<div class="chart-container">
-							<canvas id="donutChart"></canvas>
+						<div class="chart-container" style="text-align: center;">
+							<canvas id="transactionChart" style="margin: 0 auto;"></canvas>						
 						</div>
+
 					</div>
 				</div>
-        	</div>
+			</div>
 		</div>
 	</div>
 	<!-- Transaction Rapide -->
@@ -345,9 +309,8 @@
 			</div>
 			<div class="col-xxl-4 col-md-6 box-col-6">
 				<div class="card">
-
-					<div class="card-body">
-						<div id="basic-apex"></div>
+					<div class="chart-container">
+						<canvas id="lineChart"></canvas>						
 					</div>
 				</div>
 			</div>
@@ -356,19 +319,15 @@
 					<form action="" method="POST">
 						@csrf
 						
-						<a href="{{ route('distributeur-agent') }}" class="btn btn-light text-dark w-75 d-flex align-items-center border border-radius m-5 shadow p-3 mb-5 bg-body rounded rounded-5 fw-bold">
+						<button type="submit" class="btn btn-light text-dark w-75 d-flex align-items-center border border-radius m-5 shadow p-3 mb-5 bg-body rounded rounded-5 fw-bold">
 							<span class="bg-info text-white rounded-circle d-flex justify-content-center align-items-center" style="width: 25px; height: 25px; margin-right: 10px;">+</span>
 							Un Distributeur / Agent
-						</a>
-						
+						</button>
 
-				<a href="{{ route('register') }}" 
-						class="btn btn-light text-dark w-75 d-flex align-items-center border border-radius m-5 shadow p-3 mb-5 bg-body rounded rounded-5 fw-bold">
-							<span class="bg-info text-white rounded-circle d-flex justify-content-center align-items-center" 
-								style="width: 25px; height: 25px; margin-right: 10px;">+</span>
+						<button type="submit" class="btn btn-light text-dark w-75  d-flex align-items-center border border-radius m-5 shadow p-3 mb-5 bg-body rounded rounded-5 fw-bold">
+							<span class="bg-info text-white rounded-circle d-flex justify-content-center align-items-center" style="width: 25px; height: 25px; margin-right: 10px;">+</span>
 							Un Client
-				</a>
-
+						</button>
 
 					</form>
 				</div>
@@ -379,11 +338,10 @@
 		var session_layout = '{{ session()->get("layout") }}';
 	</script>
 @endsection
-
 @section('script')
-<script src="{{asset('assets/js/chart/apex-chart/apex-chart.js')}}"></script>
+<!-- <script src="{{ asset('assets/js/chart/apex-chart/apex-chart.js') }}"></script> -->
 <!-- <script src="{{ asset('assets/js/clock.js') }}"></script> -->
-<script src="{{ asset('assets/js/chart/apex-chart/moment.min.js') }}"></script>
+<!-- <script src="{{ asset('assets/js/chart/apex-chart/moment.min.js') }}"></script> -->
 <script src="{{ asset('assets/js/notify/bootstrap-notify.min.js') }}"></script>
 <!-- <script src="{{ asset('assets/js/dashboard/default.js') }}"></script> -->
 <script src="{{ asset('assets/js/notify/index.js') }}"></script>
@@ -394,31 +352,90 @@
 <script src="{{ asset('assets/js/typeahead-search/typeahead-custom.js') }}"></script>
 <script src="{{ asset('assets/js/height-equal.js') }}"></script>
 <script src="{{ asset('assets/js/animation/wow/wow.min.js') }}"></script>
-<script src="{{asset('assets/js/chart/apex-chart/stock-prices.js')}}"></script>
-<script src="{{asset('assets/js/chart/apex-chart/chart-custom.js')}}"></script>
+<!-- <script src="{{ asset('assets/js/chart/apex-chart/stock-prices.js') }}"></script> -->
+<!-- <script src="{{ asset('assets/js/chart/apex-chart/chart-custom.js') }}"></script> -->
 
-<!-- Include necessary scripts for the charts -->
+<!-- Include Chart.js -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 <script>
-    var ctx = document.getElementById('donutChart').getContext('2d');
-    var donutChart = new Chart(ctx, {
-        type: 'doughnut',
+    // Passer les données PHP aux variables JavaScript
+    var months = JSON.parse('<?php echo json_encode($months); ?>');//+
+    var totals = JSON.parse('<?php echo json_encode($totals); ?>');//+
+
+    // Logique pour créer le graphique
+    const ctxTransaction = document.getElementById('transactionChart').getContext('2d');
+    const transactionChart = new Chart(ctxTransaction, {
+        type: 'pie',
         data: {
-            labels: ['Envoie', 'Créditer', 'Retrait 2'],
+            labels: months,
             datasets: [{
-                data: [40, 30, 30], // Adjust these values for the chart
-                backgroundColor: ['#00a9ff', '#d1d5db', '#83d1d4'],
+                label: 'Total des Transactions',
+                data: totals,
+                backgroundColor: [
+                    'rgba(255, 99, 132, 0.2)',
+                    'rgba(54, 162, 235, 0.2)',
+                    'rgba(255, 206, 86, 0.2)',
+                    'rgba(75, 192, 192, 0.2)',
+                    'rgba(153, 102, 255, 0.2)',
+                    'rgba(255, 159, 64, 0.2)',
+                ],
+                borderColor: [
+                    'rgba(255, 99, 132, 1)',
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(255, 206, 86, 1)',
+                    'rgba(75, 192, 192, 1)',
+                    'rgba(153, 102, 255, 1)',
+                    'rgba(255, 159, 64, 1)',
+                ],
                 borderWidth: 1
             }]
         },
         options: {
-            cutoutPercentage: 70, // Creates a donut shape
             responsive: true,
-            maintainAspectRatio: false,
-            legend: {
-                display: false // Hides default legend as we have our custom one
+            plugins: {
+                legend: {
+                    position: 'top',
+                },
+                title: {
+                    display: true,
+                    text: 'Bilan des Transactions par Mois'
+                }
+            }
+        }
+    });
+	// Graphique en courbe (line chart)
+    const ctxLine = document.getElementById('lineChart').getContext('2d');
+    const lineChart = new Chart(ctxLine, {
+        type: 'line',
+        data: {
+            labels: months,
+            datasets: [{
+                label: 'Total des Transactions',
+                data: totals,
+                fill: false,
+                borderColor: 'rgba(75, 192, 192, 1)',
+                tension: 0.1
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'top',
+                },
+                title: {
+                    display: true,
+                    text: 'Total des Transactions par Mois'
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
             }
         }
     });
 </script>
+
 @endsection

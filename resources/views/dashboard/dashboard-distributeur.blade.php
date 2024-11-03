@@ -48,8 +48,9 @@
                                 <div class="d-flex justify-content-between align-items-center text-center">
                                     <div>
                                         <h6 class="text-muted">Solde</h6>
-                                        <h2>$128,320</h2>
+                                        <h2>{{ number_format($solde, 0, ',', ' ') }} FCFA</h2>
                                     </div>
+                                    
                                     <div class="d-flex flex-column align-items-center">
                                         <div class="mb-2">
                                             <div class="icon-circle d-flex justify-content-center align-items-center" style="width: 40px; height: 40px; border-radius: 50%; background-color: #003f6b;"
@@ -177,21 +178,19 @@
                     
                     </div>
                     <div class="card-body">
-                        <div class="table-responsive user-datatable">
-                            <table class="display" id="datatable-range">
-                            <div class="table-responsive">
-                                <table class="table">
-                                    
-                                    <thead class="table-light">
+                        
+                         <div class="table-responsive user-datatable">
+                                        <table class="display" id="datatable-range">
+                                            <thead>
                                         <tr>
-                                            <th class="align-middle">Photo</th>
+                                             <th class="align-middle">Photo</th>
                                             <th class="align-middle">Clients</th>
                                             <th class="align-middle">Numéro Compte</th>
                                             <th class="align-middle">Montant</th>
                                             <th class="align-middle">Type_Transaction</th>
                                             <th class="align-middle">Action</th>
                                         </tr>
-                                    </thead>
+                                            </thead>
                                     <tbody>
                                         @if(isset($transactions) && count($transactions) > 0)
                                             @foreach($transactions as $transaction)
@@ -237,75 +236,72 @@
                                                     
                                                     <td class="align-middle">
                                                     <div class="d-flex gap-2">
-    <!-- Bouton détails -->
-    <button type="button" 
-            class="btn btn-info btn-sm"
-            data-bs-toggle="modal" 
-            data-bs-target="#detailsModal{{ $transaction->id }}"
-            title="Voir détails">
-        <i class="bi bi-eye"></i> <!-- Icône de l'œil pour voir les détails -->
-    </button>
+                                                        <!-- Bouton détails -->
+                                                        <button type="button" 
+                                                                class="btn btn-info btn-sm"
+                                                                data-bs-toggle="modal" 
+                                                                data-bs-target="#detailsModal{{ $transaction->id }}"
+                                                                title="Voir détails">
+                                                            <i class="bi bi-eye"></i> <!-- Icône de l'œil pour voir les détails -->
+                                                        </button>
 
-    <!-- Bouton annuler -->
-    <button type="button text-white" 
-            class="btn btn-danger btn-sm"
-            data-bs-toggle="modal" 
-            data-bs-target="#annulerModal{{ $transaction->id }}"
-            title="Annuler">
-        <i class="bi bi-x-lg"></i> <!-- Icône X pour annuler -->
-    </button>
-</div>
-
-
-                                                        <!-- Modal Détails -->
-                                                        <div class="modal fade" id="detailsModal{{ $transaction->id }}" tabindex="-1">
-                                                            <div class="modal-dialog modal-dialog-centered">
-                                                                <div class="modal-content">
-                                                                    <div class="modal-header">
-                                                                        <h5 class="modal-title">Détails de la transaction</h5>
-                                                                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                                                                    </div>
-                                                                    <div class="modal-body">
+                                                        <!-- Bouton annuler -->
+                                                        <button type="button text-white" 
+                                                                class="btn btn-danger btn-sm"
+                                                                data-bs-toggle="modal" 
+                                                                data-bs-target="#annulerModal{{ $transaction->id }}"
+                                                                title="Annuler">
+                                                            <i class="bi bi-x-lg"></i> <!-- Icône X pour annuler -->
+                                                        </button>
+                                                    </div>
+                                                    <!-- Modal Détails -->
+                                                    <div class="modal fade" id="detailsModal{{ $transaction->id }}" tabindex="-1">
+                                                        <div class="modal-dialog modal-dialog-centered">
+                                                            <div class="modal-content">
+                                                                <div class="modal-header">
+                                                                    <h5 class="modal-title">Détails de la transaction</h5>
+                                                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                                                </div>
+                                                                <div class="modal-body">
+                                                                    <p><strong>Distributeur :</strong> {{ $transaction->nom }} {{ $transaction->prenom }}</p>
+                                                                    <p><strong>Numéro de compte :</strong> {{ $transaction->numero_compte }}</p>
+                                                                    <p><strong>Type :</strong> {{ ucfirst($transaction->type_transaction) }}</p>
+                                                                    <p><strong>Montant :</strong> {{ number_format($transaction->montant, 0, ',', ' ') }} FCFA</p>
+                                                                </div>
+                                                                <div class="modal-footer">
+                                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <!-- Modal Annulation -->
+                                                    <div class="modal fade" id="annulerModal{{ $transaction->id }}" tabindex="-1">
+                                                        <div class="modal-dialog modal-dialog-centered">
+                                                            <div class="modal-content">
+                                                                <div class="modal-header">
+                                                                    <h5 class="modal-title">Confirmation d'annulation</h5>
+                                                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                                                </div>
+                                                                <div class="modal-body">
+                                                                    <div class="alert alert-warning">
+                                                                        <p><strong>Êtes-vous sûr de vouloir annuler cette transaction ?</strong></p>
                                                                         <p><strong>Distributeur :</strong> {{ $transaction->nom }} {{ $transaction->prenom }}</p>
-                                                                        <p><strong>Numéro de compte :</strong> {{ $transaction->numero_compte }}</p>
-                                                                        <p><strong>Type :</strong> {{ ucfirst($transaction->type_transaction) }}</p>
                                                                         <p><strong>Montant :</strong> {{ number_format($transaction->montant, 0, ',', ' ') }} FCFA</p>
+                                                                        <p><strong>Type :</strong> {{ ucfirst($transaction->type_transaction) }}</p>
+                                                                        <p><strong>Date :</strong> {{ \Carbon\Carbon::parse($transaction->created_at)->format('d/m/Y H:i') }}</p>
                                                                     </div>
-                                                                    <div class="modal-footer">
-                                                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
-                                                                    </div>
+                                                                </div>
+                                                                <div class="modal-footer">
+                                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                                                                    <form action="{{ route('distributeurs.annuler_transaction', $transaction->id) }}" method="POST" class="d-inline">
+                                                                        @csrf
+                                                                        @method('POST')
+                                                                        <button type="submit" class="btn btn-danger">Confirmer</button>
+                                                                    </form>
                                                                 </div>
                                                             </div>
                                                         </div>
-
-                                                        <!-- Modal Annulation -->
-                                                        <div class="modal fade" id="annulerModal{{ $transaction->id }}" tabindex="-1">
-                                                            <div class="modal-dialog modal-dialog-centered">
-                                                                <div class="modal-content">
-                                                                    <div class="modal-header">
-                                                                        <h5 class="modal-title">Confirmation d'annulation</h5>
-                                                                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                                                                    </div>
-                                                                    <div class="modal-body">
-                                                                        <div class="alert alert-warning">
-                                                                            <p><strong>Êtes-vous sûr de vouloir annuler cette transaction ?</strong></p>
-                                                                            <p><strong>Distributeur :</strong> {{ $transaction->nom }} {{ $transaction->prenom }}</p>
-                                                                            <p><strong>Montant :</strong> {{ number_format($transaction->montant, 0, ',', ' ') }} FCFA</p>
-                                                                            <p><strong>Type :</strong> {{ ucfirst($transaction->type_transaction) }}</p>
-                                                                            <p><strong>Date :</strong> {{ \Carbon\Carbon::parse($transaction->created_at)->format('d/m/Y H:i') }}</p>
-                                                                        </div>
-                                                                    </div>
-                                                                    <div class="modal-footer">
-                                                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
-                                                                        <form action="{{ route('distributeurs.annuler_transaction', $transaction->id) }}" method="POST" class="d-inline">
-                                                                            @csrf
-                                                                            @method('POST')
-                                                                            <button type="submit" class="btn btn-danger">Confirmer</button>
-                                                                        </form>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
+                                                    </div>
                                                     </td>
                                                 </tr>
                                             @endforeach

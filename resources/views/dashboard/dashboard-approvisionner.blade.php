@@ -74,46 +74,31 @@
             <form id="credit-form" method="POST" action="{{ route('agents.crediter_compte_distributeur') }}">
                 @csrf
                 <div class="col mt-5">
-                    <div class="mb-4">
-                        <label for="distributeur" class="form-label">Sélectionnez un Distributeur</label>
-                        <div class="input-group custom-input-group">
-                            <select class="form-control" id="distributeur" onchange="updateDistributeurDetails()">
-                                <option value="">Choisissez un distributeur</option>
-                                @foreach ($distributeurs as $distributeur)
-                                    @foreach($distributeur->comptes as $compte)
-                                    <option value="{{ $compte->id }}"
-                                            data-nom="{{ $distributeur->nom }}"
-                                            data-prenom="{{ $distributeur->prenom }}"
-                                            data-numero="{{ $compte->numero_compte }}"
-                                            data-solde="{{ $compte->solde }}">
-                                        {{ $distributeur->nom }} {{ $distributeur->prenom }}
-                                    </option>
-                                    @endforeach
-                                @endforeach
-                            </select>
-                            <span class="input-group-text"><i class="bi bi-person"></i></span>
-                        </div>
-                    </div>
-
+                    <!-- Numéro de Compte avec validation en temps réel -->
                     <div class="mb-4">
                         <label for="card-number" class="form-label">Numéro de Compte</label>
                         <div class="input-group custom-input-group">
-                            <input type="text" class="form-control" id="card-number" name="numero_compte" placeholder="Numéro de compte" readonly>
+                            <input type="text" class="form-control" id="card-number" name="numero_compte" placeholder="Numéro de compte" required pattern="^[A-Z]{2}\d{3}$">
+                            <span class="input-group-text"><i class="bi bi-card-checklist"></i></span>
                         </div>
+                        <small id="account-feedback" class="text-danger"></small>
                     </div>
-
+            
+                    <!-- Montant à Créditer -->
                     <div class="mb-4">
-                        <label for="credit" class="form-label">Montant à Créditer</label>
+                        <label for="montant" class="form-label">Montant à Créditer</label>
                         <div class="input-group custom-input-group">
-                            <input type="number" class="form-control" id="montant" name="montant" placeholder="Montant" required>
+                            <input type="number" class="form-control" id="montant" name="montant" placeholder="Montant" required min="1">
                             <span class="input-group-text">F/ FCFA</span>
                         </div>
                     </div>
-
+            
                     <button type="submit" class="btn btn-secondary btn-custom me-2">Envoyer</button>
-                    <button class="btn btn-secondary btn-custom">Annuler</button>
+                    <button type="button" class="btn btn-secondary btn-custom">Annuler</button>
                 </div>
             </form>
+       
+            
             <!-- Table Section -->
         </div>
 

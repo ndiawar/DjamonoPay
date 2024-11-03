@@ -28,7 +28,7 @@
                         <h3 class="mb-3">Listes des utilisateurs</h3>
                         <div class="row w-75 mt-5 justify-content-center">
                             <div class="col-md-4">
-                                <div class="w-75 border-start border-5  card small-widget">
+                                <div class="w-75 border-start border-5 card small-widget">
                                     <div class="bg-gradient">
                                         <svg class="stroke-icon svg-fill">
                                             <use href="{{ asset('assets/svg/icon-sprite.svg#pending-order') }}"></use>
@@ -41,14 +41,14 @@
                                     <div class="card-body primary">
                                         <span class="f-light pt-2 fs-6">Nombre de Clients</span>
                                         <div class="d-flex align-items-end gap-1 pt-4">
-                                            <h6 class="fs-2">1.258</h6>
+                                            <h6 class="fs-2">{{ $nombreClients }}</h6>
                                         </div>
-                                        
                                     </div>
                                 </div>
                             </div>
+                        
                             <div class="col-md-4">
-                                <div class="w-75 border-start border-5  card small-widget">
+                                <div class="w-75 border-start border-5 card small-widget">
                                     <div class="bg-gradient">
                                         <svg class="stroke-icon svg-fill">
                                             <use href="{{ asset('assets/svg/icon-sprite.svg#pending-order') }}"></use>
@@ -61,14 +61,14 @@
                                     <div class="card-body primary">
                                         <span class="f-light pt-2 fs-6">Nombre de Distributeurs</span>
                                         <div class="d-flex align-items-end gap-1 pt-4">
-                                            <h6 class="fs-2">1.258</h6>
+                                            <h6 class="fs-2">{{ $nombreDistributeurs }}</h6>
                                         </div>
-                                        
                                     </div>
                                 </div>
                             </div>
+                        
                             <div class="col-md-4">
-                                <div class="w-75 border-start border-5  card small-widget">
+                                <div class="w-75 border-start border-5 card small-widget">
                                     <div class="bg-gradient">
                                         <svg class="stroke-icon svg-fill">
                                             <use href="{{ asset('assets/svg/icon-sprite.svg#pending-order') }}"></use>
@@ -79,53 +79,62 @@
                                         </span>
                                     </div>
                                     <div class="card-body primary">
-                                        <span class="f-light pt-2 fs-6">Nombre de Agents</span>
+                                        <span class="f-light pt-2 fs-6">Nombre d'Agents</span>
                                         <div class="d-flex align-items-end gap-1 pt-4">
-                                            <h6 class="fs-2">1.258</h6>
+                                            <h6 class="fs-2">{{ $nombreAgents }}</h6>
                                         </div>
-                                        
                                     </div>
                                 </div>
                             </div>
                         </div>
+                        
                     </div>
                     <div class="card-body">
+                        <!-- Formulaire de filtre -->
+                    <div class="mb-3">
+                        <form method="GET" action="{{ route('dashboard-utilisateurs') }}">
+                            <label for="type_transaction">Filtrer par type de transaction :</label>
+                            <select name="type_transaction" id="type_transaction" class="form-select" onchange="this.form.submit()">
+                                <option value="">Tous</option>
+                                <option value="depot" {{ request('type_transaction') == 'depot' ? 'selected' : '' }}>Dépôt</option>
+                                <option value="retrait" {{ request('type_transaction') == 'retrait' ? 'selected' : '' }}>Retrait</option>
+                                <option value="transfert" {{ request('type_transaction') == 'transfert' ? 'selected' : '' }}>Transfert</option>
+                            </select>
+                        </form>
+                    </div>
+
                         <div class="table-responsive user-datatable">
                             <table class="display" id="datatable-range">
                                 <thead>
                                     <tr>
-                                    <th>Photo</th>
-                                    <th>Nom</th>
-                                    <th>Numero_Compte</th>
-                                    <th>Role</th>
-                                    <th>Solde</th>
-                                    <th>État compte</th>
-                                    <th>Actions</th>
+                                        <th>Photo</th>
+                                        <th>Nom</th>
+                                        <th>Numero_Compte</th>
+                                        <th>Role</th>
+                                        <th>État compte</th>
+                                        <th>Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                @foreach($users as $user)
+                                @foreach ($users as $user)
                                     @foreach($user->comptes as $compte) <!-- Itère sur les comptes de chaque utilisateur -->
                                         <tr>
                                             <td>
                                                 @if($user->photo)
                                                     <img class="img-fluid table-avtar rounded-circle" 
-                                                        src="{{ asset('storage/' . $user->photo) }}" 
-                                                        alt="Photo"
-                                                        style="width: 40px; height: 40px; object-fit: cover;">
+                                                         src="{{ asset('storage/' . $user->photo) }}" 
+                                                         alt="Photo"
+                                                         style="width: 40px; height: 40px; object-fit: cover;">
                                                 @else
                                                     <img class="img-fluid table-avtar rounded-circle" 
-                                                        src="{{ asset('assets/images/user.jpg') }}" 
-                                                        alt="Default"
-                                                        style="width: 40px; height: 40px; object-fit: cover;">
+                                                         src="{{ asset('assets/images/user.jpg') }}" 
+                                                         alt="Default"
+                                                         style="width: 40px; height: 40px; object-fit: cover;">
                                                 @endif
                                             </td>
                                             <td>{{ $user->nom }} {{ $user->prenom }}</td>
-                                            <td>{{ $compte->numero }}</td> <!-- Utilise le numéro de compte du compte associé -->
-                                            <td>{{ $user->nom }} {{ $user->prenom }}</td> 
-                                            <td>{{ $compte->numero_compte }}</td> <!-- Utilise le numéro de compte du compte associé -->
-                                            <td>{{ $user->role }}</td>
-                                            <td>{{ number_format($compte->solde ?? 0, 0, ',', ' ') }} FCFA</td>
+                                            <td>{{ $compte->numero_compte }}</td>
+                                            <td>{{ $user->role }}</td> 
                                             <td>
                                                 <span class="badge {{ $user->etat_compte == 'actif' ? 'bg-success' : 'bg-warning' }}">
                                                     {{ ucfirst($user->etat_compte) }}
@@ -161,7 +170,12 @@
                                 </tbody>
                             </table>
                         </div>
+                        <!-- Pagination Bootstrap -->
+                        <div class="d-flex justify-content-center mt-4">
+                            
+                        </div>
                     </div>
+                    
                 </div>
             </div>
             <!-- Tale Utilisateurs-->
@@ -172,21 +186,9 @@
 <script src="{{ asset('assets/js/datatable/datatables/jquery.dataTables.min.js') }}"></script>
 <script src="{{ asset('assets/js/datatable/datatables/datatable.custom.js') }}"></script>
 <script src="{{ asset('assets/js/dashboard/dashboard_5.js') }}"></script>
-
-
-<script src="{{asset('assets/js/chart/apex-chart/apex-chart.js')}}"></script>
-<!-- <script src="{{ asset('assets/js/clock.js') }}"></script> -->
-<script src="{{ asset('assets/js/chart/apex-chart/moment.min.js') }}"></script>
 <script src="{{ asset('assets/js/notify/bootstrap-notify.min.js') }}"></script>
-<!-- <script src="{{ asset('assets/js/dashboard/default.js') }}"></script> -->
 <script src="{{ asset('assets/js/notify/index.js') }}"></script>
-<script src="{{ asset('assets/js/typeahead/handlebars.js') }}"></script>
-<script src="{{ asset('assets/js/typeahead/typeahead.bundle.js') }}"></script>
-<script src="{{ asset('assets/js/typeahead/typeahead.custom.js') }}"></script>
-<script src="{{ asset('assets/js/typeahead-search/handlebars.js') }}"></script>
-<script src="{{ asset('assets/js/typeahead-search/typeahead-custom.js') }}"></script>
 <script src="{{ asset('assets/js/height-equal.js') }}"></script>
 <script src="{{ asset('assets/js/animation/wow/wow.min.js') }}"></script>
-<script src="{{asset('assets/js/chart/apex-chart/stock-prices.js')}}"></script>
-<script src="{{asset('assets/js/chart/apex-chart/chart-custom.js')}}"></script>
+
 @endsection
