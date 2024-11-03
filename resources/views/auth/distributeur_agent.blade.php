@@ -128,13 +128,41 @@
         </footer>
     </div>
 
-  <!-- Modal de confirmation -->
-<div id="successModal" class="modal">
-    <div class="modal-content">
-        <span class="close">&times;</span>
-        <h2>Inscription réussie !</h2>
-        <p>Bienvenue sur DjomanoPay. Votre inscription a été effectuée avec succès.</p>
-    </div>
+  <!-- Modal d'inscription réussie -->
+  @if(session('success'))
+  <div class="modal fade" id="successModal" tabindex="-1" aria-labelledby="successModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+          <div class="modal-content">
+              <div class="modal-header">
+                  <h5 class="modal-title" id="successModalLabel">Inscription réussie !</h5>
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                      <span aria-hidden="true">&times;</span>
+                  </button>
+              </div>
+              <div class="modal-body">
+                  {{ session('success') }}
+              </div>
+              <div class="modal-footer">
+                  <button type="button" class="btn btn-primary" data-dismiss="modal">Fermer</button>
+              </div>
+          </div>
+      </div>
+  </div>
+  @endif
+
+  <!-- JavaScript Bootstrap et jQuery -->
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script>
+      // Afficher le modal d'inscription réussie automatiquement si session success est définie
+      $(document).ready(function(){
+          @if(session('success'))
+              $('#successModal').modal('show');
+          @endif
+      });
+  </script>
+
 </div>
 
 
