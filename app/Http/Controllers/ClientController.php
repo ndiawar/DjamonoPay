@@ -144,49 +144,47 @@ class ClientController extends Controller
     /**
  * Historique transaction
  */
-    public function afficherHistoriqueClients() 
-    {
-        try {
-            // Récupérer les transactions des clients avec les clients et les comptes
-            $transactions = Transaction::join('users', 'transactions.user_id', '=', 'users.id')
-                ->join('comptes', 'users.id', '=', 'comptes.user_id')
-                ->select([
-                    'transactions.id', // Ajout de l'ID pour les modales
-                    'transactions.type as type_transaction',
-                    'transactions.montant',
-                    'transactions.created_at',
-                    'users.nom',
-                    'users.prenom',
-                    'users.photo',
-                    'comptes.numero_compte'
-                ])
-                ->where('users.role', 'client') // Filtrer les clients
-                ->orderBy('transactions.created_at', 'desc')
-                ->get();
+public function afficherHistoriqueClients() 
+{
+    try {
+        // Récupérer le client connecté
+        $client = Auth::user();
 
-            // Récupérer le client connecté
-            $client = Auth::user();
+        // Récupérer les transactions de transfert ou réception spécifiques au client connecté
+        $transactions = Transaction::join('users', 'transactions.user_id', '=', 'users.id')
+            ->join('comptes', 'users.id', '=', 'comptes.user_id')
+            ->select([
+                'transactions.id', // Ajout de l'ID pour les modales
+                'transactions.type as type_transaction',
+                'transactions.montant',
+                'transactions.created_at',
+                'users.nom',
+                'users.prenom',
+                'users.photo',
+                'comptes.numero_compte'
+            ])
+            ->where('users.role', 'client') // Filtrer les clients
+            ->where('users.id', $client->id) // Filtrer par ID du client connecté
+            ->whereIn('transactions.type', ['transfert', 'reception','annule']) // Filtrer les types de transactions
+            ->orderBy('transactions.created_at', 'desc')
+            ->get();
 
-            // Vérifier si le client a un compte et récupérer le solde
-            $compte = Compte::where('user_id', $client->id)->first();
-            $solde = $compte ? $compte->solde : 0; // Assurez-vous que le compte existe
+        // Vérifier si le client a un compte et récupérer le solde
+        $compte = Compte::where('user_id', $client->id)->first();
+        $solde = $compte ? $compte->solde : 0; // Assurez-vous que le compte existe
 
-            // Déboguer pour vérifier les données récupérées
-            // \Log::info('Transactions clients récupérées:', ['count' => $transactions->count()]);
-            // dd($transactions);
+        // Renvoyer la vue pour les clients
+        return view('dashboard.dashboard-client', [
+            'transactions' => $transactions,
+            'solde' => $solde // Passer le solde à la vue
+        ]);
 
-            // Renvoyer la vue pour les clients (modifiez le nom de la vue si nécessaire)
-            return view('dashboard.dashboard-client', [
-                'transactions' => $transactions,
-                'solde' => $solde // Passer le solde à la vue
-            ]);
-
-        } catch (\Exception $e) {
-            // Journaliser l'erreur
-            // \Log::error('Erreur dans afficherHistoriqueClients: ' . $e->getMessage());
-            return view('dashboard.dashboard-client')->with('error', 'Une erreur est survenue lors du chargement des transactions.');
-        }
+    } catch (\Exception $e) {
+        // Journaliser l'erreur
+        return view('dashboard.dashboard-client')->with('error', 'Une erreur est survenue lors du chargement des transactions.');
     }
+}
+
 
 
 }
